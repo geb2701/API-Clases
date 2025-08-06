@@ -1,0 +1,346 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    color: #202124;
+    background-color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styles */
+.header {
+    padding: 6px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-link {
+    color: rgba(0, 0, 0, 0.87);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 5px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    text-decoration: underline;
+}
+
+.apps-link {
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.apps-icon {
+    width: 24px;
+    height: 24px;
+    fill: #5f6368;
+}
+
+.signin-btn {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 9px 23px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.signin-btn:hover {
+    background-color: #1557b0;
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+/* Main content styles */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin-top: -100px;
+}
+
+.logo-container {
+    margin-bottom: 30px;
+}
+
+.google-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-text {
+    font-size: 92px;
+    font-weight: 400;
+    color: #202124;
+    letter-spacing: -2px;
+    background: linear-gradient(45deg, #4285f4, #ea4335, #fbbc05, #34a853);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Search container styles */
+.search-container {
+    width: 100%;
+    max-width: 584px;
+    margin: 0 auto;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #dfe1e5;
+    border-radius: 24px;
+    padding: 8px 16px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s;
+}
+
+.search-box:hover {
+    box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+    border-color: rgba(223, 225, 229, 0);
+}
+
+.search-box:focus-within {
+    box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+    border-color: rgba(223, 225, 229, 0);
+}
+
+.search-icon {
+    margin-right: 13px;
+}
+
+.search-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: #9aa0a6;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.87);
+    background: transparent;
+}
+
+.search-input::placeholder {
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.voice-icon, .camera-icon {
+    margin-left: 13px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.voice-icon:hover, .camera-icon:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.voice-icon svg, .camera-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: #9aa0a6;
+}
+
+/* Search buttons styles */
+.search-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.search-btn, .lucky-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #f8f9fa;
+    border-radius: 4px;
+    color: #3c4043;
+    font-size: 14px;
+    padding: 0 16px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-btn:hover, .lucky-btn:hover {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    border: 1px solid #dadce0;
+    color: #202124;
+}
+
+.search-btn:focus, .lucky-btn:focus {
+    border: 1px solid #4285f4;
+    outline: none;
+}
+
+/* Language options styles */
+.language-options {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.language-text {
+    color: #3c4043;
+    font-size: 13px;
+    margin-right: 10px;
+}
+
+.language-link {
+    color: #1a0dab;
+    text-decoration: none;
+    font-size: 13px;
+    margin: 0 5px;
+}
+
+.language-link:hover {
+    text-decoration: underline;
+}
+
+/* Footer styles */
+.footer {
+    background-color: #f2f2f2;
+    border-top: 1px solid #dadce0;
+    padding: 0 20px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 0;
+    flex-wrap: wrap;
+}
+
+.footer-left, .footer-center, .footer-right {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-link {
+    color: #70757a;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .nav {
+        padding: 0 10px;
+    }
+    
+    .nav-left {
+        gap: 10px;
+    }
+    
+    .nav-right {
+        gap: 10px;
+    }
+    
+    .logo-text {
+        font-size: 70px;
+    }
+    
+    .search-container {
+        max-width: 90%;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .footer-left, .footer-center, .footer-right {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-text {
+        font-size: 50px;
+    }
+    
+    .search-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .search-btn, .lucky-btn {
+        width: 200px;
+    }
+    
+    .language-options {
+        display: none;
+    }
+}
+
+/* Focus styles for accessibility */
+.search-input:focus {
+    outline: none;
+}
+
+/* Animation for search box focus */
+@keyframes searchBoxFocus {
+    0% { box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28); }
+    100% { box-shadow: 0 2px 8px rgba(32, 33, 36, 0.4); }
+}
+
+.search-box:focus-within {
+    animation: searchBoxFocus 0.2s ease-in-out;
+} 
