@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 12px 20px;
+        gap: 15px;
+        font-size: 14px;
+      }
+
+      body.dark {
+  background-color: #202124;
+  color: #e8eaed;
+}
+body.dark header,
+body.dark footer {
+  background-color: #171717;
+  color: #e8eaed;
+}
+body.dark .search-box {
+  background-color: #303134;
+  color: #e8eaed;
+  border: 1px solid #5f6368;
+}
+body.dark .buttons input {
+  background-color: #303134;
+  color: #e8eaed;
+  border: 1px solid #5f6368;
+}
+body.dark .footer-links a {
+  color: #b0b3b8;
+}
+
+      a {
+        text-decoration: none;
+        color: #202124;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .apps-icon {
+        width: 24px;
+        height: 24px;
+        background-image: url('https://ssl.gstatic.com/gb/images/bar/al-icon.png');
+        background-size: cover;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        background-color: #ccc;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+      }
+
+      .logo {
+        width: 272px;
+        height: 92px;
+        margin: 40px 0 20px;
+      }
+
+      .search-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .search-box {
+        width: 560px;
+        max-width: 90%;
+        padding: 12px 20px;
+        border: 1px solid #dfe1e5;
+        border-radius: 24px;
+        font-size: 16px;
+        outline: none;
+      }
+
+      .buttons {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .buttons input {
+        padding: 10px 20px;
+        font-size: 14px;
+        background-color: #f8f9fa;
+        border: 1px solid #f8f9fa;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .buttons input:hover {
+        border: 1px solid #c6c6c6;
+      }
+
+      footer {
+        width: 100%;
+        background-color: #f2f2f2;
+        font-size: 14px;
+        color: #70757a;
+        margin-top: auto;
+        }
+
+    .footer-top {
+        padding: 15px 30px;
+        border-bottom: 1px solid #dadce0;
+        }
+
+    .footer-links {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 30px;
+        flex-wrap: wrap;
+        }
+
+    .footer-links a {
+        margin-right: 20px;
+        color: #70757a;
+        text-decoration: none;
+        }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+        }
+
+    .footer-links .left,
+    .footer-links .right {
+        display: flex;
+        flex-wrap: wrap;
+        }
+
+    </style>
+  </head>
+  <body>
+    <!-- Header superior -->
+    <header>
+      <a href="https://mail.google.com">Gmail</a>
+      <a href="https://www.google.com/imghp">Imágenes</a>
+                  <button id="theme-toggle-btn" style="margin-left:10px;">🌙 Tema oscuro</button> 
+      <div class="apps-icon" title="Aplicaciones de Google"></div>
+      <div class="avatar" title="Cuenta de Google"></div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main id="main-content">     <!-- Agregamos id para el modo oscuro -->
+      <img src="google.jpg" alt="Google Logo" class="logo" />
+
+      <div class="search-container">
+        <form action="https://www.google.com/search" method="GET" target="_blank">
+          <input
+            type="text"
+            class="search-box"
+            name="q"
+            id="q"
+            placeholder="Buscar en Google"
+          />
+          <div class="buttons">
+            <input type="submit" value="Buscar con Google" />
+            <input
+              type="submit"
+              value="Voy a tener suerte"
+              formaction="https://doodles.google/"
+            />
+          </div>
+        </form>
+      </div>
+    </main>
+    <footer>
+        <div class="footer-top">
+          <p>Argentina</p>
+        </div>
+        <div class="footer-links">
+          <div class="left">
+            <a href="#">Sobre Google</a>
+            <a href="#">Publicidad</a>
+            <a href="#">Negocios</a>
+            <a href="#">Cómo funciona la Búsqueda</a>
+          </div>
+          <div class="right">
+            <a href="#">Privacidad</a>
+            <a href="#">Términos</a>
+            <a href="#">Preferencias</a>
+          </div>
+        </div>
+      </footer>
+      
+  </body>
+<script>
+  // Script para alternar el modo oscuro
+  document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('theme-toggle-btn').addEventListener('click', function () {
+    document.body.classList.toggle('dark');
+  });
+});
+  </script>
+</html>
