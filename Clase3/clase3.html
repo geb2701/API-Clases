@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Pokémon — Tabla paginada con PokeAPI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+    body { margin: 24px; color: #222; }
+    h1 { margin: 0 0 12px; font-size: 1.4rem; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .controls > * { margin: 0; }
+    select, input[type="number"] { padding: 6px 8px; border: 1px solid #ccc; border-radius: 8px; }
+    button { padding: 8px 12px; border: 1px solid #ccc; background: #fff; border-radius: 10px; cursor: pointer; }
+    button[disabled] { opacity: .5; cursor: not-allowed; }
+    .pill { padding: 6px 10px; border-radius: 999px; background: #f5f5f5; border: 1px solid #e6e6e6; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid #eee; border-radius: 14px; overflow: hidden; }
+    thead th { background: #fafafa; text-align: left; font-weight: 600; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; }
+    tbody tr:hover { background: #fcfcff; }
+    .id { font-variant-numeric: tabular-nums; color:#666; }
+    .sprite { width: 56px; height: 56px; image-rendering: pixelated; }
+    .loading { padding: 12px; }
+    .footer { margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .sr { position: absolute; left: -9999px; }
+  </style>
+</head>
+<body>
+  <h1>Pokémon — Tabla paginada</h1>
+
+  <div class="controls" aria-label="Controles de paginación">
+    <label>Mostrar
+      <select id="pageSize">
+        <option>10</option>
+        <option selected>20</option>
+        <option>50</option>
+        <option>100</option>
+      </select>
+      por página
+    </label>
+
+    <span class="pill" id="pageInfo">Página 1 de ?</span>
+
+    <label>Ir a página
+      <input id="gotoPage" type="number" min="1" value="1" style="width: 6rem" />
+    </label>
+    <button id="gotoBtn">Ir</button>
+
+    <div style="flex:1"></div>
+
+    <button id="prevBtn">← Anterior</button>
+    <button id="nextBtn">Siguiente →</button>
+  </div>
+
+  <div id="status" class="loading" aria-live="polite"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:80px">Sprite</th>
+        <th style="width:90px">ID</th>
+        <th>Nombre</th>
+        <th>URL API</th>
+      </tr>
+    </thead>
+    <tbody id="rows">
+      <!-- filas dinámicas -->
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <span>Total: <strong id="totalCount">—</strong> Pokémon</span>
+  </div>
+
+  <script>
+    // Configuración base
+    const API_BASE = "https://pokeapi.co/api/v2/pokemon";
+    const rowsEl = document.getElementById("rows");
+    const statusEl = document.getElementById("status");
+    const pageInfoEl = document.getElementById("pageInfo");
+    const totalCountEl = document.getElementById("totalCount");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const pageSizeEl = document.getElementById("pageSize");
+    const gotoPageEl = document.getElementById("gotoPage");
+    const gotoBtn = document.getElementById("gotoBtn");
+
+    let state = {
+      count: 0,
+      next: null,
+      previous: null,
+      offset: 0,
+      limit: parseInt(pageSizeEl.value, 10),
+      page: 1,
+      totalPages: 1
+    };
+
+    function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+    // Extrae el ID desde la URL del recurso (/pokemon/25/ -> 25)
+    function idFromUrl(url) {
+      const m = url.match(/\/pokemon\/(\d+)\/?$/);
+      return m ? parseInt(m[1], 10) : null;
+    }
+
+    // Sprite oficial sin pedir detalles de cada Pokémon
+    function spriteUrl(id) {
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+    }
+
+    function setLoading(yes, msg = "Cargando...") {
+      statusEl.textContent = yes ? msg : "";
+    }
+
+    function updateControls() {
+      pageInfoEl.textContent = `Página ${state.page} de ${state.totalPages}`;
+      totalCountEl.textContent = state.count.toLocaleString("es-AR");
+      prevBtn.disabled = state.page <= 1;
+      nextBtn.disabled = state.page >= state.totalPages;
+      gotoPageEl.max = state.totalPages;
+      if (parseInt(gotoPageEl.value, 10) !== state.page) {
+        gotoPageEl.value = state.page;
+      }
+    }
+
+    async function fetchPage(offset = 0, limit = state.limit) {
+      setLoading(true);
+      rowsEl.innerHTML = "";
+      try {
+        const url = `${API_BASE}?offset=${offset}&limit=${limit}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        state.count = data.count;
+        state.limit = limit;
+        state.offset = offset;
+        state.page = Math.floor(offset / limit) + 1;
+        state.totalPages = Math.max(1, Math.ceil(data.count / limit));
+        state.next = data.next;
+        state.previous = data.previous;
+
+        // Render de filas
+        const frag = document.createDocumentFragment();
+        data.results.forEach((item, i) => {
+          const id = idFromUrl(item.url);
+          const tr = document.createElement("tr");
+
+          const tdSprite = document.createElement("td");
+          const img = document.createElement("img");
+          img.src = spriteUrl(id);
+          img.alt = `Sprite de ${item.name}`;
+          img.width = 56; img.height = 56;
+          img.className = "sprite";
+          tdSprite.appendChild(img);
+
+          const tdId = document.createElement("td");
+          tdId.textContent = id;
+          tdId.className = "id";
+
+          const tdName = document.createElement("td");
+          tdName.textContent = capitalize(item.name);
+
+          const tdUrl = document.createElement("td");
+          const a = document.createElement("a");
+          a.href = item.url;
+          a.target = "_blank";
+          a.rel = "noreferrer";
+          a.textContent = item.url;
+          tdUrl.appendChild(a);
+
+          tr.appendChild(tdSprite);
+          tr.appendChild(tdId);
+          tr.appendChild(tdName);
+          tr.appendChild(tdUrl);
+          frag.appendChild(tr);
+        });
+
+        rowsEl.appendChild(frag);
+        updateControls();
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Ocurrió un error al cargar los datos. Reintentá.";
+      } finally {
+        setLoading(false, "");
+      }
+    }
+
+    // Navegación
+    prevBtn.addEventListener("click", () => {
+      if (state.page > 1) {
+        const newOffset = Math.max(0, state.offset - state.limit);
+        fetchPage(newOffset, state.limit);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (state.page < state.totalPages) {
+        const newOffset = state.offset + state.limit;
+        fetchPage(newOffset, state.limit);
+      }
+    });
+
+    // Cambio de tamaño de página
+    pageSizeEl.addEventListener("change", () => {
+      const newLimit = parseInt(pageSizeEl.value, 10);
+      // Volver a la página 1 con el nuevo límite
+      fetchPage(0, newLimit);
+    });
+
+    // Ir a página específica
+    gotoBtn.addEventListener("click", () => {
+      const p = Math.min(state.totalPages, Math.max(1, parseInt(gotoPageEl.value || "1", 10)));
+      const newOffset = (p - 1) * state.limit;
+      fetchPage(newOffset, state.limit);
+    });
+
+    gotoPageEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        gotoBtn.click();
+      }
+    });
+
+    // Carga inicial
+    fetchPage(0, state.limit);
+  </script>
+</body>
+</html>
