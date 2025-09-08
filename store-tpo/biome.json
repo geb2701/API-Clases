@@ -1,0 +1,36 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"includes": [
+			"**",
+			"!src/components/ui",
+			"!src/routeTree.gen.ts",
+			"!**/node_modules/**",
+			"!**/dist/**",
+			"!**/build/**",
+			"!.git/**",
+			"!.hg/**",
+			"!.biome.json"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	}
+}
