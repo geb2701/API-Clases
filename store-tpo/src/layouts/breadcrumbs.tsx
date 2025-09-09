@@ -33,7 +33,7 @@ export function Breadcrumbs() {
 			<BreadcrumbList className="p-0">
 				<BreadcrumbItem className="hidden md:block">
 					<BreadcrumbLink asChild>
-						<Link to="/"> Inicio </Link>
+						<Link to="/"> Home </Link>
 					</BreadcrumbLink>
 				</BreadcrumbItem>
 				<BreadcrumbSeparator className="hidden md:block" />

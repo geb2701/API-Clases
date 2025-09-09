@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Landmark } from "lucide-react";
 
 interface SpinnerProps {
 	size?: "sm" | "md" | "lg";
@@ -10,16 +9,9 @@ interface SpinnerProps {
 
 export default function Spinner({
 	size = "md",
-	iconSize = "md",
 	className,
 	message,
 }: SpinnerProps) {
-	const iconSizeClasses = {
-		sm: "size-4",
-		md: "size-6",
-		lg: "size-8",
-		xl: "size-12",
-	};
 
 	return (
 		<div className="flex flex-col items-center space-y-3">
