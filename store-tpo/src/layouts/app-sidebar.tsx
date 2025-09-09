@@ -37,8 +37,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	return (
 		<Sidebar collapsible="icon" variant="inset" {...props}>
-			<SidebarHeader className="h-16 max-md:mt-2 mb-2 justify-center">
-				<img src={logo} alt="Logo" />
+			<SidebarHeader className="h-16 max-md:mt-2 mb-2 flex items-center justify-center">
+				<img src={logo} alt="Logo" className="size-10" />
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup className="group-data-[collapsible=icon]:hidden pb-0">

@@ -19,9 +19,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import Spinner from "@/components/skeletons/spinner";
-// import { Product } from "@/product/models/Product"; // si querés tipar explícito
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
