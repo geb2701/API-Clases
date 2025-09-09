@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "name": "Camiseta React",
+    "description": "Camiseta cómoda con logo React",
+    "price": 25.5,
+    "category": "Ropa",
+    "image": "/images/camiseta-react.png"
+  },
+  {
+    "id": 2,
+    "name": "Taza Javascript",
+    "description": "Taza blanca con logo JS",
+    "price": 12.9,
+    "category": "Accesorios",
+    "image": "/images/taza-js.png"
+  },
+  {
+    "id": 3,
+    "name": "Hoodie TypeScript",
+    "description": "Buzo azul con logo TS",
+    "price": 45,
+    "category": "Ropa",
+    "image": "/images/hoodie-ts.png"
+  },
+  {
+    "id": 4,
+    "name": "Mouse Inalámbrico",
+    "description": "Mouse ergonómico con conexión Bluetooth",
+    "price": 19.99,
+    "category": "Tecnología",
+    "image": "/images/mouse.png"
+  },
+  {
+    "id": 5,
+    "name": "Teclado Mecánico",
+    "description": "Teclado retroiluminado con switches azules",
+    "price": 79.5,
+    "category": "Tecnología",
+    "image": "/images/teclado.png"
+  },
+  {
+    "id": 6,
+    "name": "Auriculares Bluetooth",
+    "description": "Auriculares con cancelación de ruido",
+    "price": 120,
+    "category": "Tecnología",
+    "image": "/images/auriculares.png"
+  },
+  {
+    "id": 7,
+    "name": "Botella Térmica",
+    "description": "Botella de acero inoxidable 500ml",
+    "price": 18,
+    "category": "Accesorios",
+    "image": "/images/botella.png"
+  },
+  {
+    "id": 8,
+    "name": "Mochila Urbana",
+    "description": "Mochila resistente al agua con compartimento para notebook",
+    "price": 65,
+    "category": "Accesorios",
+    "image": "/images/mochila.png"
+  },
+  {
+    "id": 9,
+    "name": "Lámpara de Escritorio LED",
+    "description": "Lámpara ajustable con control táctil",
+    "price": 30,
+    "category": "Hogar",
+    "image": "/images/lampara.png"
+  },
+  {
+    "id": 10,
+    "name": "Silla Gamer",
+    "description": "Silla ergonómica reclinable",
+    "price": 210,
+    "category": "Hogar",
+    "image": "/images/silla.png"
+  },
+  {
+    "id": 11,
+    "name": "Sudadera Node.js",
+    "description": "Sudadera verde con logo Node.js",
+    "price": 40,
+    "category": "Ropa",
+    "image": "/images/sudadera-node.png"
+  },
+  {
+    "id": 12,
+    "name": "Zapatillas Running",
+    "description": "Zapatillas deportivas transpirables",
+    "price": 75,
+    "category": "Ropa",
+    "image": "/images/zapatillas.png"
+  },
+  {
+    "id": 13,
+    "name": "Smartwatch",
+    "description": "Reloj inteligente con monitoreo de salud",
+    "price": 150,
+    "category": "Tecnología",
+    "image": "/images/smartwatch.png"
+  },
+  {
+    "id": 14,
+    "name": "Alfombra Decorativa",
+    "description": "Alfombra suave 120x180cm",
+    "price": 55,
+    "category": "Hogar",
+    "image": "/images/alfombra.png"
+  },
+  {
+    "id": 15,
+    "name": "Cafetera Italiana",
+    "description": "Cafetera de aluminio para 6 tazas",
+    "price": 35,
+    "category": "Hogar",
+    "image": "/images/cafetera.png"
+  },
+  {
+    "id": 16,
+    "name": "Gorra Dev",
+    "description": "Gorra negra con bordado ‘Code Life’",
+    "price": 20,
+    "category": "Accesorios",
+    "image": "/images/gorra.png"
+  },
+  {
+    "id": 17,
+    "name": "Monitor 27'' 4K",
+    "description": "Monitor UHD con panel IPS",
+    "price": 320,
+    "category": "Tecnología",
+    "image": "/images/monitor.png"
+  },
+  {
+    "id": 18,
+    "name": "Teclado Compacto",
+    "description": "Teclado 60% mecánico RGB",
+    "price": 65,
+    "category": "Tecnología",
+    "image": "/images/teclado-compacto.png"
+  },
+  {
+    "id": 19,
+    "name": "Camiseta Full Stack",
+    "description": "Camiseta blanca con tipografía geek",
+    "price": 22,
+    "category": "Ropa",
+    "image": "/images/camiseta-fullstack.png"
+  },
+  {
+    "id": 20,
+    "name": "Set de Tazas CSS",
+    "description": "Set de 3 tazas con diseño CSS3",
+    "price": 29,
+    "category": "Accesorios",
+    "image": "/images/tazas-css.png"
+  }
+]
