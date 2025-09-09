@@ -1,22 +1,21 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getProducts } from "../services/productService";
+import { getProducts } from "../services/product-service";
 
-const queryKey = "productos";
-const queryKeyPaginated = "productos-paginated";
+const queryKey = ["productos"];
+const queryKeyPaginated = ["productos-paginated"];
 
-export const useProducts = (p0: { pageSize: number; }) => 
+export const useProducts = () => 
 {
-
 	const all = () => {
-
 		return queryOptions({
-			queryKey: [queryKeyPaginated],
+			queryKey: queryKeyPaginated,
 			queryFn: async () => getProducts(),
 			staleTime: Number.POSITIVE_INFINITY,
 			refetchOnWindowFocus: false,
 			refetchOnReconnect: false,
 		});
 	};
+
 	return {
 		queryOptions: {
 			all,

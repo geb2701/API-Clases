@@ -27,14 +27,14 @@ export default function Spinner({
 				<svg
 					aria-hidden="true"
 					className={cn(
-					"animate-spin text-gray-200 dark:text-gray-600",
-					{
-						"w-4 h-4": size === "sm",
-						"w-8 h-8": size === "md",
-						"w-12 h-12": size === "lg",
-					},
-					className,
-				)}
+						"animate-spin text-gray-200 dark:text-gray-600",
+						{
+							"w-4 h-4": size === "sm",
+							"w-8 h-8": size === "md",
+							"w-12 h-12": size === "lg",
+						},
+						className,
+					)}
 					viewBox="0 0 100 101"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
@@ -44,17 +44,6 @@ export default function Spinner({
 						fill="currentColor"
 					/>
 				</svg>
-				
-
-				{/* Aplicar el tamaño correspondiente al ícono Landmark */}
-				<div className="absolute inset-0 flex items-center justify-center text-primary">
-					<Landmark
-						className={cn(
-							"transition-all group-hover:scale-110",
-							iconSizeClasses[iconSize],
-						)}
-					/>
-				</div>
 			</div>
 
 			{message ? (

@@ -5,8 +5,6 @@ export class Product {
   price: number;
   category: string;
   image: string;
-  rows: any;
-  paginationData: any;
 
   constructor(
     id: number,
