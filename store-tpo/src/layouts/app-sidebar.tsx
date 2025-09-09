@@ -15,7 +15,7 @@ import {
 	House,
 	Search,
 } from "lucide-react";
-//import { NavUser } from "./nav-user";
+import { NavUser } from "./nav-user";
 import { SidebarItems } from "./sidebar-items";
 import { SidebarSearchStore } from "./storage/sidebar-search-store";
 
@@ -62,9 +62,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				</SidebarGroup>
 				<SidebarItems items={data} />
 			</SidebarContent>
-			{/*<SidebarFooter className="pt-2 pb-0"> //TODO: habilitar cuando tengamos perfil de usuario
+			<SidebarFooter className="pt-2 pb-0">
 				<NavUser />
-			</SidebarFooter>*/}
+			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>
 	);

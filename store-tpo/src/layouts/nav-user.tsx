@@ -1,4 +1,3 @@
-/*
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
@@ -16,101 +15,52 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuthContext } from "@/context/auth-context";
 import useTheme, { type Theme } from "@/hooks/use-theme";
 import { getInitials } from "@/lib/helpers";
-import {
-	Database,
-	EllipsisVertical,
-	FileText,
-	Moon,
-	Settings,
-	Sun,
-	User,
-	Users,
-} from "lucide-react";
-import { useState } from "react";
-
-export const resources = [
-	{
-		name: "Panel de Control del Proyecto",
-		type: "dashboard",
-		access: ["viewer", "editor", "admin", "owner"],
-		icon: FileText,
-	},
-	{
-		name: "Gestión de Usuarios",
-		type: "users",
-		access: ["admin", "owner"],
-		icon: Users,
-	},
-	{
-		name: "Acceso a la Base de Datos",
-		type: "database",
-		access: ["editor", "admin", "owner"],
-		icon: Database,
-	},
-	{
-		name: "Configuración del Proyecto",
-		type: "settings",
-		access: ["admin", "owner"],
-		icon: Settings,
-	},
-	{
-		name: "Facturación y Suscripción",
-		type: "billing",
-		access: ["owner"],
-		icon: Lock,
-	},
-];
+import { EllipsisVertical, Moon, Sun, User } from "lucide-react";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
 	const { setTheme, theme } = useTheme();
-	const user = useUserContext().getUser() || {
-		firstname: "",
-		lastname: "",
-		imageUrl: "",
-	};
-	const [isProfileOpen, setIsProfileOpen] = useState(false);
-	const toggleProfile = () => {
-		setIsProfileOpen(!isProfileOpen);
-	};
+	const { user, login, logout } = useAuthContext();
+
+	const initials = getInitials(user?.name ?? "", user?.surname ?? "");
 
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>
 				<DropdownMenu>
-					<DropdownMenuTrigger className="py-0" asChild>
+					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size="lg"
-							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+							className="w-full justify-between data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
-							<Avatar className="in-data-[state=expanded]:size-6 transition-[width,height] duration-200 ease-in-out">
-								<AvatarImage
-									src={user.imageUrl ?? ""}
-									alt={getInitials(user.firstname, user.lastname)}
-								/>
+							<Avatar className="size-8">
+								<AvatarImage alt={initials} />
 								<AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-									{getInitials(user.firstname, user.lastname)}
+									{initials}
 								</AvatarFallback>
 							</Avatar>
-							<div className="grid flex-1 text-left text-sm leading-tight ms-1">
-								<span className="truncate font-medium">
-									{user.firstname} {user.lastname}
-								</span>
+
+							<div className="flex-1 ms-2 truncate text-sm font-medium text-left">
+								{user?.name ?? "Usuario"}
 							</div>
-							<div className="size-8 rounded-lg flex items-center justify-center bg-sidebar-accent/50 in-[[data-slot=dropdown-menu-trigger]:hover]:bg-transparent">
-								<EllipsisVertical className="size-5 opacity-40" size={20} />
+
+							<div className="size-8 rounded-lg flex items-center justify-center bg-sidebar-accent/50">
+								<EllipsisVertical className="size-5 opacity-40" />
 							</div>
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
+
+					{/* ÚNICO Content */}
 					<DropdownMenuContent
-						className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+						className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56 rounded-lg"
 						side={isMobile ? "bottom" : "right"}
 						align="end"
 						sideOffset={4}
 					>
-						<DropdownMenuItem className="gap-3 px-1" onClick={toggleProfile}>
+						<DropdownMenuItem className="gap-3 px-1">
 							<User
 								size={20}
 								className="text-muted-foreground/70"
@@ -118,7 +68,9 @@ export function NavUser() {
 							/>
 							<span>Perfil</span>
 						</DropdownMenuItem>
+
 						<DropdownMenuSeparator />
+
 						<DropdownMenuLabel className="flex items-center gap-2">
 							<div className="relative size-5">
 								<Sun className="absolute inset-0 size-5 opacity-100 transition-opacity duration-300 dark:opacity-0" />
@@ -126,6 +78,7 @@ export function NavUser() {
 							</div>
 							<span className="text-sm">Tema</span>
 						</DropdownMenuLabel>
+
 						<DropdownMenuRadioGroup
 							value={theme}
 							onValueChange={(t) => setTheme(t as Theme)}
@@ -140,11 +93,21 @@ export function NavUser() {
 								Sistema
 							</DropdownMenuRadioItem>
 						</DropdownMenuRadioGroup>
+
+						<DropdownMenuSeparator />
+
+						<DropdownMenuItem
+							onClick={
+								user
+									? () => logout()
+									: () => login("demo", "demo123")
+							}
+						>
+							{user ? "Cerrar sesión" : "Iniciar sesión"}
+						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</SidebarMenuItem>
 		</SidebarMenu>
 	);
 }
-*/
-//Todo : habilitar cuando tengamos perfil de usuario

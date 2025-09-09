@@ -4,6 +4,7 @@ import { routeTree } from "./routeTree.gen";
 import { Toaster } from './components/ui/sonner';
 import NotFoundPage from './components/page-404/page';
 import SpinnerPage from './components/spinner/spinner-page';
+import { AuthProvider } from './context/auth-context';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -32,10 +33,12 @@ const router = createRouter({
 function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<RouterProvider
-				router={router}
-				context={{ queryClient }}
-			/>
+			<AuthProvider>
+				<RouterProvider
+					router={router}
+					context={{ queryClient }}
+				/>
+			</AuthProvider>
 			<Toaster richColors />
 		</QueryClientProvider>
 	)
