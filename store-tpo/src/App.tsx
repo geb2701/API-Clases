@@ -6,6 +6,7 @@ import { createRouter } from '@tanstack/react-router';
 import { routeTree } from "./routeTree.gen";
 import { Toaster } from './components/ui/sonner';
 import NotFoundPage from './components/page-404/page';
+import SpinnerPage from './components/spinner/spinner-page';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
