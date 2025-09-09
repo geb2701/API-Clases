@@ -1,8 +1,5 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRouter } from '@tanstack/react-router';
+import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { routeTree } from "./routeTree.gen";
 import { Toaster } from './components/ui/sonner';
 import NotFoundPage from './components/page-404/page';
@@ -21,10 +18,6 @@ const router = createRouter({
 	routeTree,
 	context: {
 		queryClient,
-		// biome-ignore lint/style/noNonNullAssertion: <explanation>
-		dataTableStore: undefined!,
-		// biome-ignore lint/style/noNonNullAssertion: <explanation>
-		entitiesQueryOptions: undefined!,
 	},
 	defaultPreload: "intent",
 	scrollRestoration: true,
@@ -37,11 +30,15 @@ const router = createRouter({
 });
 
 function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Toaster richColors />
-    </QueryClientProvider>
-  )
+	return (
+		<QueryClientProvider client={queryClient}>
+			<RouterProvider
+				router={router}
+				context={{ queryClient }}
+			/>
+			<Toaster richColors />
+		</QueryClientProvider>
+	)
 }
 
 export default App

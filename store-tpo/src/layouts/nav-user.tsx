@@ -1,5 +1,4 @@
-"use client";
-
+/*
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
@@ -17,7 +16,6 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { useUserContext } from "@/contexts/user-context";
 import useTheme, { type Theme } from "@/hooks/use-theme";
 import { getInitials } from "@/lib/helpers";
 import {
@@ -31,7 +29,6 @@ import {
 	Users,
 } from "lucide-react";
 import { useState } from "react";
-import DialogUser from "./dialog-user";
 
 export const resources = [
 	{
@@ -145,8 +142,9 @@ export function NavUser() {
 						</DropdownMenuRadioGroup>
 					</DropdownMenuContent>
 				</DropdownMenu>
-				<DialogUser isOpen={isProfileOpen} onClose={toggleProfile} />
 			</SidebarMenuItem>
 		</SidebarMenu>
 	);
 }
+*/
+//Todo : habilitar cuando tengamos perfil de usuario

@@ -10,11 +10,11 @@
 			"**",
 			"!src/components/ui",
 			"!src/routeTree.gen.ts",
-			"!**/node_modules/**",
-			"!**/dist/**",
-			"!**/build/**",
-			"!.git/**",
-			"!.hg/**",
+			"!**/node_modules",
+			"!**/dist",
+			"!**/build",
+			"!.git",
+			"!.hg",
 			"!.biome.json"
 		]
 	},

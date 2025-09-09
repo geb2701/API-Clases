@@ -16,7 +16,6 @@ import {
 	SidebarMenuSub,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuthContext } from "@/contexts/auth-context";
 import { Link } from "@tanstack/react-router";
 import React from "react";
 import { SidebarSearchStore } from "./storage/sidebar-search-store";
@@ -34,28 +33,6 @@ interface NavMainProps {
 	items: SidebarItem[];
 	level?: number;
 }
-
-// Helper to check if an item or its descendants are enabled
-const isEnabled = (
-	navegationItem: SidebarItem,
-	haveAccessRoute: (route: string) => boolean,
-): boolean => {
-	if (navegationItem.url) {
-		return haveAccessRoute(navegationItem.url);
-	}
-	if (navegationItem.items) {
-		return navegationItem.items.some((subAction) => {
-			if (subAction.url) {
-				return haveAccessRoute(subAction.url);
-			}
-			if (subAction.items) {
-				return isEnabled(subAction, haveAccessRoute);
-			}
-			return false;
-		});
-	}
-	return true;
-};
 
 // Helper to check if an item or its descendants are matched
 const isFilter = (navegationItem: SidebarItem, filter: string): boolean => {
@@ -81,7 +58,6 @@ const getCleanedUrl = (url?: string) =>
 	url?.includes("#") ? url.substring(0, url.indexOf("#")) : url;
 
 export const SidebarItems = ({ items, level = 0 }: NavMainProps) => {
-	const { haveAccessRoute } = useAuthContext();
 	const { filterValue } = SidebarSearchStore();
 
 	const aux = items.filter((x) => isFilter(x, filterValue));
@@ -93,7 +69,6 @@ export const SidebarItems = ({ items, level = 0 }: NavMainProps) => {
 			{
 				//hacemos primero el filtrado por el filtro que es menos costoso
 				itemsFilter
-					.filter((x) => isEnabled(x, haveAccessRoute)) // Replace with actual access check if needed
 					.map((item) => (
 						//   <motion.div
 						//     key={item.title}

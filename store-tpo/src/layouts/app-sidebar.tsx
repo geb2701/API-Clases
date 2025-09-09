@@ -1,5 +1,5 @@
 import type * as React from "react";
-
+import logo from "/Logo.png";
 import { Label } from "@/components/ui/label";
 import {
 	Sidebar,
@@ -11,24 +11,11 @@ import {
 	SidebarInput,
 	SidebarRail,
 } from "@/components/ui/sidebar";
-import { AppSwitcher } from "@/layouts/app-switcher";
 import {
-	BookA,
-	Building,
-	Fence,
-	FileBadge2,
-	Group,
 	House,
-	Landmark,
-	List,
-	ListTree,
-	Notebook,
-	Plus,
-	ScrollText,
 	Search,
-	ShieldHalf,
 } from "lucide-react";
-import { NavUser } from "./nav-user";
+//import { NavUser } from "./nav-user";
 import { SidebarItems } from "./sidebar-items";
 import { SidebarSearchStore } from "./storage/sidebar-search-store";
 
@@ -51,7 +38,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar collapsible="icon" variant="inset" {...props}>
 			<SidebarHeader className="h-16 max-md:mt-2 mb-2 justify-center">
-				<AppSwitcher apps={data.apps} />
+				<img src={logo} alt="Logo" />
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup className="group-data-[collapsible=icon]:hidden pb-0">
@@ -60,6 +47,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							<Label htmlFor="search" className="sr-only">
 								Buscar
 							</Label>
+							{/** biome-ignore lint/correctness/useUniqueElementIds: <explanation> */}
 							<SidebarInput
 								id="search"
 								placeholder="Buscar..."
@@ -72,11 +60,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						</form>
 					</SidebarGroupContent>
 				</SidebarGroup>
-				<SidebarItems items={data.navMain} />
+				<SidebarItems items={data} />
 			</SidebarContent>
-			<SidebarFooter className="pt-2 pb-0">
+			{/*<SidebarFooter className="pt-2 pb-0"> //TODO: habilitar cuando tengamos perfil de usuario
 				<NavUser />
-			</SidebarFooter>
+			</SidebarFooter>*/}
 			<SidebarRail />
 		</Sidebar>
 	);
