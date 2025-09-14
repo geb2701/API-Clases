@@ -178,8 +178,8 @@
     "category": "Accesorios",
     "image": "/images/tazas-css.png",
     "stock": 10
-  }
-    {
+  },
+  {
     "id": 21,
     "name": "Libro Python Avanzado",
     "description": "Guía completa de programación avanzada en Python",
