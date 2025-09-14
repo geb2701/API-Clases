@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import ImageLazy from "./image-lazy";
 import type { Product } from "@/types/product";
 import { useCartContext } from "@/context/cart-context";
@@ -56,7 +57,7 @@ export const ProductCard = ({
   };
 
   const onViewDetail = (id: number) => {
-    console.log(`Ver detalle del producto ID ${id}`);
+    // La navegación se maneja con el Link component
   };
 
   return (
@@ -152,9 +153,11 @@ export const ProductCard = ({
             size="sm"
             variant="secondary"
             className="w-full"
-            onClick={() => onViewDetail?.(p.id)}
+            asChild
           >
-            Ver detalle
+            <Link to="/productos/$id" params={{ id: p.id.toString() }}>
+              Ver detalle
+            </Link>
           </Button>
 
           <Button
