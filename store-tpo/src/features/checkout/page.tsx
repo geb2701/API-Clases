@@ -16,7 +16,14 @@ import {
     ArrowLeft,
     CheckCircle
 } from "lucide-react";
-import type { CheckoutData } from "@/types/checkout";
+import {
+    checkoutSchema,
+    billingInfoSchema,
+    shippingInfoSchema,
+    paymentInfoSchema,
+    type CheckoutData
+} from "@/lib/validations/checkout";
+import { ZodError } from "zod";
 
 const CheckoutPage: React.FC = () => {
     const navigate = useNavigate();
@@ -48,7 +55,7 @@ const CheckoutPage: React.FC = () => {
         sameAddress: true
     });
 
-    const [errors, setErrors] = useState<Partial<CheckoutData>>({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleInputChange = (field: string, value: string | boolean, section: 'billing' | 'shipping' | 'payment') => {
         setFormData(prev => ({
@@ -60,49 +67,46 @@ const CheckoutPage: React.FC = () => {
         }));
 
         // Limpiar errores cuando el usuario empiece a escribir
-        if (errors[section]?.[field as keyof typeof errors[section]]) {
+        const errorKey = `${section}.${field}`;
+        if (errors[errorKey]) {
             setErrors(prev => ({
                 ...prev,
-                [section]: {
-                    ...prev[section],
-                    [field]: undefined
-                }
+                [errorKey]: ""
             }));
         }
     };
 
     const validateStep = (step: number): boolean => {
-        const newErrors: Partial<CheckoutData> = {};
+        const newErrors: Record<string, string> = {};
 
-        if (step === 1) {
-            // Validar datos de facturación
-            if (!formData.billing.firstName.trim()) newErrors.billing = { ...newErrors.billing, firstName: "El nombre es requerido" };
-            if (!formData.billing.lastName.trim()) newErrors.billing = { ...newErrors.billing, lastName: "El apellido es requerido" };
-            if (!formData.billing.dni.trim()) newErrors.billing = { ...newErrors.billing, dni: "El DNI/CUIT es requerido" };
-            if (!formData.billing.address.trim()) newErrors.billing = { ...newErrors.billing, address: "La dirección es requerida" };
-            if (!formData.billing.city.trim()) newErrors.billing = { ...newErrors.billing, city: "La ciudad es requerida" };
-            if (!formData.billing.postalCode.trim()) newErrors.billing = { ...newErrors.billing, postalCode: "El código postal es requerido" };
+        try {
+            if (step === 1) {
+                // Validar datos de facturación
+                billingInfoSchema.parse(formData.billing);
 
-            // Si no es la misma dirección, validar datos de envío
-            if (!formData.sameAddress) {
-                if (!formData.shipping.firstName.trim()) newErrors.shipping = { ...newErrors.shipping, firstName: "El nombre es requerido" };
-                if (!formData.shipping.lastName.trim()) newErrors.shipping = { ...newErrors.shipping, lastName: "El apellido es requerido" };
-                if (!formData.shipping.address.trim()) newErrors.shipping = { ...newErrors.shipping, address: "La dirección es requerida" };
-                if (!formData.shipping.city.trim()) newErrors.shipping = { ...newErrors.shipping, city: "La ciudad es requerida" };
-                if (!formData.shipping.postalCode.trim()) newErrors.shipping = { ...newErrors.shipping, postalCode: "El código postal es requerido" };
+                // Si no es la misma dirección, validar datos de envío
+                if (!formData.sameAddress) {
+                    shippingInfoSchema.parse(formData.shipping);
+                }
             }
-        }
 
-        if (step === 2) {
-            // Validar datos de pago
-            if (!formData.payment.cardNumber.trim()) newErrors.payment = { ...newErrors.payment, cardNumber: "El número de tarjeta es requerido" };
-            if (!formData.payment.expiryDate.trim()) newErrors.payment = { ...newErrors.payment, expiryDate: "La fecha de vencimiento es requerida" };
-            if (!formData.payment.cvv.trim()) newErrors.payment = { ...newErrors.payment, cvv: "El CVV es requerido" };
-            if (!formData.payment.cardholderName.trim()) newErrors.payment = { ...newErrors.payment, cardholderName: "El nombre del titular es requerido" };
-        }
+            if (step === 2) {
+                // Validar datos de pago
+                paymentInfoSchema.parse(formData.payment);
+            }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+            setErrors({});
+            return true;
+        } catch (error) {
+            if (error instanceof ZodError) {
+                error.errors.forEach((err) => {
+                    const path = err.path.join('.');
+                    newErrors[path] = err.message;
+                });
+            }
+            setErrors(newErrors);
+            return false;
+        }
     };
 
     const handleNext = () => {
@@ -140,6 +144,23 @@ const CheckoutPage: React.FC = () => {
             sameAddress: checked,
             shipping: checked ? prev.billing : prev.shipping
         }));
+    };
+
+    const formatCardNumber = (value: string) => {
+        // Remover todos los espacios y caracteres no numéricos
+        const cleaned = value.replace(/\D/g, '');
+        // Agregar espacios cada 4 dígitos
+        return cleaned.replace(/(.{4})/g, '$1 ').trim();
+    };
+
+    const formatExpiryDate = (value: string) => {
+        // Remover caracteres no numéricos
+        const cleaned = value.replace(/\D/g, '');
+        // Formatear como MM/AA
+        if (cleaned.length >= 2) {
+            return cleaned.substring(0, 2) + '/' + cleaned.substring(2, 4);
+        }
+        return cleaned;
     };
 
     if (items.length === 0) {
@@ -202,10 +223,12 @@ const CheckoutPage: React.FC = () => {
                                                 id="firstName"
                                                 value={formData.billing.firstName}
                                                 onChange={(e) => handleInputChange("firstName", e.target.value, "billing")}
-                                                className={errors.billing?.firstName ? "border-red-500" : ""}
+                                                className={errors["billing.firstName"] ? "border-red-500" : ""}
+                                                maxLength={50}
+                                                placeholder="Ej: Juan"
                                             />
-                                            {errors.billing?.firstName && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.billing.firstName}</p>
+                                            {errors["billing.firstName"] && (
+                                                <p className="text-sm text-red-500 mt-1">{errors["billing.firstName"]}</p>
                                             )}
                                         </div>
                                         <div>
@@ -214,10 +237,12 @@ const CheckoutPage: React.FC = () => {
                                                 id="lastName"
                                                 value={formData.billing.lastName}
                                                 onChange={(e) => handleInputChange("lastName", e.target.value, "billing")}
-                                                className={errors.billing?.lastName ? "border-red-500" : ""}
+                                                className={errors["billing.lastName"] ? "border-red-500" : ""}
+                                                maxLength={50}
+                                                placeholder="Ej: Pérez"
                                             />
-                                            {errors.billing?.lastName && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.billing.lastName}</p>
+                                            {errors["billing.lastName"] && (
+                                                <p className="text-sm text-red-500 mt-1">{errors["billing.lastName"]}</p>
                                             )}
                                         </div>
                                     </div>
@@ -227,11 +252,13 @@ const CheckoutPage: React.FC = () => {
                                         <Input
                                             id="dni"
                                             value={formData.billing.dni}
-                                            onChange={(e) => handleInputChange("dni", e.target.value, "billing")}
-                                            className={errors.billing?.dni ? "border-red-500" : ""}
+                                            onChange={(e) => handleInputChange("dni", e.target.value.replace(/\D/g, ''), "billing")}
+                                            className={errors["billing.dni"] ? "border-red-500" : ""}
+                                            maxLength={11}
+                                            placeholder="Ej: 12345678"
                                         />
-                                        {errors.billing?.dni && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.billing.dni}</p>
+                                        {errors["billing.dni"] && (
+                                            <p className="text-sm text-red-500 mt-1">{errors["billing.dni"]}</p>
                                         )}
                                     </div>
 
@@ -241,10 +268,12 @@ const CheckoutPage: React.FC = () => {
                                             id="address"
                                             value={formData.billing.address}
                                             onChange={(e) => handleInputChange("address", e.target.value, "billing")}
-                                            className={errors.billing?.address ? "border-red-500" : ""}
+                                            className={errors["billing.address"] ? "border-red-500" : ""}
+                                            maxLength={100}
+                                            placeholder="Ej: Av. Corrientes 1234"
                                         />
-                                        {errors.billing?.address && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.billing.address}</p>
+                                        {errors["billing.address"] && (
+                                            <p className="text-sm text-red-500 mt-1">{errors["billing.address"]}</p>
                                         )}
                                     </div>
 
@@ -255,10 +284,12 @@ const CheckoutPage: React.FC = () => {
                                                 id="city"
                                                 value={formData.billing.city}
                                                 onChange={(e) => handleInputChange("city", e.target.value, "billing")}
-                                                className={errors.billing?.city ? "border-red-500" : ""}
+                                                className={errors["billing.city"] ? "border-red-500" : ""}
+                                                maxLength={50}
+                                                placeholder="Ej: Buenos Aires"
                                             />
-                                            {errors.billing?.city && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.billing.city}</p>
+                                            {errors["billing.city"] && (
+                                                <p className="text-sm text-red-500 mt-1">{errors["billing.city"]}</p>
                                             )}
                                         </div>
                                         <div>
@@ -267,10 +298,12 @@ const CheckoutPage: React.FC = () => {
                                                 id="postalCode"
                                                 value={formData.billing.postalCode}
                                                 onChange={(e) => handleInputChange("postalCode", e.target.value, "billing")}
-                                                className={errors.billing?.postalCode ? "border-red-500" : ""}
+                                                className={errors["billing.postalCode"] ? "border-red-500" : ""}
+                                                maxLength={10}
+                                                placeholder="Ej: 1043"
                                             />
-                                            {errors.billing?.postalCode && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.billing.postalCode}</p>
+                                            {errors["billing.postalCode"] && (
+                                                <p className="text-sm text-red-500 mt-1">{errors["billing.postalCode"]}</p>
                                             )}
                                         </div>
                                     </div>
@@ -302,10 +335,12 @@ const CheckoutPage: React.FC = () => {
                                                         id="shippingFirstName"
                                                         value={formData.shipping.firstName}
                                                         onChange={(e) => handleInputChange("firstName", e.target.value, "shipping")}
-                                                        className={errors.shipping?.firstName ? "border-red-500" : ""}
+                                                        className={errors["shipping.firstName"] ? "border-red-500" : ""}
+                                                        maxLength={50}
+                                                        placeholder="Ej: Juan"
                                                     />
-                                                    {errors.shipping?.firstName && (
-                                                        <p className="text-sm text-red-500 mt-1">{errors.shipping.firstName}</p>
+                                                    {errors["shipping.firstName"] && (
+                                                        <p className="text-sm text-red-500 mt-1">{errors["shipping.firstName"]}</p>
                                                     )}
                                                 </div>
                                                 <div>
@@ -314,10 +349,12 @@ const CheckoutPage: React.FC = () => {
                                                         id="shippingLastName"
                                                         value={formData.shipping.lastName}
                                                         onChange={(e) => handleInputChange("lastName", e.target.value, "shipping")}
-                                                        className={errors.shipping?.lastName ? "border-red-500" : ""}
+                                                        className={errors["shipping.lastName"] ? "border-red-500" : ""}
+                                                        maxLength={50}
+                                                        placeholder="Ej: Pérez"
                                                     />
-                                                    {errors.shipping?.lastName && (
-                                                        <p className="text-sm text-red-500 mt-1">{errors.shipping.lastName}</p>
+                                                    {errors["shipping.lastName"] && (
+                                                        <p className="text-sm text-red-500 mt-1">{errors["shipping.lastName"]}</p>
                                                     )}
                                                 </div>
                                             </div>
@@ -328,10 +365,12 @@ const CheckoutPage: React.FC = () => {
                                                     id="shippingAddress"
                                                     value={formData.shipping.address}
                                                     onChange={(e) => handleInputChange("address", e.target.value, "shipping")}
-                                                    className={errors.shipping?.address ? "border-red-500" : ""}
+                                                    className={errors["shipping.address"] ? "border-red-500" : ""}
+                                                    maxLength={100}
+                                                    placeholder="Ej: Av. Corrientes 1234"
                                                 />
-                                                {errors.shipping?.address && (
-                                                    <p className="text-sm text-red-500 mt-1">{errors.shipping.address}</p>
+                                                {errors["shipping.address"] && (
+                                                    <p className="text-sm text-red-500 mt-1">{errors["shipping.address"]}</p>
                                                 )}
                                             </div>
 
@@ -342,10 +381,12 @@ const CheckoutPage: React.FC = () => {
                                                         id="shippingCity"
                                                         value={formData.shipping.city}
                                                         onChange={(e) => handleInputChange("city", e.target.value, "shipping")}
-                                                        className={errors.shipping?.city ? "border-red-500" : ""}
+                                                        className={errors["shipping.city"] ? "border-red-500" : ""}
+                                                        maxLength={50}
+                                                        placeholder="Ej: Buenos Aires"
                                                     />
-                                                    {errors.shipping?.city && (
-                                                        <p className="text-sm text-red-500 mt-1">{errors.shipping.city}</p>
+                                                    {errors["shipping.city"] && (
+                                                        <p className="text-sm text-red-500 mt-1">{errors["shipping.city"]}</p>
                                                     )}
                                                 </div>
                                                 <div>
@@ -354,10 +395,12 @@ const CheckoutPage: React.FC = () => {
                                                         id="shippingPostalCode"
                                                         value={formData.shipping.postalCode}
                                                         onChange={(e) => handleInputChange("postalCode", e.target.value, "shipping")}
-                                                        className={errors.shipping?.postalCode ? "border-red-500" : ""}
+                                                        className={errors["shipping.postalCode"] ? "border-red-500" : ""}
+                                                        maxLength={10}
+                                                        placeholder="Ej: 1043"
                                                     />
-                                                    {errors.shipping?.postalCode && (
-                                                        <p className="text-sm text-red-500 mt-1">{errors.shipping.postalCode}</p>
+                                                    {errors["shipping.postalCode"] && (
+                                                        <p className="text-sm text-red-500 mt-1">{errors["shipping.postalCode"]}</p>
                                                     )}
                                                 </div>
                                             </div>
@@ -389,11 +432,12 @@ const CheckoutPage: React.FC = () => {
                                             id="cardNumber"
                                             placeholder="1234 5678 9012 3456"
                                             value={formData.payment.cardNumber}
-                                            onChange={(e) => handleInputChange("cardNumber", e.target.value, "payment")}
-                                            className={errors.payment?.cardNumber ? "border-red-500" : ""}
+                                            onChange={(e) => handleInputChange("cardNumber", formatCardNumber(e.target.value), "payment")}
+                                            className={errors["payment.cardNumber"] ? "border-red-500" : ""}
+                                            maxLength={19}
                                         />
-                                        {errors.payment?.cardNumber && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.payment.cardNumber}</p>
+                                        {errors["payment.cardNumber"] && (
+                                            <p className="text-sm text-red-500 mt-1">{errors["payment.cardNumber"]}</p>
                                         )}
                                     </div>
 
@@ -403,10 +447,12 @@ const CheckoutPage: React.FC = () => {
                                             id="cardholderName"
                                             value={formData.payment.cardholderName}
                                             onChange={(e) => handleInputChange("cardholderName", e.target.value, "payment")}
-                                            className={errors.payment?.cardholderName ? "border-red-500" : ""}
+                                            className={errors["payment.cardholderName"] ? "border-red-500" : ""}
+                                            maxLength={50}
+                                            placeholder="Ej: JUAN PEREZ"
                                         />
-                                        {errors.payment?.cardholderName && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.payment.cardholderName}</p>
+                                        {errors["payment.cardholderName"] && (
+                                            <p className="text-sm text-red-500 mt-1">{errors["payment.cardholderName"]}</p>
                                         )}
                                     </div>
 
@@ -417,11 +463,12 @@ const CheckoutPage: React.FC = () => {
                                                 id="expiryDate"
                                                 placeholder="MM/AA"
                                                 value={formData.payment.expiryDate}
-                                                onChange={(e) => handleInputChange("expiryDate", e.target.value, "payment")}
-                                                className={errors.payment?.expiryDate ? "border-red-500" : ""}
+                                                onChange={(e) => handleInputChange("expiryDate", formatExpiryDate(e.target.value), "payment")}
+                                                className={errors["payment.expiryDate"] ? "border-red-500" : ""}
+                                                maxLength={5}
                                             />
-                                            {errors.payment?.expiryDate && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.payment.expiryDate}</p>
+                                            {errors["payment.expiryDate"] && (
+                                                <p className="text-sm text-red-500 mt-1">{errors["payment.expiryDate"]}</p>
                                             )}
                                         </div>
                                         <div>
@@ -430,11 +477,12 @@ const CheckoutPage: React.FC = () => {
                                                 id="cvv"
                                                 placeholder="123"
                                                 value={formData.payment.cvv}
-                                                onChange={(e) => handleInputChange("cvv", e.target.value, "payment")}
-                                                className={errors.payment?.cvv ? "border-red-500" : ""}
+                                                onChange={(e) => handleInputChange("cvv", e.target.value.replace(/\D/g, ''), "payment")}
+                                                className={errors["payment.cvv"] ? "border-red-500" : ""}
+                                                maxLength={4}
                                             />
-                                            {errors.payment?.cvv && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.payment.cvv}</p>
+                                            {errors["payment.cvv"] && (
+                                                <p className="text-sm text-red-500 mt-1">{errors["payment.cvv"]}</p>
                                             )}
                                         </div>
                                     </div>
