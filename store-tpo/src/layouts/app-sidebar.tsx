@@ -12,7 +12,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  House, Search, ShoppingCart,
+  Cpu,
+  House, Lamp, PackageSearch, Search, Shirt, ShoppingCart,
 } from "lucide-react";
 import { NavUser } from "./nav-user";
 import { SidebarItems } from "./sidebar-items";
@@ -38,7 +39,7 @@ const data = [
       {
         title: "Productos",
         url: "/productos",
-        icon: House,
+        icon: PackageSearch,
       },
     ],
   },
@@ -53,17 +54,17 @@ const data = [
       {
         title: "Hogar",
         url: "/productos/categorias/hogar",
-        icon: House,
+        icon: Lamp,
       },
       {
         title: "Ropa",
         url: "/productos/categorias/ropa",
-        icon: House,
+        icon: Shirt,
       },
       {
         title: "Tecnología",
         url: "/productos/categorias/tecnologia",
-        icon: House,
+        icon: Cpu,
       },
     ],
   },
@@ -78,6 +79,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="h-16 max-md:mt-2 mb-2 flex items-center justify-center">
         <img src={logo} alt="Logo" className="size-10" />
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup className="group-data-[collapsible=icon]:hidden pb-0">
           <SidebarGroupContent>
@@ -85,7 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Label htmlFor="search" className="sr-only">
                 Buscar
               </Label>
-              {/** biome-ignore lint/correctness/useUniqueElementIds: <explanation> */}
+              {/* biome-ignore lint/correctness/useUniqueElementIds: <explanation> */}
               <SidebarInput
                 id="search"
                 placeholder="Buscar..."
@@ -98,28 +100,50 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </form>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarItems items={data} />
 
-        {/* Cart Button */}
-        <div className="px-2 py-2">
+        <SidebarItems items={data} />
+      </SidebarContent>
+
+      {/* Footer con carrito pegado al usuario */}
+      <SidebarFooter className="pt-2 pb-0 flex flex-col gap-2 group-data-[collapsible=icon]:items-center">
+        {/* Wrapper: saca padding y centra en colapsado */}
+        <div className="
+    px-2 w-full
+    group-data-[collapsible=icon]:px-0
+    group-data-[collapsible=icon]:flex
+    group-data-[collapsible=icon]:justify-center
+  ">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2"
             onClick={openCart}
+            aria-label="Abrir carrito"
+            className="
+        w-full gap-2 justify-start
+        group-data-[collapsible=icon]:w-10
+        group-data-[collapsible=icon]:h-10
+        group-data-[collapsible=icon]:justify-center
+        group-data-[collapsible=icon]:p-0
+        group-data-[collapsible=icon]:rounded-xl
+      "
           >
             <ShoppingCart className="h-4 w-4" />
-            <span>Carrito</span>
+            {/* Texto solo visible expandido */}
+            <span className="group-data-[collapsible=icon]:hidden">Carrito</span>
+            {/* Total solo visible expandido */}
             {getTotalItems() > 0 && (
-              <Badge variant="secondary" className="ml-auto">
+              <Badge
+                variant="secondary"
+                className="ml-auto group-data-[collapsible=icon]:hidden"
+              >
                 {getTotalItems()}
               </Badge>
             )}
           </Button>
         </div>
-      </SidebarContent>
-      <SidebarFooter className="pt-2 pb-0">
+
         <NavUser />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

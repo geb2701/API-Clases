@@ -24,7 +24,8 @@ const ImageLazy = ({
       effect="blur"
       placeholderSrc={placeholder}
       className={className}
-      threshold={100}
+      threshold={300}
+      delayTime={300}
       onError={() => setImgSrc(placeholder)}
     />
   );
