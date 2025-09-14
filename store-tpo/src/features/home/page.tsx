@@ -1,6 +1,5 @@
 import React from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useProducts } from "../product/hooks/useProducts";
 import { useCartContext } from "@/context/cart-context";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Star, Clock, Zap } from "lucide-react";
+import { useProducts } from "../product/hooks/use-products";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -126,7 +126,7 @@ const HomePage = () => {
               Bienvenido a nuestra tienda
             </h1>
             <p className="mt-4 text-lg text-blue-100 md:text-xl">
-              Descubre productos increíbles con las mejores ofertas del mercado. 
+              Descubre productos increíbles con las mejores ofertas del mercado.
               Envío gratis en compras superiores a $100.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -181,7 +181,7 @@ const HomePage = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button 
+                <Button
                   className="w-full flex items-center gap-1"
                   onClick={() => addToCart(product)}
                 >
@@ -270,8 +270,8 @@ const HomePage = () => {
                 <div className="text-sm opacity-90">OFF</div>
               </div>
             </div>
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               className="mt-4 w-fit"
               onClick={() => setCategory("Tecnología")}
             >
@@ -374,8 +374,8 @@ const HomePage = () => {
                 >
                   Ver detalle
                 </Button>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   onClick={() => addToCart(p)}
                   className="flex items-center gap-1"
                 >
