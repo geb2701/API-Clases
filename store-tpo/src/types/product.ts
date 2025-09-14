@@ -5,6 +5,7 @@ export class Product {
   price: number;
   category: string;
   image: string;
+  stock: number;
 
   constructor(
     id: number,
@@ -12,7 +13,8 @@ export class Product {
     description: string,
     price: number,
     category: string,
-    image: string
+    image: string,
+    stock: number
   ) {
     this.id = id;
     this.name = name;
@@ -20,6 +22,7 @@ export class Product {
     this.price = price;
     this.category = category;
     this.image = image;
+    this.stock = stock;
   }
 
   getFormattedPrice(): string {

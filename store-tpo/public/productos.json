@@ -5,7 +5,8 @@
     "description": "Camiseta cómoda con logo React",
     "price": 25.5,
     "category": "Ropa",
-    "image": "/images/camiseta-react.png"
+    "image": "/images/camiseta-react.png",
+    "stock": 10
   },
   {
     "id": 2,
@@ -13,7 +14,8 @@
     "description": "Taza blanca con logo JS",
     "price": 12.9,
     "category": "Accesorios",
-    "image": "/images/taza-js.png"
+    "image": "/images/taza-js.png",
+    "stock": 10
   },
   {
     "id": 3,
@@ -21,7 +23,8 @@
     "description": "Buzo azul con logo TS",
     "price": 45,
     "category": "Ropa",
-    "image": "/images/hoodie-ts.png"
+    "image": "/images/hoodie-ts.png",
+    "stock": 10
   },
   {
     "id": 4,
@@ -29,7 +32,8 @@
     "description": "Mouse ergonómico con conexión Bluetooth",
     "price": 19.99,
     "category": "Tecnología",
-    "image": "/images/mouse.png"
+    "image": "/images/mouse.png",
+    "stock": 10
   },
   {
     "id": 5,
@@ -37,7 +41,8 @@
     "description": "Teclado retroiluminado con switches azules",
     "price": 79.5,
     "category": "Tecnología",
-    "image": "/images/teclado.png"
+    "image": "/images/teclado.png",
+    "stock": 10
   },
   {
     "id": 6,
@@ -45,7 +50,8 @@
     "description": "Auriculares con cancelación de ruido",
     "price": 120,
     "category": "Tecnología",
-    "image": "/images/auriculares.png"
+    "image": "/images/auriculares.png",
+    "stock": 10
   },
   {
     "id": 7,
@@ -53,7 +59,8 @@
     "description": "Botella de acero inoxidable 500ml",
     "price": 18,
     "category": "Accesorios",
-    "image": "/images/botella.png"
+    "image": "/images/botella.png",
+    "stock": 10
   },
   {
     "id": 8,
@@ -61,7 +68,8 @@
     "description": "Mochila resistente al agua con compartimento para notebook",
     "price": 65,
     "category": "Accesorios",
-    "image": "/images/mochila.png"
+    "image": "/images/mochila.png",
+    "stock": 10
   },
   {
     "id": 9,
@@ -69,7 +77,8 @@
     "description": "Lámpara ajustable con control táctil",
     "price": 30,
     "category": "Hogar",
-    "image": "/images/lampara.png"
+    "image": "/images/lampara.png",
+    "stock": 10
   },
   {
     "id": 10,
@@ -77,7 +86,8 @@
     "description": "Silla ergonómica reclinable",
     "price": 210,
     "category": "Hogar",
-    "image": "/images/silla.png"
+    "image": "/images/silla.png",
+    "stock": 10
   },
   {
     "id": 11,
@@ -85,7 +95,8 @@
     "description": "Sudadera verde con logo Node.js",
     "price": 40,
     "category": "Ropa",
-    "image": "/images/sudadera-node.png"
+    "image": "/images/sudadera-node.png",
+    "stock": 10
   },
   {
     "id": 12,
@@ -93,7 +104,8 @@
     "description": "Zapatillas deportivas transpirables",
     "price": 75,
     "category": "Ropa",
-    "image": "/images/zapatillas.png"
+    "image": "/images/zapatillas.png",
+    "stock": 10
   },
   {
     "id": 13,
@@ -101,7 +113,8 @@
     "description": "Reloj inteligente con monitoreo de salud",
     "price": 150,
     "category": "Tecnología",
-    "image": "/images/smartwatch.png"
+    "image": "/images/smartwatch.png",
+    "stock": 10
   },
   {
     "id": 14,
@@ -109,7 +122,8 @@
     "description": "Alfombra suave 120x180cm",
     "price": 55,
     "category": "Hogar",
-    "image": "/images/alfombra.png"
+    "image": "/images/alfombra.png",
+    "stock": 10
   },
   {
     "id": 15,
@@ -117,7 +131,8 @@
     "description": "Cafetera de aluminio para 6 tazas",
     "price": 35,
     "category": "Hogar",
-    "image": "/images/cafetera.png"
+    "image": "/images/cafetera.png",
+    "stock": 10
   },
   {
     "id": 16,
@@ -125,7 +140,8 @@
     "description": "Gorra negra con bordado ‘Code Life’",
     "price": 20,
     "category": "Accesorios",
-    "image": "/images/gorra.png"
+    "image": "/images/gorra.png",
+    "stock": 10
   },
   {
     "id": 17,
@@ -133,7 +149,8 @@
     "description": "Monitor UHD con panel IPS",
     "price": 320,
     "category": "Tecnología",
-    "image": "/images/monitor.png"
+    "image": "/images/monitor.png",
+    "stock": 10
   },
   {
     "id": 18,
@@ -141,7 +158,8 @@
     "description": "Teclado 60% mecánico RGB",
     "price": 65,
     "category": "Tecnología",
-    "image": "/images/teclado-compacto.png"
+    "image": "/images/teclado-compacto.png",
+    "stock": 10
   },
   {
     "id": 19,
@@ -149,7 +167,8 @@
     "description": "Camiseta blanca con tipografía geek",
     "price": 22,
     "category": "Ropa",
-    "image": "/images/camiseta-fullstack.png"
+    "image": "/images/camiseta-fullstack.png",
+    "stock": 10
   },
   {
     "id": 20,
@@ -157,6 +176,7 @@
     "description": "Set de 3 tazas con diseño CSS3",
     "price": 29,
     "category": "Accesorios",
-    "image": "/images/tazas-css.png"
+    "image": "/images/tazas-css.png",
+    "stock": 10
   }
 ]
