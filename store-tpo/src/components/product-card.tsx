@@ -102,6 +102,14 @@ export const ProductCard = ({
             </span>
           )}
         </div>
+
+        {/* Stock Information */}
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Stock disponible:</span>
+          <span className={`text-xs font-medium ${p.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {p.stock} unidades
+          </span>
+        </div>
       </CardContent>
 
       {/* Footer */}
@@ -165,8 +173,9 @@ export const ProductCard = ({
             className="w-full"
             onClick={() => onAddToCart?.(qty)}
             disabled={disabled}
+            variant={disabled ? "destructive" : "default"}
           >
-            Agregar
+            {disabled ? "Sin stock" : "Agregar"}
           </Button>
         </div>
       </CardFooter>

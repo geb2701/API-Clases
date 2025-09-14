@@ -32,6 +32,23 @@ export const ProductDetailPage = () => {
     addItem(product, quantity);
   };
 
+  if (!product) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Producto no encontrado</h1>
+          <Link 
+            to="/productos" 
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver a productos
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
@@ -49,7 +66,7 @@ export const ProductDetailPage = () => {
         {/* Imagen del producto */}
         <div className="aspect-square w-full overflow-hidden bg-muted/30 rounded-lg flex items-center justify-center">
           <ImageLazy
-            src={`http://localhost:3000/${product.image}`}
+            src={`http://localhost:3000${product.image}`}
             alt={product.name}
             className="block max-h-full max-w-full object-contain"
           />

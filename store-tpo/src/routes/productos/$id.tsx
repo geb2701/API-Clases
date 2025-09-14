@@ -3,9 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/productos/$id")({
   component: ProductDetailPage,
-  loader: ({ params }) => ({
+  loader: () => ({
     crumb: {
-      label: `Producto #${params.id}`,
+      label: ` Detalle Producto`,
     },
   }),
 });

@@ -1,6 +1,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { toast } from "sonner";
 import { Product } from "@/types/product";
 import { CartItemClass } from "@/types/cart";
 
@@ -39,25 +40,73 @@ const useCartStore = create<CartState>()(
           );
 
           if (existingItem) {
-            // Si el producto ya existe, incrementar la cantidad
+            // Si el producto ya existe, verificar stock disponible
+            const newQuantity = existingItem.quantity + quantity;
+            
+            if (newQuantity > product.stock) {
+              // Notificación de error por exceder stock
+              toast.error("Stock insuficiente", {
+                description: `${product.name} - Stock disponible: ${product.stock}, Cantidad solicitada: ${newQuantity}`,
+                duration: 4000,
+              });
+              return state; // No hacer cambios si excede el stock
+            }
+            
+            // Si no excede el stock, incrementar la cantidad
             const updatedItems = state.items.map((item) =>
               item.product.id === product.id
-                ? new CartItemClass(item.product, item.quantity + quantity)
+                ? new CartItemClass(item.product, newQuantity)
                 : item
             );
+            
+            // Notificación para producto existente
+            toast.success("Cantidad actualizada", {
+              description: `${product.name} - Cantidad: ${newQuantity}`,
+              duration: 3000,
+            });
+            
             return { items: updatedItems };
           } else {
-            // Si es un producto nuevo, agregarlo al carrito
+            // Si es un producto nuevo, verificar stock disponible
+            if (quantity > product.stock) {
+              // Notificación de error por exceder stock
+              toast.error("Stock insuficiente", {
+                description: `${product.name} - Stock disponible: ${product.stock}, Cantidad solicitada: ${quantity}`,
+                duration: 4000,
+              });
+              return state; // No hacer cambios si excede el stock
+            }
+            
+            // Si no excede el stock, agregarlo al carrito
             const newItem = new CartItemClass(product, quantity);
+            
+            // Notificación para producto nuevo
+            toast.success("Producto agregado al carrito", {
+              description: `${product.name} - Cantidad: ${quantity}`,
+              duration: 3000,
+            });
+            
             return { items: [...state.items, newItem] };
           }
         });
       },
 
       removeItem: (productId: number) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.product.id !== productId),
-        }));
+        set((state) => {
+          const itemToRemove = state.items.find((item) => item.product.id === productId);
+          
+          // Notificación para producto eliminado
+          if (itemToRemove) {
+            toast.error("Producto eliminado del carrito", {
+              description: `${itemToRemove.product.name}`,
+              duration: 3000,
+            });
+          }
+          
+          return {
+            items: state.items.filter((item) => item.product.id !== productId),
+          };
+        });
       },
 
       updateQuantity: (productId: number, quantity: number) => {
@@ -66,17 +115,53 @@ const useCartStore = create<CartState>()(
           return;
         }
 
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.product.id === productId
-              ? new CartItemClass(item.product, quantity)
-              : item
-          ),
-        }));
+        set((state) => {
+          const itemToUpdate = state.items.find((item) => item.product.id === productId);
+          
+          if (!itemToUpdate) {
+            return state; // No hacer cambios si no se encuentra el item
+          }
+          
+          // Verificar si la nueva cantidad excede el stock
+          if (quantity > itemToUpdate.product.stock) {
+            // Notificación de error por exceder stock
+            toast.error("Stock insuficiente", {
+              description: `${itemToUpdate.product.name} - Stock disponible: ${itemToUpdate.product.stock}, Cantidad solicitada: ${quantity}`,
+              duration: 4000,
+            });
+            return state; // No hacer cambios si excede el stock
+          }
+          
+          // Notificación para cantidad actualizada
+          toast.info("Cantidad actualizada", {
+            description: `${itemToUpdate.product.name} - Nueva cantidad: ${quantity}`,
+            duration: 3000,
+          });
+          
+          return {
+            items: state.items.map((item) =>
+              item.product.id === productId
+                ? new CartItemClass(item.product, quantity)
+                : item
+            ),
+          };
+        });
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set((state) => {
+          const itemCount = state.items.length;
+          
+          // Notificación para carrito vaciado
+          if (itemCount > 0) {
+            toast.warning("Carrito vaciado", {
+              description: `Se eliminaron ${itemCount} producto${itemCount > 1 ? 's' : ''} del carrito`,
+              duration: 3000,
+            });
+          }
+          
+          return { items: [] };
+        });
       },
 
       toggleCart: () => {
