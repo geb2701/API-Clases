@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
-import { Route } from "@/routes/category/$nombre";
+import { Route } from "@/routes/productos/categorias/$nombre";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";

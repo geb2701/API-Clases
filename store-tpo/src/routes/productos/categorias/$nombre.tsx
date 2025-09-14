@@ -8,12 +8,11 @@ const titleFromSlug = (s: string) =>
     .trim()
     .replace(/\b\p{L}/gu, (c) => c.toUpperCase());
 
-export const Route = createFileRoute("/category/$nombre")({
+export const Route = createFileRoute("/productos/categorias/$nombre")({
   component: CategoryPage,
   loader: ({ params }) => ({
     crumb: {
       label: titleFromSlug(params.nombre),
     },
   }),
-
 });

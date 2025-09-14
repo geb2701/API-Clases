@@ -33,26 +33,36 @@ const data = [
     ],
   },
   {
+    title: "",
+    items: [
+      {
+        title: "Productos",
+        url: "/productos",
+        icon: House,
+      },
+    ],
+  },
+  {
     title: "Categorias",
     items: [
       {
         title: "Accesorios",
-        url: "/category/accesorios",
+        url: "/productos/categorias/accesorios",
         icon: House,
       },
       {
         title: "Hogar",
-        url: "/category/hogar",
+        url: "/productos/categorias/hogar",
         icon: House,
       },
       {
         title: "Ropa",
-        url: "/category/ropa",
+        url: "/productos/categorias/ropa",
         icon: House,
       },
       {
         title: "Tecnología",
-        url: "/category/tecnologia",
+        url: "/productos/categorias/tecnologia",
         icon: House,
       },
     ],
