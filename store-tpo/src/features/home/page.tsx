@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Star, Clock, Zap } from "lucide-react";
 import { useProducts } from "../product/hooks/use-products";
+import type { Product } from "@/types/product";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -110,14 +111,14 @@ const HomePage = () => {
 
   React.useEffect(() => {
     setPage(1);
-  }, [q, category, sortKey, sortDir]);
+  }, []);
 
   const navigateToDetail = (id: number) => {
     // TODO: integrar con tu router: navigate(`/products/${id}`)
     console.log("go detail", id);
   };
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: Product) => {
     addItem(product);
   };
 
@@ -136,9 +137,9 @@ const HomePage = () => {
               Envío gratis en compras superiores a $100.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Button 
-                size="lg" 
-                variant="secondary" 
+              <Button
+                size="lg"
+                variant="secondary"
                 className="w-fit"
                 onClick={() => {
                   setShowOffers(false);
@@ -148,9 +149,9 @@ const HomePage = () => {
               >
                 Ver Productos
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 className="w-fit border-white text-white hover:bg-white hover:text-gray-900"
                 onClick={() => {
                   setShowOffers(true);
@@ -225,7 +226,7 @@ const HomePage = () => {
           <h2 className="text-2xl font-bold">Ofertas</h2>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {productsByCategory.map(({ category, products: categoryProducts, discount }) => (
+          {productsByCategory.map(({ category, products: categoryProducts }) => (
             <Card key={category} className="overflow-hidden">
               <div className="bg-gradient-to-r from-orange-500 to-red-500 p-4 text-white">
                 <div className="flex items-center justify-between">
@@ -294,8 +295,8 @@ const HomePage = () => {
                 <div className="text-sm opacity-90">OFF</div>
               </div>
             </div>
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               className="mt-4 w-fit"
               onClick={() => {
                 setShowOffers(true);
@@ -317,80 +318,80 @@ const HomePage = () => {
               {showOffers ? 'Ofertas Especiales' : 'Todos los Productos'}
             </h2>
             <p className="text-sm text-muted-foreground">{total} productos disponibles</p>
-        </div>
+          </div>
 
-        <div className="flex flex-col gap-2 md:flex-row md:items-center">
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por nombre o descripción…"
-            className="md:w-64"
-          />
+          <div className="flex flex-col gap-2 md:flex-row md:items-center">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar por nombre o descripción…"
+              className="md:w-64"
+            />
 
-          <Select
-            value={category ?? "all"}
-            onValueChange={(v) => setCategory(v === "all" ? null : v)}
-          >
-            <SelectTrigger className="md:w-52">
-              <SelectValue placeholder="Categoría" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              {categories.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select
+              value={category ?? "all"}
+              onValueChange={(v) => setCategory(v === "all" ? null : v)}
+            >
+              <SelectTrigger className="md:w-52">
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <Select
-            value={`${sortKey}:${sortDir}`}
-            onValueChange={(v) => {
-              const [k, d] = v.split(":") as [SortKey, SortDir];
-              setSort(k, d);
-            }}
-          >
-            <SelectTrigger className="md:w-48">
-              <SelectValue placeholder="Ordenar" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name:asc">Nombre ↑</SelectItem>
-              <SelectItem value="name:desc">Nombre ↓</SelectItem>
-              <SelectItem value="price:asc">Precio ↑</SelectItem>
-              <SelectItem value="price:desc">Precio ↓</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </header>
+            <Select
+              value={`${sortKey}:${sortDir}`}
+              onValueChange={(v) => {
+                const [k, d] = v.split(":") as [SortKey, SortDir];
+                setSort(k, d);
+              }}
+            >
+              <SelectTrigger className="md:w-48">
+                <SelectValue placeholder="Ordenar" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name:asc">Nombre ↑</SelectItem>
+                <SelectItem value="name:desc">Nombre ↓</SelectItem>
+                <SelectItem value="price:asc">Precio ↑</SelectItem>
+                <SelectItem value="price:desc">Precio ↓</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </header>
 
         {/* Grid de Productos */}
-      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-        {items.map((p) => (
+        <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+          {items.map((p) => (
             <Card key={p.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
-            <div className="aspect-square w-full overflow-hidden bg-muted/30">
-              <img
-                src={`http://localhost:3000/${p.image}`}
-                alt={p.name}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
-              />
-            </div>
-
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-base leading-tight">
-                  {p.name}
-                </CardTitle>
-                <Badge variant="secondary" className="shrink-0">
-                  {p.category}
-                </Badge>
+              <div className="aspect-square w-full overflow-hidden bg-muted/30">
+                <img
+                  src={`http://localhost:3000/${p.image}`}
+                  alt={p.name}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <p className="line-clamp-2 text-sm text-muted-foreground">
-                {p.description}
-              </p>
+
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle className="text-base leading-tight">
+                    {p.name}
+                  </CardTitle>
+                  <Badge variant="secondary" className="shrink-0">
+                    {p.category}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="line-clamp-2 text-sm text-muted-foreground">
+                  {p.description}
+                </p>
                 <div className="mt-2">
                   {p.hasDiscount() ? (
                     <div className="flex items-center gap-2">
@@ -410,16 +411,16 @@ const HomePage = () => {
                     </p>
                   )}
                 </div>
-            </CardContent>
+              </CardContent>
 
-            <CardFooter className="flex gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => navigateToDetail(p.id)}
-              >
-                Ver detalle
-              </Button>
+              <CardFooter className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => navigateToDetail(p.id)}
+                >
+                  Ver detalle
+                </Button>
                 <Button
                   size="sm"
                   onClick={() => addToCart(p)}
@@ -427,35 +428,35 @@ const HomePage = () => {
                 >
                   <ShoppingCart className="w-4 h-4" />
                   {getItemQuantity(p.id) > 0 && `(${getItemQuantity(p.id)})`}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
 
-      {/* Paginación */}
+        {/* Paginación */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-8">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page <= 1}
-        >
-          Anterior
-        </Button>
-        <span className="text-sm text-muted-foreground">
-          Página {page} / {totalPages}
-        </span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page >= totalPages}
-        >
-          Siguiente
-        </Button>
-      </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              Anterior
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Página {page} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+            >
+              Siguiente
+            </Button>
+          </div>
         )}
       </section>
     </div>
