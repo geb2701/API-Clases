@@ -12,7 +12,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  House, Search 	ShoppingCart,
+  House, Search, ShoppingCart,
 } from "lucide-react";
 import { NavUser } from "./nav-user";
 import { SidebarItems } from "./sidebar-items";

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
 import ImageLazy from "./image-lazy";
 import type { Product } from "@/types/product";
+import { useCartContext } from "@/context/cart-context";
 
 type ProductCardProps = {
   product: Product;
@@ -37,6 +38,7 @@ export const ProductCard = ({
     () => (typeof max === "number" ? max : p.stock ?? 99),
     [max, p.stock]
   );
+  const { addItem } = useCartContext();
   const [qty, setQty] = useState(clamp(defaultQty, min, maxAllowed));
 
   const inc = () => setQty((q) => clamp(q + 1, min, maxAllowed));
@@ -49,8 +51,8 @@ export const ProductCard = ({
 
   const disabled = maxAllowed <= 0;
 
-  const onAddToCart = (id: number, quantity: number) => {
-    console.log(`Agregar al carrito: Producto ID ${id}, Cantidad: ${quantity}`);
+  const onAddToCart = (quantity: number) => {
+    addItem(p, quantity);
   };
 
   const onViewDetail = (id: number) => {
@@ -158,7 +160,7 @@ export const ProductCard = ({
           <Button
             size="sm"
             className="w-full"
-            onClick={() => onAddToCart?.(p.id, qty)}
+            onClick={() => onAddToCart?.(qty)}
             disabled={disabled}
           >
             Agregar
