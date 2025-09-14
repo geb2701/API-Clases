@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Star, Clock, Zap } from "lucide-react";
 import { useProducts } from "../product/hooks/use-products";
 import type { Product } from "@/types/product";
+import { ProductCard } from "@/components/product-card";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -368,69 +369,7 @@ const HomePage = () => {
         {/* Grid de Productos */}
         <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
           {items.map((p) => (
-            <Card key={p.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
-              <div className="aspect-square w-full overflow-hidden bg-muted/30">
-                <img
-                  src={`http://localhost:3000/${p.image}`}
-                  alt={p.name}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-base leading-tight">
-                    {p.name}
-                  </CardTitle>
-                  <Badge variant="secondary" className="shrink-0">
-                    {p.category}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="line-clamp-2 text-sm text-muted-foreground">
-                  {p.description}
-                </p>
-                <div className="mt-2">
-                  {p.hasDiscount() ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground line-through">
-                        {p.getFormattedPrice()}
-                      </span>
-                      <span className="text-lg font-semibold text-green-600">
-                        {p.getFormattedDiscountPrice()}
-                      </span>
-                      <Badge variant="destructive" className="text-xs">
-                        -{p.getDiscountPercentage()}%
-                      </Badge>
-                    </div>
-                  ) : (
-                    <p className="text-lg font-semibold">
-                      {p.getFormattedPrice()}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-
-              <CardFooter className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => navigateToDetail(p.id)}
-                >
-                  Ver detalle
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => addToCart(p)}
-                  className="flex items-center gap-1"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  {getItemQuantity(p.id) > 0 && `(${getItemQuantity(p.id)})`}
-                </Button>
-              </CardFooter>
-            </Card>
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
 

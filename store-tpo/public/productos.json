@@ -225,7 +225,7 @@
     "description": "Poster decorativo con diseño de consolas clásicas",
     "price": 20,
     "category": "Decoración",
-    "image": "/images/poster.png",
+    "image": "/images/posters.png",
     "stock": 10,
     "discount": 18.5
   },
