@@ -12,8 +12,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
+  Book,
   Cpu,
   House, Lamp, PackageSearch, Search, Shirt, ShoppingCart,
+  SquareStar,
 } from "lucide-react";
 import { NavUser } from "./nav-user";
 import { SidebarItems } from "./sidebar-items";
@@ -53,9 +55,19 @@ const data = [
         icon: House,
       },
       {
+        title: "Decoración",
+        url: "/productos/categorias/decoracion",
+        icon: SquareStar,
+      },
+      {
         title: "Hogar",
         url: "/productos/categorias/hogar",
         icon: Lamp,
+      },
+      {
+        title: "Libros",
+        url: "/productos/categorias/libros",
+        icon: Book,
       },
       {
         title: "Ropa",

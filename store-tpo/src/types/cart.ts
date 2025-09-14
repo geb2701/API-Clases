@@ -15,7 +15,7 @@ export class CartItemClass {
   }
 
   get total(): number {
-    return this.product.price * this.quantity;
+    return this.product.discount ? this.product.discount : this.product.price * this.quantity;
   }
 
   get formattedTotal(): string {

@@ -88,16 +88,22 @@ export const ProductCard = ({
         </p>
 
         <div className="mt-2 flex items-baseline gap-2">
-          <p className="text-lg font-semibold">
-            {currencySymbol}
-            {p.price.toFixed(2)}
-          </p>
+          <div className="flex items-center gap-2">
+            {(p.discount ?? 0) > 0 && (
+              <span className="text-sm text-muted-foreground line-through">
+                {p.getFormattedPrice()}
+              </span>
+            )}
+            <span className="text-sm font-semibold text-green-600">
+              {p.getFormattedDiscountPrice()}
+            </span>
+          </div>
           {qty > 1 && (
             <span className="text-sm text-muted-foreground">
               × {qty} ={" "}
               <strong>
                 {currencySymbol}
-                {(p.price * qty).toFixed(2)}
+                {(p.getActualPrice() * qty).toFixed(2)}
               </strong>
             </span>
           )}
@@ -105,7 +111,7 @@ export const ProductCard = ({
 
         {/* Stock Information */}
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Stock disponible:</span>
+          <span className="text-xs text-muted-foreground">Stock:</span>
           <span className={`text-xs font-medium ${p.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
             {p.stock} unidades
           </span>
@@ -179,6 +185,6 @@ export const ProductCard = ({
           </Button>
         </div>
       </CardFooter>
-    </Card>
+    </Card >
   );
 };

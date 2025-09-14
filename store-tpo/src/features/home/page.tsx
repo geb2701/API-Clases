@@ -124,7 +124,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 my-2">
       {/* Banner Principal */}
       <section className="relative overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white">
         <div className="absolute inset-0 bg-black/20"></div>

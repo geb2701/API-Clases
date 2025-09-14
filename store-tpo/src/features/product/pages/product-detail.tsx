@@ -78,13 +78,25 @@ export const ProductDetailPage = () => {
             </p>
 
             <div className="text-3xl font-bold text-primary mb-6">
-              {product.getFormattedPrice()}
+              <div className="flex items-center gap-2">
+                {
+                  (product.discount ?? 0) > 0 && (
+                    <span className="text-muted-foreground line-through">
+                      {product.getFormattedPrice()}
+                    </span>
+                  )
+                }
+
+                <span className="font-semibold text-green-600">
+                  {product.getFormattedDiscountPrice()}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Stock */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Stock disponible:</span>
+            <span className="text-sm text-muted-foreground">Stock:</span>
             <span className={`text-sm font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
               {product.stock} unidades
             </span>

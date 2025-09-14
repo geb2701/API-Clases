@@ -24,9 +24,6 @@ export function Breadcrumbs() {
     };
   });
 
-
-  console.log({ items });
-
   return (
     <Breadcrumb>
       <BreadcrumbList className="p-0">

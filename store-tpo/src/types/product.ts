@@ -36,6 +36,10 @@ export class Product {
     return this.discount ? `$${this.discount.toFixed(2)}` : this.getFormattedPrice();
   }
 
+  getActualPrice(): number {
+    return this.discount ? this.discount : this.price;
+  }
+
   hasDiscount(): boolean {
     return this.discount !== undefined && this.discount < this.price;
   }
