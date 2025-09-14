@@ -1,6 +1,7 @@
 import React from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useProducts } from "../product/hooks/use-products";
+import { useCartContext } from "@/context/cart-context";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ProductCard } from "@/components/product-card";
+import { Badge } from "@/components/ui/badge";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -19,6 +20,7 @@ const pageSize = 12;
 
 const HomePage = () => {
   const api = useProducts();
+  const { addItem, getItemQuantity } = useCartContext();
 
   const { data: products } = useSuspenseQuery(api.queryOptions.all());
 

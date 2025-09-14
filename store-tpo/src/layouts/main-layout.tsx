@@ -7,6 +7,7 @@ import {
 import { Outlet } from "@tanstack/react-router";
 import { AppSidebar } from "./app-sidebar";
 import { Breadcrumbs } from "./breadcrumbs";
+import { CartSidebar } from "@/components/cart/cart-sidebar";
 
 const MainLayout = () => {
 	return (
@@ -36,6 +37,7 @@ const MainLayout = () => {
 					</div>
 				</div>
 			</SidebarInset>
+			<CartSidebar />
 		</SidebarProvider>
 	);
 };
