@@ -14,10 +14,14 @@ import {
 import {
 	House,
 	Search,
+	ShoppingCart,
 } from "lucide-react";
 import { NavUser } from "./nav-user";
 import { SidebarItems } from "./sidebar-items";
 import { SidebarSearchStore } from "./storage/sidebar-search-store";
+import { useCartContext } from "@/context/cart-context";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const data = [
 	{
@@ -34,6 +38,7 @@ const data = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { filterValue, setFilter } = SidebarSearchStore();
+	const { openCart, getTotalItems } = useCartContext();
 
 	return (
 		<Sidebar collapsible="icon" variant="inset" {...props}>
@@ -61,6 +66,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					</SidebarGroupContent>
 				</SidebarGroup>
 				<SidebarItems items={data} />
+				
+				{/* Cart Button */}
+				<div className="px-2 py-2">
+					<Button
+						variant="ghost"
+						className="w-full justify-start gap-2"
+						onClick={openCart}
+					>
+						<ShoppingCart className="h-4 w-4" />
+						<span>Carrito</span>
+						{getTotalItems() > 0 && (
+							<Badge variant="secondary" className="ml-auto">
+								{getTotalItems()}
+							</Badge>
+						)}
+					</Button>
+				</div>
 			</SidebarContent>
 			<SidebarFooter className="pt-2 pb-0">
 				<NavUser />

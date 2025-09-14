@@ -5,6 +5,7 @@ import { Toaster } from './components/ui/sonner';
 import NotFoundPage from './components/page-404/page';
 import SpinnerPage from './components/spinner/spinner-page';
 import { AuthProvider } from './context/auth-context';
+import { CartProvider } from './context/cart-context';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -34,10 +35,12 @@ function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<AuthProvider>
-				<RouterProvider
-					router={router}
-					context={{ queryClient }}
-				/>
+				<CartProvider>
+					<RouterProvider
+						router={router}
+						context={{ queryClient }}
+					/>
+				</CartProvider>
 			</AuthProvider>
 			<Toaster richColors />
 		</QueryClientProvider>

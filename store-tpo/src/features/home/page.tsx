@@ -2,6 +2,7 @@
 import React from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useProducts } from "../product/hooks/useProducts";
+import { useCartContext } from "@/context/cart-context";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ShoppingCart } from "lucide-react";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -27,6 +29,7 @@ const pageSize = 12;
 
 const HomePage = () => {
   const api = useProducts();
+  const { addItem, getItemQuantity } = useCartContext();
 
   const { data: products } = useSuspenseQuery(api.queryOptions.all());
 
@@ -87,9 +90,8 @@ const HomePage = () => {
     // TODO: integrar con tu router: navigate(`/products/${id}`)
     console.log("go detail", id);
   };
-  const addToCart = (id: number) => {
-    // TODO: integrar con tu cart store
-    console.log("add to cart", id);
+  const addToCart = (product: any) => {
+    addItem(product);
   };
 
   return (
@@ -187,8 +189,13 @@ const HomePage = () => {
               >
                 Ver detalle
               </Button>
-              <Button size="sm" onClick={() => addToCart(p.id)}>
-                Agregar
+              <Button 
+                size="sm" 
+                onClick={() => addToCart(p)}
+                className="flex items-center gap-1"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {getItemQuantity(p.id) > 0 && `(${getItemQuantity(p.id)})`}
               </Button>
             </CardFooter>
           </Card>
