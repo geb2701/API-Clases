@@ -13,8 +13,7 @@ export const Route = createFileRoute("/category/$nombre")({
   loader: ({ params }) => ({
     crumb: {
       label: titleFromSlug(params.nombre),
-      href: "/category/$nombre",
-      params,
     },
   }),
+
 });

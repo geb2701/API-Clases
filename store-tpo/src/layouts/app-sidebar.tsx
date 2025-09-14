@@ -32,22 +32,22 @@ const data = [
     items: [
       {
         title: "Accesorios",
-        url: "/",
+        url: "/category/accesorios",
         icon: House,
       },
       {
         title: "Hogar",
-        url: "/",
+        url: "/category/hogar",
         icon: House,
       },
       {
         title: "Ropa",
-        url: "/",
+        url: "/category/ropa",
         icon: House,
       },
       {
         title: "Tecnología",
-        url: "/",
+        url: "/category/tecnologia",
         icon: House,
       },
     ],

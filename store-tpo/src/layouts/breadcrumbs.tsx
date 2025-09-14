@@ -18,18 +18,14 @@ export function Breadcrumbs() {
   const items = matchesWithCrumbs.map(({ pathname, loaderData }) => {
     return {
       href: pathname,
-      label: loaderData?.crumb,
+      label: loaderData?.crumb?.label
+        ? loaderData?.crumb?.label
+        : loaderData?.crum,
     };
   });
 
-  console.log(
-    "matches: ",
-    matches.map((m) => ({
-      pathname: m.pathname,
-      crumb: m.loaderData?.crumb,
-      routeId: m.routeId,
-    }))
-  );
+
+  console.log({ items });
 
   return (
     <Breadcrumb>
