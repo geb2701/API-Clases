@@ -109,23 +109,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter className="pt-2 pb-0 flex flex-col gap-2 group-data-[collapsible=icon]:items-center">
         {/* Wrapper: saca padding y centra en colapsado */}
         <div className="
-    px-2 w-full
-    group-data-[collapsible=icon]:px-0
-    group-data-[collapsible=icon]:flex
-    group-data-[collapsible=icon]:justify-center
-  ">
+            px-2 w-full
+            group-data-[collapsible=icon]:px-0
+            group-data-[collapsible=icon]:flex
+            group-data-[collapsible=icon]:justify-center
+          ">
           <Button
             variant="ghost"
             onClick={openCart}
             aria-label="Abrir carrito"
             className="
-        w-full gap-2 justify-start
-        group-data-[collapsible=icon]:w-10
-        group-data-[collapsible=icon]:h-10
-        group-data-[collapsible=icon]:justify-center
-        group-data-[collapsible=icon]:p-0
-        group-data-[collapsible=icon]:rounded-xl
-      "
+              w-full gap-2 justify-start
+              group-data-[collapsible=icon]:w-10
+              group-data-[collapsible=icon]:h-10
+              group-data-[collapsible=icon]:justify-center
+              group-data-[collapsible=icon]:p-0
+              group-data-[collapsible=icon]:rounded-xl
+            "
           >
             <ShoppingCart className="h-4 w-4" />
             {/* Texto solo visible expandido */}

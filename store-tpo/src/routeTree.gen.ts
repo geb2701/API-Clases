@@ -9,20 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProductosRouteRouteImport } from './routes/productos/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as ProductosIndexRouteImport } from './routes/productos/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
+import { Route as ProductosIdRouteImport } from './routes/productos/$id'
 import { Route as ProductosCategoriasNombreRouteImport } from './routes/productos/categorias/$nombre'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const ProductosRouteRoute = ProductosRouteRouteImport.update({
+  id: '/productos',
+  path: '/productos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -30,86 +28,115 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductosIndexRoute = ProductosIndexRouteImport.update({
-  id: '/productos/',
-  path: '/productos/',
+const SignupIndexRoute = SignupIndexRouteImport.update({
+  id: '/signup/',
+  path: '/signup/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProductosIndexRoute = ProductosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProductosRouteRoute,
+} as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutIndexRoute = CheckoutIndexRouteImport.update({
+  id: '/checkout/',
+  path: '/checkout/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductosIdRoute = ProductosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProductosRouteRoute,
 } as any)
 const ProductosCategoriasNombreRoute =
   ProductosCategoriasNombreRouteImport.update({
-    id: '/productos/categorias/$nombre',
-    path: '/productos/categorias/$nombre',
-    getParentRoute: () => rootRouteImport,
+    id: '/categorias/$nombre',
+    path: '/categorias/$nombre',
+    getParentRoute: () => ProductosRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/productos': typeof ProductosIndexRoute
+  '/productos': typeof ProductosRouteRouteWithChildren
+  '/productos/$id': typeof ProductosIdRoute
+  '/checkout': typeof CheckoutIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/productos/': typeof ProductosIndexRoute
+  '/signup': typeof SignupIndexRoute
   '/productos/categorias/$nombre': typeof ProductosCategoriasNombreRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/productos/$id': typeof ProductosIdRoute
+  '/checkout': typeof CheckoutIndexRoute
+  '/login': typeof LoginIndexRoute
   '/productos': typeof ProductosIndexRoute
+  '/signup': typeof SignupIndexRoute
   '/productos/categorias/$nombre': typeof ProductosCategoriasNombreRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/productos': typeof ProductosRouteRouteWithChildren
+  '/productos/$id': typeof ProductosIdRoute
+  '/checkout/': typeof CheckoutIndexRoute
+  '/login/': typeof LoginIndexRoute
   '/productos/': typeof ProductosIndexRoute
+  '/signup/': typeof SignupIndexRoute
   '/productos/categorias/$nombre': typeof ProductosCategoriasNombreRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
-    | '/signup'
     | '/productos'
+    | '/productos/$id'
+    | '/checkout'
+    | '/login'
+    | '/productos/'
+    | '/signup'
     | '/productos/categorias/$nombre'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/productos/$id'
+    | '/checkout'
     | '/login'
-    | '/signup'
     | '/productos'
+    | '/signup'
     | '/productos/categorias/$nombre'
   id:
     | '__root__'
     | '/'
-    | '/login'
-    | '/signup'
+    | '/productos'
+    | '/productos/$id'
+    | '/checkout/'
+    | '/login/'
     | '/productos/'
+    | '/signup/'
     | '/productos/categorias/$nombre'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
-  ProductosIndexRoute: typeof ProductosIndexRoute
-  ProductosCategoriasNombreRoute: typeof ProductosCategoriasNombreRoute
+  ProductosRouteRoute: typeof ProductosRouteRouteWithChildren
+  CheckoutIndexRoute: typeof CheckoutIndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  SignupIndexRoute: typeof SignupIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/productos': {
+      id: '/productos'
+      path: '/productos'
+      fullPath: '/productos'
+      preLoaderRoute: typeof ProductosRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -119,29 +146,73 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup/': {
+      id: '/signup/'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/productos/': {
       id: '/productos/'
-      path: '/productos'
-      fullPath: '/productos'
+      path: '/'
+      fullPath: '/productos/'
       preLoaderRoute: typeof ProductosIndexRouteImport
+      parentRoute: typeof ProductosRouteRoute
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/checkout/': {
+      id: '/checkout/'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/productos/$id': {
+      id: '/productos/$id'
+      path: '/$id'
+      fullPath: '/productos/$id'
+      preLoaderRoute: typeof ProductosIdRouteImport
+      parentRoute: typeof ProductosRouteRoute
     }
     '/productos/categorias/$nombre': {
       id: '/productos/categorias/$nombre'
-      path: '/productos/categorias/$nombre'
+      path: '/categorias/$nombre'
       fullPath: '/productos/categorias/$nombre'
       preLoaderRoute: typeof ProductosCategoriasNombreRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ProductosRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
-  SignupRoute: SignupRoute,
+interface ProductosRouteRouteChildren {
+  ProductosIdRoute: typeof ProductosIdRoute
+  ProductosIndexRoute: typeof ProductosIndexRoute
+  ProductosCategoriasNombreRoute: typeof ProductosCategoriasNombreRoute
+}
+
+const ProductosRouteRouteChildren: ProductosRouteRouteChildren = {
+  ProductosIdRoute: ProductosIdRoute,
   ProductosIndexRoute: ProductosIndexRoute,
   ProductosCategoriasNombreRoute: ProductosCategoriasNombreRoute,
+}
+
+const ProductosRouteRouteWithChildren = ProductosRouteRoute._addFileChildren(
+  ProductosRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  ProductosRouteRoute: ProductosRouteRouteWithChildren,
+  CheckoutIndexRoute: CheckoutIndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  SignupIndexRoute: SignupIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

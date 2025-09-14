@@ -78,7 +78,6 @@ export const paymentInfoSchema = z.object({
         .max(19, "El número de tarjeta no puede exceder los 19 dígitos")
         .regex(/^[0-9\s]+$/, "El número de tarjeta solo puede contener números y espacios")
         .refine((val) => {
-            // Algoritmo de Luhn para validar tarjetas
             const digits = val.replace(/\s/g, '');
             let sum = 0;
             let isEven = false;

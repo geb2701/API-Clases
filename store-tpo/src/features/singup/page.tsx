@@ -1,18 +1,15 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { Signup01 } from "@/components/auth/signup01";
+
+import { SignupComponent } from "@/components/auth/signup-Component";
 import { useAuthContext } from "@/context/auth-context";
+import { useRouter } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/signup")({
-  component: SignupPage,
-});
-
-function SignupPage() {
+export const SignupPage = () => {
   const { signup } = useAuthContext();
   const router = useRouter();
 
   return (
     <div className="container mx-auto px-4">
-      <Signup01
+      <SignupComponent
         onSuccess={async (values) => {
           const ok = await signup(values);
           if (ok) router.navigate({ to: "/" });

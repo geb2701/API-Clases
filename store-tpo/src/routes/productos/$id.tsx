@@ -5,7 +5,7 @@ export const Route = createFileRoute("/productos/$id")({
   component: ProductDetailPage,
   loader: () => ({
     crumb: {
-      label: ` Detalle Producto`,
+      label: "Detalle Producto",
     },
   }),
 });

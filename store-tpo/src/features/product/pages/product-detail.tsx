@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus, ArrowLeft, ShoppingCart } from "lucide-react";
 import ImageLazy from "@/components/image-lazy";
-import { useProduct } from "../hooks/use-product";
 import { useCartContext } from "@/context/cart-context";
 import { Route } from "@/routes/productos/$id";
+import { useProducts } from "../hooks/use-products";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(Math.max(v, min), max);
@@ -16,9 +17,10 @@ const clamp = (v: number, min: number, max: number) =>
 export const ProductDetailPage = () => {
   const { id } = Route.useParams();
   const productId = parseInt(id);
-  const { data: product } = useProduct(productId);
+  const product = useSuspenseQuery(useProducts().queryOptions.all()).data.find(p => p.id === productId);
+
   const { addItem } = useCartContext();
-  
+
   const [quantity, setQuantity] = useState(1);
 
   const handleQuantityChange = (newQuantity: number) => {
@@ -37,8 +39,8 @@ export const ProductDetailPage = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Producto no encontrado</h1>
-          <Link 
-            to="/productos" 
+          <Link
+            to="/productos"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -51,17 +53,6 @@ export const ProductDetailPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Breadcrumb */}
-      <div className="mb-6">
-        <Link 
-          to="/productos" 
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver a productos
-        </Link>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Imagen del producto */}
         <div className="aspect-square w-full overflow-hidden bg-muted/30 rounded-lg flex items-center justify-center">
@@ -81,7 +72,7 @@ export const ProductDetailPage = () => {
                 {product.category}
               </Badge>
             </div>
-            
+
             <p className="text-lg text-muted-foreground mb-4">
               {product.description}
             </p>
@@ -114,7 +105,7 @@ export const ProductDetailPage = () => {
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                
+
                 <Input
                   type="number"
                   value={quantity}
@@ -123,7 +114,7 @@ export const ProductDetailPage = () => {
                   max={product.stock}
                   className="w-20 text-center"
                 />
-                
+
                 <Button
                   variant="outline"
                   size="icon"

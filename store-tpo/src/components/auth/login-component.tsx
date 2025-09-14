@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
+/** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 import * as React from "react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,7 +17,7 @@ type Props = {
   onSignup?: () => void
 }
 
-export function Login01({ onSuccess, onForgotPassword, onSignup }: Props) {
+export const LoginComponent = ({ onSuccess, onForgotPassword, onSignup }: Props) => {
   const [values, setValues] = React.useState<FormValues>({ email: "", password: "" })
   const [remember, setRemember] = React.useState(false)
   const [show, setShow] = React.useState(false)
@@ -24,8 +26,8 @@ export function Login01({ onSuccess, onForgotPassword, onSignup }: Props) {
 
   const setField =
     (k: keyof FormValues) =>
-    (v: string) =>
-      setValues((s) => ({ ...s, [k]: v }))
+      (v: string) =>
+        setValues((s) => ({ ...s, [k]: v }))
 
   const validate = (): string | null => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -65,7 +67,7 @@ export function Login01({ onSuccess, onForgotPassword, onSignup }: Props) {
                 type="email"
                 placeholder="vos@ejemplo.com"
                 value={values.email}
-                onChange={(e) => setField("email")(e.target.value)}/>
+                onChange={(e) => setField("email")(e.target.value)} />
             </div>
 
             <div className="grid gap-2">

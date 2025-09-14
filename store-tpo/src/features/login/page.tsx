@@ -1,18 +1,14 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { Login01 } from "@/components/auth/login01";
+import { LoginComponent } from "@/components/auth/login-component";
 import { useAuthContext } from "@/context/auth-context";
+import { useRouter } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/login")({
-  component: LoginPage,
-});
-
-function LoginPage() {
+export const LoginPage = () => {
   const { login } = useAuthContext();
   const router = useRouter();
 
   return (
     <div className="container mx-auto px-4">
-      <Login01
+      <LoginComponent
         onSuccess={async ({ email, password }) => {
           const ok = await login(email, password);
           if (ok) router.navigate({ to: "/" });

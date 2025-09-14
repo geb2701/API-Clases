@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
 import * as React from "react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button"
 type FormValues = { name: string; surname: string; email: string; password: string }
 type Props = { onSuccess?: (values: FormValues) => void }
 
-export function Signup01({ onSuccess }: Props) {
+export const SignupComponent = ({ onSuccess }: Props) => {
   const [values, setValues] = React.useState<FormValues>({
     name: "", surname: "", email: "", password: ""
   })
