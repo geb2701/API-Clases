@@ -1,4 +1,3 @@
-import HomePage from '@/features/home/page';
 import { createFileRoute } from '@tanstack/react-router'
 
 
