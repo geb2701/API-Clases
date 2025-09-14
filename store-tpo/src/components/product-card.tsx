@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import ImageLazy from "./image-lazy";
 import type { Product } from "@/types/product";
 import { useCartContext } from "@/context/cart-context";
@@ -56,7 +57,7 @@ export const ProductCard = ({
   };
 
   const onViewDetail = (id: number) => {
-    console.log(`Ver detalle del producto ID ${id}`);
+    // La navegación se maneja con el Link component
   };
 
   return (
@@ -100,6 +101,14 @@ export const ProductCard = ({
               </strong>
             </span>
           )}
+        </div>
+
+        {/* Stock Information */}
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Stock disponible:</span>
+          <span className={`text-xs font-medium ${p.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {p.stock} unidades
+          </span>
         </div>
       </CardContent>
 
@@ -152,9 +161,11 @@ export const ProductCard = ({
             size="sm"
             variant="secondary"
             className="w-full"
-            onClick={() => onViewDetail?.(p.id)}
+            asChild
           >
-            Ver detalle
+            <Link to="/productos/$id" params={{ id: p.id.toString() }}>
+              Ver detalle
+            </Link>
           </Button>
 
           <Button
@@ -162,8 +173,9 @@ export const ProductCard = ({
             className="w-full"
             onClick={() => onAddToCart?.(qty)}
             disabled={disabled}
+            variant={disabled ? "destructive" : "default"}
           >
-            Agregar
+            {disabled ? "Sin stock" : "Agregar"}
           </Button>
         </div>
       </CardFooter>

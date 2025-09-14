@@ -178,5 +178,105 @@
     "category": "Accesorios",
     "image": "/images/tazas-css.png",
     "stock": 10
+  },
+  {
+    "id": 21,
+    "name": "Libro Python Avanzado",
+    "description": "Guía completa de programación avanzada en Python",
+    "price": 50,
+    "category": "Libros",
+    "image": "/images/libro-python.png",
+    "stock": 10,
+    "discount": 47.5
+  },
+  {
+    "id": 22,
+    "name": "Placa Raspberry Pi 4",
+    "description": "Mini computadora ideal para proyectos IoT",
+    "price": 95,
+    "category": "Tecnología",
+    "image": "/images/raspberry.png",
+    "stock": 10,
+    "discount": 86.5
+  },
+  {
+    "id": 23,
+    "name": "Cámara Web Full HD",
+    "description": "Cámara con micrófono integrado para streaming",
+    "price": 60,
+    "category": "Tecnología",
+    "image": "/images/camara.png",
+    "stock": 10,
+    "discount": 55
+  },
+  {
+    "id": 24,
+    "name": "Agenda de Programador",
+    "description": "Agenda 2025 con espacio para notas técnicas",
+    "price": 15,
+    "category": "Accesorios",
+    "image": "/images/agenda.png",
+    "stock": 10,
+    "discount": 14.25
+  },
+  {
+    "id": 25,
+    "name": "Poster Retro Gaming",
+    "description": "Poster decorativo con diseño de consolas clásicas",
+    "price": 20,
+    "category": "Decoración",
+    "image": "/images/poster.png",
+    "stock": 10,
+    "discount": 18.5
+  },
+  {
+    "id": 26,
+    "name": "Cargador Inalámbrico",
+    "description": "Base de carga rápida Qi para smartphones",
+    "price": 40,
+    "category": "Tecnología",
+    "image": "/images/cargador.png",
+    "stock": 10,
+    "discount": 37
+  },
+  {
+    "id": 27,
+    "name": "Cuadro Código Binario",
+    "description": "Cuadro minimalista con arte en binario",
+    "price": 28,
+    "category": "Decoración",
+    "image": "/images/cuadro.png",
+    "stock": 10,
+    "discount": 26
+  },
+  {
+    "id": 28,
+    "name": "Router WiFi 6",
+    "description": "Router de alto rendimiento con WiFi 6",
+    "price": 130,
+    "category": "Tecnología",
+    "image": "/images/router.png",
+    "stock": 10,
+    "discount": 120
+  },
+  {
+    "id": 29,
+    "name": "Pack Stickers Geek",
+    "description": "Set de 50 stickers de programación y tecnología",
+    "price": 10,
+    "category": "Accesorios",
+    "image": "/images/stickers.png",
+    "stock": 10,
+    "discount": 9.2
+  },
+  {
+    "id": 30,
+    "name": "Mesa Ajustable Notebook",
+    "description": "Mesa portátil regulable para laptop",
+    "price": 70,
+    "category": "Hogar",
+    "image": "/images/mesa.png",
+    "stock": 10,
+    "discount": 64.5
   }
 ]

@@ -119,6 +119,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                               size="sm"
                               onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                               className="h-6 w-6 p-0"
+                              disabled={item.quantity >= item.product.stock}
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -129,6 +130,9 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                             </p>
                             <p className="text-xs text-muted-foreground">
                               ${item.product.price.toFixed(2)} c/u
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Stock: {item.product.stock - item.quantity} disponibles
                             </p>
                           </div>
                         </div>
