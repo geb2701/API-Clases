@@ -1,14 +1,15 @@
 import React from "react";
 import { useCartContext } from "@/context/cart-context";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  ShoppingCart, 
-  Plus, 
-  Minus, 
-  Trash2, 
+import {
+  ShoppingCart,
+  Plus,
+  Minus,
+  Trash2,
   X,
   ShoppingBag
 } from "lucide-react";
@@ -19,6 +20,7 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
+  const navigate = useNavigate();
   const {
     items,
     isOpen,
@@ -77,7 +79,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                           className="h-full w-full object-cover"
                         />
                       </div>
-                      
+
                       <div className="flex flex-1 flex-col gap-2">
                         <div className="flex items-start justify-between">
                           <div>
@@ -97,7 +99,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1">
                             <Button
@@ -117,6 +119,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                               size="sm"
                               onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                               className="h-6 w-6 p-0"
+                              disabled={item.quantity >= item.product.stock}
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -127,6 +130,9 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                             </p>
                             <p className="text-xs text-muted-foreground">
                               ${item.product.price.toFixed(2)} c/u
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Stock: {item.product.stock - item.quantity} disponibles
                             </p>
                           </div>
                         </div>
@@ -147,7 +153,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                   <span className="text-lg font-semibold">Total:</span>
                   <span className="text-lg font-bold">{getFormattedTotal()}</span>
                 </div>
-                
+
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -156,7 +162,13 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                   >
                     Vaciar carrito
                   </Button>
-                  <Button className="flex-1">
+                  <Button
+                    className="flex-1"
+                    onClick={() => {
+                      closeCart();
+                      navigate({ to: "/checkout" });
+                    }}
+                  >
                     Finalizar compra
                   </Button>
                 </div>
