@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as ProductosIndexRouteImport } from './routes/productos/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as ForgotIndexRouteImport } from './routes/forgot/index'
 import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
 import { Route as ProductosIdRouteImport } from './routes/productos/$id'
 import { Route as ProductosCategoriasNombreRouteImport } from './routes/productos/categorias/$nombre'
@@ -43,6 +44,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotIndexRoute = ForgotIndexRouteImport.update({
+  id: '/forgot/',
+  path: '/forgot/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutIndexRoute = CheckoutIndexRouteImport.update({
   id: '/checkout/',
   path: '/checkout/',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/productos': typeof ProductosRouteRouteWithChildren
   '/productos/$id': typeof ProductosIdRoute
   '/checkout': typeof CheckoutIndexRoute
+  '/forgot': typeof ForgotIndexRoute
   '/login': typeof LoginIndexRoute
   '/productos/': typeof ProductosIndexRoute
   '/signup': typeof SignupIndexRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/productos/$id': typeof ProductosIdRoute
   '/checkout': typeof CheckoutIndexRoute
+  '/forgot': typeof ForgotIndexRoute
   '/login': typeof LoginIndexRoute
   '/productos': typeof ProductosIndexRoute
   '/signup': typeof SignupIndexRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/productos': typeof ProductosRouteRouteWithChildren
   '/productos/$id': typeof ProductosIdRoute
   '/checkout/': typeof CheckoutIndexRoute
+  '/forgot/': typeof ForgotIndexRoute
   '/login/': typeof LoginIndexRoute
   '/productos/': typeof ProductosIndexRoute
   '/signup/': typeof SignupIndexRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/productos'
     | '/productos/$id'
     | '/checkout'
+    | '/forgot'
     | '/login'
     | '/productos/'
     | '/signup'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/productos/$id'
     | '/checkout'
+    | '/forgot'
     | '/login'
     | '/productos'
     | '/signup'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/productos'
     | '/productos/$id'
     | '/checkout/'
+    | '/forgot/'
     | '/login/'
     | '/productos/'
     | '/signup/'
@@ -126,6 +138,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProductosRouteRoute: typeof ProductosRouteRouteWithChildren
   CheckoutIndexRoute: typeof CheckoutIndexRoute
+  ForgotIndexRoute: typeof ForgotIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   SignupIndexRoute: typeof SignupIndexRoute
 }
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot/': {
+      id: '/forgot/'
+      path: '/forgot'
+      fullPath: '/forgot'
+      preLoaderRoute: typeof ForgotIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout/': {
@@ -211,6 +231,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProductosRouteRoute: ProductosRouteRouteWithChildren,
   CheckoutIndexRoute: CheckoutIndexRoute,
+  ForgotIndexRoute: ForgotIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   SignupIndexRoute: SignupIndexRoute,
 }
