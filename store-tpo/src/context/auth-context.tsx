@@ -1,4 +1,4 @@
-import { User } from "@/type/user";
+import { User } from "@/types/user";
 import { createContext, useContext, type ReactNode } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -78,11 +78,11 @@ const useAuthStore = create<AuthState>()(
             typeof updater === "function"
               ? (updater as (prev: User) => User)(current)
               : new User(
-                  current.id,
-                  updater.name ?? current.name,
-                  updater.surname ?? current.surname,
-                  updater.email ?? current.email
-                );
+                current.id,
+                updater.name ?? current.name,
+                updater.surname ?? current.surname,
+                updater.email ?? current.email
+              );
           return { user: next };
         }),
     }),

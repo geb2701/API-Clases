@@ -89,8 +89,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
-      <SidebarHeader className="h-16 max-md:mt-2 mb-2 flex items-center justify-center">
-        <Logo size="md" showText={false} />
+      <SidebarHeader className="h-16 max-md:mt-2 mb-2 flex items-center justify-center overflow-hidden">
+        {/* Versión expandida: con texto */}
+        <div className="group-data-[collapsible=icon]:hidden">
+          <Logo size="md" showText />
+        </div>
+
+        {/* Versión colapsada: sin texto */}
+        <div className="hidden group-data-[collapsible=icon]:block">
+          <Logo size="md" showText={false} />
+        </div>
       </SidebarHeader>
 
       <SidebarContent>

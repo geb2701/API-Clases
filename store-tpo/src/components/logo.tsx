@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
 import React, { useEffect, useState } from "react";
 import useTheme from "@/hooks/use-theme";
 
@@ -7,14 +8,14 @@ interface LogoProps {
   showText?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ 
-  className = "", 
-  size = "md", 
-  showText = true 
+export const Logo: React.FC<LogoProps> = ({
+  className = "",
+  size = "md",
+  showText = true
 }) => {
   const { theme } = useTheme();
   const [isDark, setIsDark] = useState(false);
-  
+
   useEffect(() => {
     const checkTheme = () => {
       if (theme === "dark") {
@@ -26,9 +27,9 @@ export const Logo: React.FC<LogoProps> = ({
         setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
       }
     };
-    
+
     checkTheme();
-    
+
     // Escuchar cambios en el tema del sistema
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
@@ -36,9 +37,9 @@ export const Logo: React.FC<LogoProps> = ({
         checkTheme();
       }
     };
-    
+
     mediaQuery.addEventListener("change", handleChange);
-    
+
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
@@ -74,6 +75,7 @@ export const Logo: React.FC<LogoProps> = ({
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       {/* Icono del mono */}
+      {/** biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
       <svg
         width={currentSize.width}
         height={currentSize.height}
@@ -103,7 +105,7 @@ export const Logo: React.FC<LogoProps> = ({
           stroke={currentColors.monkey}
           strokeWidth="3"
         />
-        
+
         {/* Orejas del mono */}
         <circle
           cx="25"
@@ -121,7 +123,7 @@ export const Logo: React.FC<LogoProps> = ({
           stroke={currentColors.monkey}
           strokeWidth="2"
         />
-        
+
         {/* Ojos del mono */}
         <circle
           cx="30"
@@ -135,7 +137,7 @@ export const Logo: React.FC<LogoProps> = ({
           r="2"
           fill={currentColors.monkey}
         />
-        
+
         {/* Nariz del mono */}
         <ellipse
           cx="35"
@@ -144,7 +146,7 @@ export const Logo: React.FC<LogoProps> = ({
           ry="1"
           fill={currentColors.monkey}
         />
-        
+
         {/* Boca del mono */}
         <path
           d="M 30 42 Q 35 45 40 42"
@@ -153,7 +155,7 @@ export const Logo: React.FC<LogoProps> = ({
           strokeWidth="2"
           strokeLinecap="round"
         />
-        
+
         {/* Cuerpo del mono */}
         <ellipse
           cx="35"
@@ -164,7 +166,7 @@ export const Logo: React.FC<LogoProps> = ({
           stroke={currentColors.monkey}
           strokeWidth="3"
         />
-        
+
         {/* Brazo izquierdo del mono */}
         <path
           d="M 23 60 Q 15 55 12 65"
@@ -173,7 +175,7 @@ export const Logo: React.FC<LogoProps> = ({
           strokeWidth="3"
           strokeLinecap="round"
         />
-        
+
         {/* Mano del mono con cursor */}
         <circle
           cx="12"
@@ -181,7 +183,7 @@ export const Logo: React.FC<LogoProps> = ({
           r="3"
           fill={currentColors.cursor}
         />
-        
+
         {/* Cursor de computadora */}
         <path
           d="M 12 65 L 8 70 L 10 72 L 14 70 Z"
@@ -197,12 +199,11 @@ export const Logo: React.FC<LogoProps> = ({
       {showText && (
         <div className={`font-bold ${currentSize.textSize} tracking-tight`}>
           <span className="text-foreground">Chango</span>
-          <span 
-            className={`bg-gradient-to-r bg-clip-text text-transparent ${
-              isDark 
-                ? "from-pink-400 to-orange-400" 
-                : "from-pink-500 to-orange-500"
-            }`}
+          <span
+            className={`bg-gradient-to-r bg-clip-text text-transparent ${isDark
+              ? "from-pink-400 to-orange-400"
+              : "from-pink-500 to-orange-500"
+              }`}
           >
             Click
           </span>
