@@ -146,7 +146,9 @@ En el archivo `package.json` están definidos los siguientes comandos:
 - **Pedro Alvarez**
   - Legajo: 12345678
   - GitHub: [githubLink](githubLink)
-
+ **Tomas Angulo**
+  - Legajo: 1153717
+  - GitHub: [TomasaDev](https://github.com/TomasADev)
 ---
 
 ## 📌 Objetivo
