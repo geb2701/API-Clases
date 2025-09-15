@@ -1,6 +1,6 @@
 import type * as React from "react";
-import logo from "/Logo.png";
 import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/logo";
 import {
   Sidebar,
   SidebarContent,
@@ -90,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader className="h-16 max-md:mt-2 mb-2 flex items-center justify-center">
-        <img src={logo} alt="Logo" className="size-10" />
+        <Logo size="md" showText={false} />
       </SidebarHeader>
 
       <SidebarContent>

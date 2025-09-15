@@ -23,16 +23,17 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			},
 			{
 				name: "description",
-				content: "Web Application",
+				content: "ChangoClick - Tu tienda online de confianza",
 			},
 			{
-				title: "WebApp",
+				title: "ChangoClick - Tienda Online",
 			},
 		],
 		links: [
 			{
 				rel: "icon",
-				href: "/favicon.ico",
+				href: "/favicon.svg",
+				type: "image/svg+xml",
 			},
 			{
 				rel: "manifest",

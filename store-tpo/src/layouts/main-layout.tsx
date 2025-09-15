@@ -8,6 +8,7 @@ import { Outlet } from "@tanstack/react-router";
 import { AppSidebar } from "./app-sidebar";
 import { Breadcrumbs } from "./breadcrumbs";
 import { CartSidebar } from "@/layouts/cart-sidebar";
+import { Logo } from "@/components/logo";
 
 const MainLayout = () => {
 	return (
@@ -21,6 +22,11 @@ const MainLayout = () => {
 							<div className="flex flex-1 items-center gap-2">
 								<SidebarTrigger className="-ms-1" />
 								<div className="max-lg:hidden lg:contents">
+									<Separator
+										orientation="vertical"
+										className="me-2 data-[orientation=vertical]:h-4"
+									/>
+									<Logo size="sm" showText={true} />
 									<Separator
 										orientation="vertical"
 										className="me-2 data-[orientation=vertical]:h-4"
