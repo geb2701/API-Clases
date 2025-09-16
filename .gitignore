@@ -1,1 +1,5 @@
-store-tpo/src/routeTree.gen.ts
+/store-tpo/src/routeTree.gen.ts
+# o más general:
+**/routeTree.gen.ts
+# o incluso:
+*.gen.ts
