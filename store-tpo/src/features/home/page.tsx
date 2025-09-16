@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Star, Clock, Zap } from "lucide-react";
+import { ShoppingCart, Star, Clock, Zap, Package } from "lucide-react";
 import { useProducts } from "../product/hooks/use-products";
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product-card";
@@ -55,7 +55,7 @@ const HomePage = () => {
 
   // Productos con descuento
   const discountedProducts = React.useMemo(() => {
-    return products.filter(product => product.hasDiscount());
+    return products.filter((product) => product.hasDiscount());
   }, [products]);
 
   const filtered = React.useMemo(() => {
@@ -144,8 +144,10 @@ const HomePage = () => {
                 className="w-fit"
                 onClick={() => {
                   setShowOffers(false);
-                  const productsSection = document.querySelector('[data-section="products"]');
-                  productsSection?.scrollIntoView({ behavior: 'smooth' });
+                  const productsSection = document.querySelector(
+                    '[data-section="products"]'
+                  );
+                  productsSection?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 Ver Productos
@@ -156,8 +158,10 @@ const HomePage = () => {
                 className="w-fit border-white text-white hover:bg-white hover:text-gray-900"
                 onClick={() => {
                   setShowOffers(true);
-                  const productsSection = document.querySelector('[data-section="products"]');
-                  productsSection?.scrollIntoView({ behavior: 'smooth' });
+                  const productsSection = document.querySelector(
+                    '[data-section="products"]'
+                  );
+                  productsSection?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 Ofertas Especiales
@@ -181,7 +185,10 @@ const HomePage = () => {
         </div>
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {featuredProducts.map((product) => (
-            <Card key={product.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
+            <Card
+              key={product.id}
+              className="overflow-hidden group hover:shadow-lg transition-shadow"
+            >
               <div className="aspect-square w-full overflow-hidden bg-muted/30 relative">
                 <img
                   src={`http://localhost:3000/${product.image}`}
@@ -192,14 +199,41 @@ const HomePage = () => {
                 <Badge className="absolute top-2 left-2 bg-red-500">
                   Destacado
                 </Badge>
+                {/* Badge de Stock */}
+                <Badge
+                  className={`absolute top-2 right-2 ${product.stock > 10
+                      ? "bg-green-500"
+                      : product.stock > 0
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    }`}
+                >
+                  <Package className="w-3 h-3 mr-1" />
+                  {product.stock}
+                </Badge>
               </div>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base leading-tight">
                   {product.name}
                 </CardTitle>
-                <Badge variant="secondary" className="w-fit">
-                  {product.category}
-                </Badge>
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary" className="w-fit">
+                    {product.category}
+                  </Badge>
+                  {/* Indicador de stock textual */}
+                  <span
+                    className={`text-xs font-medium ${product.stock > 10
+                        ? "text-green-600"
+                        : product.stock > 0
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                      }`}
+                  >
+                    {product.stock > 0
+                      ? `${product.stock} disponibles`
+                      : "Sin stock"}
+                  </span>
+                </div>
               </CardHeader>
               <CardContent className="pt-0">
                 <p className="text-lg font-semibold text-green-600">
@@ -210,9 +244,10 @@ const HomePage = () => {
                 <Button
                   className="w-full flex items-center gap-1"
                   onClick={() => addToCart(product)}
+                  disabled={product.stock === 0}
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  Agregar al carrito
+                  {product.stock === 0 ? "Sin stock" : "Agregar al carrito"}
                 </Button>
               </CardFooter>
             </Card>
@@ -227,52 +262,59 @@ const HomePage = () => {
           <h2 className="text-2xl font-bold">Ofertas</h2>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {productsByCategory.map(({ category, products: categoryProducts }) => (
-            <Card key={category} className="overflow-hidden">
-              <div className="bg-gradient-to-r from-orange-500 to-red-500 p-4 text-white">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{category}</h3>
-                  <Badge variant="secondary" className="bg-white text-orange-600">
-                    -{categoryProducts[0]?.getDiscountPercentage() || 0}%
-                  </Badge>
+          {productsByCategory.map(
+            ({ category, products: categoryProducts }) => (
+              <Card key={category} className="overflow-hidden">
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 p-4 text-white">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">{category}</h3>
+                    <Badge
+                      variant="secondary"
+                      className="bg-white text-orange-600"
+                    >
+                      -{categoryProducts[0]?.getDiscountPercentage() || 0}%
+                    </Badge>
+                  </div>
+                  <p className="text-sm opacity-90 mt-1">Oferta limitada</p>
                 </div>
-                <p className="text-sm opacity-90 mt-1">Oferta limitada</p>
-              </div>
-              <CardContent className="p-4">
-                <div className="space-y-3">
-                  {categoryProducts.map((product) => (
-                    <div key={product.id} className="flex items-center gap-3">
-                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
-                        <img
-                          src={`http://localhost:3000/${product.image}`}
-                          alt={product.name}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{product.name}</p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground line-through">
-                            {product.getFormattedPrice()}
-                          </span>
-                          <span className="text-sm font-semibold text-green-600">
-                            {product.getFormattedDiscountPrice()}
-                          </span>
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    {categoryProducts.map((product) => (
+                      <div key={product.id} className="flex items-center gap-3">
+                        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
+                          <img
+                            src={`http://localhost:3000/${product.image}`}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                          />
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {product.name}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground line-through">
+                              {product.getFormattedPrice()}
+                            </span>
+                            <span className="text-sm font-semibold text-green-600">
+                              {product.getFormattedDiscountPrice()}
+                            </span>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => addToCart(product)}
+                          className="shrink-0"
+                        >
+                          <ShoppingCart className="w-3 h-3" />
+                        </Button>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => addToCart(product)}
-                        className="shrink-0"
-                      >
-                        <ShoppingCart className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          )}
         </div>
       </section>
 
@@ -288,7 +330,8 @@ const HomePage = () => {
                 </div>
                 <h3 className="text-xl font-bold mb-1">Descuento Especial</h3>
                 <p className="text-sm opacity-90">
-                  Aprovecha nuestra oferta especial con hasta 50% de descuento en productos seleccionados
+                  Aprovecha nuestra oferta especial con hasta 50% de descuento en
+                  productos seleccionados
                 </p>
               </div>
               <div className="text-right">
@@ -301,8 +344,10 @@ const HomePage = () => {
               className="mt-4 w-fit"
               onClick={() => {
                 setShowOffers(true);
-                const productsSection = document.querySelector('[data-section="products"]');
-                productsSection?.scrollIntoView({ behavior: 'smooth' });
+                const productsSection = document.querySelector(
+                  '[data-section="products"]'
+                );
+                productsSection?.scrollIntoView({ behavior: "smooth" });
               }}
             >
               Ver Ofertas
@@ -316,9 +361,11 @@ const HomePage = () => {
         <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">
-              {showOffers ? 'Ofertas Especiales' : 'Todos los Productos'}
+              {showOffers ? "Ofertas Especiales" : "Todos los Productos"}
             </h2>
-            <p className="text-sm text-muted-foreground">{total} productos disponibles</p>
+            <p className="text-sm text-muted-foreground">
+              {total} productos disponibles
+            </p>
           </div>
 
           <div className="flex flex-col gap-2 md:flex-row md:items-center">
