@@ -24,15 +24,17 @@ interface CartSidebarProps {
 export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
   const navigate = useNavigate();
   const {
-    items,
     isOpen,
     closeCart,
     updateQuantity,
     removeItem,
     clearCart,
     getTotalItems,
+    getProducts,
     getFormattedTotal,
   } = useCartContext();
+
+  const items = getProducts();
 
   if (!isOpen) return null;
 

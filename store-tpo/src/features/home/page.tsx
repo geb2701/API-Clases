@@ -30,7 +30,7 @@ const pageSize = 12;
 
 const HomePage = () => {
   const api = useProducts();
-  const { addItem, getItemQuantity } = useCartContext();
+  const { addItem } = useCartContext();
 
   const { data: products } = useSuspenseQuery(api.queryOptions.all());
 
@@ -202,10 +202,10 @@ const HomePage = () => {
                 {/* Badge de Stock */}
                 <Badge
                   className={`absolute top-2 right-2 ${product.stock > 10
-                      ? "bg-green-500"
-                      : product.stock > 0
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
+                    ? "bg-green-500"
+                    : product.stock > 0
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
                     }`}
                 >
                   <Package className="w-3 h-3 mr-1" />
@@ -223,10 +223,10 @@ const HomePage = () => {
                   {/* Indicador de stock textual */}
                   <span
                     className={`text-xs font-medium ${product.stock > 10
-                        ? "text-green-600"
-                        : product.stock > 0
-                          ? "text-yellow-600"
-                          : "text-red-600"
+                      ? "text-green-600"
+                      : product.stock > 0
+                        ? "text-yellow-600"
+                        : "text-red-600"
                       }`}
                   >
                     {product.stock > 0

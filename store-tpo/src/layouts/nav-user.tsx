@@ -60,14 +60,14 @@ export function NavUser() {
                 <span>Perfil</span>
               </Link>
             </DropdownMenuItem>
-
-            <DropdownMenuItem className="gap-3 px-1" asChild>
-              <Link to="/gestionar">
-                <BaggageClaim size={20} className="text-muted-foreground/70" aria-hidden="true" />
-                <span>Gestionar</span>
-              </Link>
-            </DropdownMenuItem>
-
+            {user && (
+              <DropdownMenuItem className="gap-3 px-1" asChild>
+                <Link to="/gestionar">
+                  <BaggageClaim size={20} className="text-muted-foreground/70" aria-hidden="true" />
+                  <span>Gestionar</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
 
             <DropdownMenuLabel className="flex items-center gap-2">

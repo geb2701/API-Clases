@@ -24,18 +24,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CartItemClass } from "@/types/cart";
-import { Product } from "@/types/product";
-import { fromObject } from "@/lib/utils";
 
 const CheckoutPage: React.FC = () => {
 	const navigate = useNavigate();
-	const { items, getFormattedTotal, clearCart } = useCartContext();
+	const { getProducts, getFormattedTotal, clearCart } = useCartContext();
 
-	const cartItems = items.map(item => {
-		const product = fromObject<Product>(Product, item.product);
-		return new CartItemClass(product, item.quantity);
-	});
+	const items = getProducts();
 
 	const [currentStep, setCurrentStep] = useState(1);
 
@@ -186,7 +180,7 @@ const CheckoutPage: React.FC = () => {
 	const onSubmit = (data: CheckoutData) => {
 		// Demo: Mostrar mensaje en consola
 		console.log("=== DATOS DE COMPRA ===");
-		console.log("Productos:", cartItems);
+		console.log("Productos:", items);
 		console.log("Total:", getFormattedTotal());
 		console.log("Datos de facturación:", data.billing);
 		console.log("Datos de envío:", data.sameAddress ? data.billing : data.shipping);
@@ -252,7 +246,7 @@ const CheckoutPage: React.FC = () => {
 		return cleaned;
 	};
 
-	if (cartItems.length === 0) {
+	if (items.length === 0) {
 		return (
 			<div className="container mx-auto px-4 py-8">
 				<Card className="max-w-md mx-auto">
@@ -785,7 +779,7 @@ const CheckoutPage: React.FC = () => {
 								<div className="space-y-3">
 									{/* Lista de productos */}
 									<div className="space-y-2">
-										{cartItems.map((item) => (
+										{items.map((item) => (
 											<div key={item.product.id} className="flex gap-2 p-2 rounded-md border bg-card">
 												<div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
 													<ImageLazy

@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 import { toast } from "sonner";
 import { Product } from "@/types/product";
 import { CartItemClass } from "@/types/cart";
+import { fromObject } from "@/lib/utils";
 
 interface CartState {
   items: CartItemClass[];
@@ -14,6 +15,7 @@ interface CartState {
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
+  getProducts: () => CartItemClass[];
 
   // Acciones de UI
   toggleCart: () => void;
@@ -161,6 +163,13 @@ const useCartStore = create<CartState>()(
           }
 
           return { items: [] };
+        });
+      },
+
+      getProducts: () => {
+        return get().items.map(item => {
+          const product = fromObject<Product>(Product, item.product);
+          return new CartItemClass(product, item.quantity);
         });
       },
 
