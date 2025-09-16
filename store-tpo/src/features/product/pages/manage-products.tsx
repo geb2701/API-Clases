@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ImageLazy from "@/components/image-lazy";
-import { Product } from "@/types/product";
-import { Edit, Trash2, Search, Plus } from "lucide-react";
+import type { Product } from "@/types/product";
+import { Edit, Trash2, Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProducts } from "../hooks/use-products";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -22,6 +22,10 @@ export const ManageProductsPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(12);
+
   // Filtrar productos por término de búsqueda
   useEffect(() => {
     const filtered = products.filter(product =>
@@ -30,7 +34,14 @@ export const ManageProductsPage = () => {
       product.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredProducts(filtered);
+    setCurrentPage(1); // Reset a la primera página cuando se filtra
   }, [searchTerm, products]);
+
+  // Calcular productos para la página actual
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
   const handleDeleteProduct = (productId: number) => {
     const product = products.find(p => p.id === productId);
@@ -64,6 +75,11 @@ export const ManageProductsPage = () => {
     if (stock === 0) return "Sin stock";
     if (stock < 10) return "Poco stock";
     return "En stock";
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -140,72 +156,123 @@ export const ManageProductsPage = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
-            <Card key={product.id} className="overflow-hidden">
-              <div className="aspect-square relative">
-                <ImageLazy
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2 right-2">
-                  <Badge variant={getStockBadgeVariant(product.stock)}>
-                    {getStockText(product.stock)}
-                  </Badge>
-                </div>
-                {product.hasDiscount() && (
-                  <div className="absolute top-2 left-2">
-                    <Badge variant="destructive">
-                      -{product.getDiscountPercentage()}%
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {currentProducts.map((product) => (
+              <Card key={product.id} className="overflow-hidden">
+                <div className="aspect-square relative">
+                  <div className="aspect-square w-full overflow-hidden bg-muted/30 flex items-center justify-center">
+                    <ImageLazy
+                      src={`http://localhost:3000/${product.image}`}
+                      alt={product.name}
+                      className="block max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="absolute top-1 right-1">
+                    <Badge variant={getStockBadgeVariant(product.stock)} className="text-xs px-1 py-0">
+                      {getStockText(product.stock)}
                     </Badge>
                   </div>
-                )}
-              </div>
-
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg line-clamp-2">{product.name}</CardTitle>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {product.description}
-                </p>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xl font-bold">
-                    {product.getFormattedDiscountPrice()}
-                  </span>
                   {product.hasDiscount() && (
-                    <span className="text-sm text-muted-foreground line-through">
-                      {product.getFormattedPrice()}
-                    </span>
+                    <div className="absolute top-1 left-1">
+                      <Badge variant="destructive" className="text-xs px-1 py-0">
+                        -{product.getDiscountPercentage()}%
+                      </Badge>
+                    </div>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                  <span>{product.category}</span>
-                  <span>{product.stock} unidades</span>
-                </div>
+                <CardHeader className="pb-1 px-3 pt-3">
+                  <CardTitle className="text-sm line-clamp-2 leading-tight">{product.name}</CardTitle>
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {product.description}
+                  </p>
+                </CardHeader>
 
-                <div className="flex gap-2">
-                  <Link to={`/gestionar/editar/${product.id}`} className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full">
-                      <Edit className="w-4 h-4 mr-2" />
-                      Editar
+                <CardContent className="pt-0 px-3 pb-3">
+                  <div className="flex items-center gap-1 mb-2">
+                    <span className="text-sm font-bold">
+                      {product.getFormattedDiscountPrice()}
+                    </span>
+                    {product.hasDiscount() && (
+                      <span className="text-xs text-muted-foreground line-through">
+                        {product.getFormattedPrice()}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                    <span className="truncate">{product.category}</span>
+                    <span>{product.stock}u</span>
+                  </div>
+
+                  <div className="flex gap-1">
+                    <Link to={`/gestionar/editar/${product.id}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full h-7 text-xs px-2">
+                        <Edit className="w-3 h-3 mr-1" />
+                        Editar
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="h-7 px-2"
+                    >
+                      <Trash2 className="w-3 h-3" />
                     </Button>
-                  </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Controles de paginación */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center gap-1"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Anterior
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
-                    variant="destructive"
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handleDeleteProduct(product.id)}
+                    onClick={() => handlePageChange(page)}
+                    className="w-8 h-8 p-0"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    {page}
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-1"
+              >
+                Siguiente
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+
+          {/* Información de paginación */}
+          <div className="text-center text-sm text-muted-foreground mt-4">
+            Mostrando {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} de {filteredProducts.length} productos
+          </div>
+        </>
       )}
 
       {/* Dialog de confirmación de eliminación */}
