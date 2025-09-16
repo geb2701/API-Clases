@@ -6,9 +6,11 @@ import MainLayout from "@/layouts/main-layout";
 import type { QueryClient } from "@tanstack/react-query";
 
 import "@/styles.css";
+import type { AuthState } from "@/context/auth-context";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
+	auth: AuthState;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

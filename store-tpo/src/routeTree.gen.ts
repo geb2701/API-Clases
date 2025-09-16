@@ -10,18 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProductosRouteRouteImport } from './routes/productos/route'
+import { Route as GestionarRouteRouteImport } from './routes/gestionar/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as ProductosIndexRouteImport } from './routes/productos/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as GestionarIndexRouteImport } from './routes/gestionar/index'
 import { Route as ForgotIndexRouteImport } from './routes/forgot/index'
 import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
 import { Route as ProductosIdRouteImport } from './routes/productos/$id'
+import { Route as GestionarAgregarRouteImport } from './routes/gestionar/agregar'
 import { Route as ProductosCategoriasNombreRouteImport } from './routes/productos/categorias/$nombre'
+import { Route as GestionarEditarProductIdRouteImport } from './routes/gestionar/editar/$productId'
 
 const ProductosRouteRoute = ProductosRouteRouteImport.update({
   id: '/productos',
   path: '/productos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestionarRouteRoute = GestionarRouteRouteImport.update({
+  id: '/gestionar',
+  path: '/gestionar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -44,6 +53,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionarIndexRoute = GestionarIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GestionarRouteRoute,
+} as any)
 const ForgotIndexRoute = ForgotIndexRouteImport.update({
   id: '/forgot/',
   path: '/forgot/',
@@ -59,83 +73,117 @@ const ProductosIdRoute = ProductosIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ProductosRouteRoute,
 } as any)
+const GestionarAgregarRoute = GestionarAgregarRouteImport.update({
+  id: '/agregar',
+  path: '/agregar',
+  getParentRoute: () => GestionarRouteRoute,
+} as any)
 const ProductosCategoriasNombreRoute =
   ProductosCategoriasNombreRouteImport.update({
     id: '/categorias/$nombre',
     path: '/categorias/$nombre',
     getParentRoute: () => ProductosRouteRoute,
   } as any)
+const GestionarEditarProductIdRoute =
+  GestionarEditarProductIdRouteImport.update({
+    id: '/editar/$productId',
+    path: '/editar/$productId',
+    getParentRoute: () => GestionarRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gestionar': typeof GestionarRouteRouteWithChildren
   '/productos': typeof ProductosRouteRouteWithChildren
+  '/gestionar/agregar': typeof GestionarAgregarRoute
   '/productos/$id': typeof ProductosIdRoute
   '/checkout': typeof CheckoutIndexRoute
   '/forgot': typeof ForgotIndexRoute
+  '/gestionar/': typeof GestionarIndexRoute
   '/login': typeof LoginIndexRoute
   '/productos/': typeof ProductosIndexRoute
   '/signup': typeof SignupIndexRoute
+  '/gestionar/editar/$productId': typeof GestionarEditarProductIdRoute
   '/productos/categorias/$nombre': typeof ProductosCategoriasNombreRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gestionar/agregar': typeof GestionarAgregarRoute
   '/productos/$id': typeof ProductosIdRoute
   '/checkout': typeof CheckoutIndexRoute
   '/forgot': typeof ForgotIndexRoute
+  '/gestionar': typeof GestionarIndexRoute
   '/login': typeof LoginIndexRoute
   '/productos': typeof ProductosIndexRoute
   '/signup': typeof SignupIndexRoute
+  '/gestionar/editar/$productId': typeof GestionarEditarProductIdRoute
   '/productos/categorias/$nombre': typeof ProductosCategoriasNombreRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gestionar': typeof GestionarRouteRouteWithChildren
   '/productos': typeof ProductosRouteRouteWithChildren
+  '/gestionar/agregar': typeof GestionarAgregarRoute
   '/productos/$id': typeof ProductosIdRoute
   '/checkout/': typeof CheckoutIndexRoute
   '/forgot/': typeof ForgotIndexRoute
+  '/gestionar/': typeof GestionarIndexRoute
   '/login/': typeof LoginIndexRoute
   '/productos/': typeof ProductosIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/gestionar/editar/$productId': typeof GestionarEditarProductIdRoute
   '/productos/categorias/$nombre': typeof ProductosCategoriasNombreRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/gestionar'
     | '/productos'
+    | '/gestionar/agregar'
     | '/productos/$id'
     | '/checkout'
     | '/forgot'
+    | '/gestionar/'
     | '/login'
     | '/productos/'
     | '/signup'
+    | '/gestionar/editar/$productId'
     | '/productos/categorias/$nombre'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/gestionar/agregar'
     | '/productos/$id'
     | '/checkout'
     | '/forgot'
+    | '/gestionar'
     | '/login'
     | '/productos'
     | '/signup'
+    | '/gestionar/editar/$productId'
     | '/productos/categorias/$nombre'
   id:
     | '__root__'
     | '/'
+    | '/gestionar'
     | '/productos'
+    | '/gestionar/agregar'
     | '/productos/$id'
     | '/checkout/'
     | '/forgot/'
+    | '/gestionar/'
     | '/login/'
     | '/productos/'
     | '/signup/'
+    | '/gestionar/editar/$productId'
     | '/productos/categorias/$nombre'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GestionarRouteRoute: typeof GestionarRouteRouteWithChildren
   ProductosRouteRoute: typeof ProductosRouteRouteWithChildren
   CheckoutIndexRoute: typeof CheckoutIndexRoute
   ForgotIndexRoute: typeof ForgotIndexRoute
@@ -150,6 +198,13 @@ declare module '@tanstack/react-router' {
       path: '/productos'
       fullPath: '/productos'
       preLoaderRoute: typeof ProductosRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionar': {
+      id: '/gestionar'
+      path: '/gestionar'
+      fullPath: '/gestionar'
+      preLoaderRoute: typeof GestionarRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -180,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionar/': {
+      id: '/gestionar/'
+      path: '/'
+      fullPath: '/gestionar/'
+      preLoaderRoute: typeof GestionarIndexRouteImport
+      parentRoute: typeof GestionarRouteRoute
+    }
     '/forgot/': {
       id: '/forgot/'
       path: '/forgot'
@@ -201,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductosIdRouteImport
       parentRoute: typeof ProductosRouteRoute
     }
+    '/gestionar/agregar': {
+      id: '/gestionar/agregar'
+      path: '/agregar'
+      fullPath: '/gestionar/agregar'
+      preLoaderRoute: typeof GestionarAgregarRouteImport
+      parentRoute: typeof GestionarRouteRoute
+    }
     '/productos/categorias/$nombre': {
       id: '/productos/categorias/$nombre'
       path: '/categorias/$nombre'
@@ -208,8 +277,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductosCategoriasNombreRouteImport
       parentRoute: typeof ProductosRouteRoute
     }
+    '/gestionar/editar/$productId': {
+      id: '/gestionar/editar/$productId'
+      path: '/editar/$productId'
+      fullPath: '/gestionar/editar/$productId'
+      preLoaderRoute: typeof GestionarEditarProductIdRouteImport
+      parentRoute: typeof GestionarRouteRoute
+    }
   }
 }
+
+interface GestionarRouteRouteChildren {
+  GestionarAgregarRoute: typeof GestionarAgregarRoute
+  GestionarIndexRoute: typeof GestionarIndexRoute
+  GestionarEditarProductIdRoute: typeof GestionarEditarProductIdRoute
+}
+
+const GestionarRouteRouteChildren: GestionarRouteRouteChildren = {
+  GestionarAgregarRoute: GestionarAgregarRoute,
+  GestionarIndexRoute: GestionarIndexRoute,
+  GestionarEditarProductIdRoute: GestionarEditarProductIdRoute,
+}
+
+const GestionarRouteRouteWithChildren = GestionarRouteRoute._addFileChildren(
+  GestionarRouteRouteChildren,
+)
 
 interface ProductosRouteRouteChildren {
   ProductosIdRoute: typeof ProductosIdRoute
@@ -229,6 +321,7 @@ const ProductosRouteRouteWithChildren = ProductosRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GestionarRouteRoute: GestionarRouteRouteWithChildren,
   ProductosRouteRoute: ProductosRouteRouteWithChildren,
   CheckoutIndexRoute: CheckoutIndexRoute,
   ForgotIndexRoute: ForgotIndexRoute,

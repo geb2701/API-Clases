@@ -1,11 +1,9 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import CheckoutPage from "@/features/checkout/page";
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute("/checkout/")({
-  component: CheckoutPage,
+export const Route = createFileRoute('/gestionar')({
   loader: () => ({
     crumb: {
-      label: "Checkout",
+      label: "Gestionar",
     },
   }),
   beforeLoad: ({ context, location }) => {
@@ -18,4 +16,4 @@ export const Route = createFileRoute("/checkout/")({
       })
     }
   },
-});
+})

@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 
 type SignupValues = { name: string; surname?: string; email: string; password: string };
 
-interface AuthState {
+export interface AuthState {
   isLogged: boolean;
   user: User | null;
   registeredUsers: Array<SignupValues & { id: number }>;

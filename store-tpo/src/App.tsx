@@ -4,7 +4,7 @@ import { routeTree } from "./routeTree.gen";
 import { Toaster } from './components/ui/sonner';
 import NotFoundPage from './components/page-404/page';
 import SpinnerPage from './components/spinner/spinner-page';
-import { AuthProvider } from './context/auth-context';
+import { AuthProvider, useAuthContext } from './context/auth-context';
 import { CartProvider } from './context/cart-context';
 
 const queryClient = new QueryClient({
@@ -20,6 +20,7 @@ const router = createRouter({
 	routeTree,
 	context: {
 		queryClient,
+		auth: undefined!,
 	},
 	defaultPreload: "intent",
 	scrollRestoration: true,
@@ -31,20 +32,26 @@ const router = createRouter({
 	defaultNotFoundComponent: NotFoundPage,
 });
 
-function App() {
+const AppRouter = () => {
+	const auth = useAuthContext(); // ahora sí, dentro del AuthProvider
+	return (
+		<RouterProvider
+			router={router}
+			context={{ queryClient, auth }}
+		/>
+	);
+}
+
+const App = () => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<AuthProvider>
 				<CartProvider>
-					<RouterProvider
-						router={router}
-						context={{ queryClient }}
-					/>
+					<AppRouter />
 				</CartProvider>
 			</AuthProvider>
 			<Toaster richColors />
 		</QueryClientProvider>
-	)
+	);
 }
-
-export default App
+export default App;

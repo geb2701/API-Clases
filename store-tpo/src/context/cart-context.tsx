@@ -8,18 +8,18 @@ import { CartItemClass } from "@/types/cart";
 interface CartState {
   items: CartItemClass[];
   isOpen: boolean;
-  
+
   // Acciones del carrito
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
-  
+
   // Acciones de UI
   toggleCart: () => void;
   openCart: () => void;
   closeCart: () => void;
-  
+
   // Getters computados
   getTotalItems: () => number;
   getTotalPrice: () => number;
@@ -42,7 +42,7 @@ const useCartStore = create<CartState>()(
           if (existingItem) {
             // Si el producto ya existe, verificar stock disponible
             const newQuantity = existingItem.quantity + quantity;
-            
+
             if (newQuantity > product.stock) {
               // Notificación de error por exceder stock
               toast.error("Stock insuficiente", {
@@ -51,20 +51,20 @@ const useCartStore = create<CartState>()(
               });
               return state; // No hacer cambios si excede el stock
             }
-            
+
             // Si no excede el stock, incrementar la cantidad
             const updatedItems = state.items.map((item) =>
               item.product.id === product.id
                 ? new CartItemClass(item.product, newQuantity)
                 : item
             );
-            
+
             // Notificación para producto existente
             toast.success("Cantidad actualizada", {
               description: `${product.name} - Cantidad: ${newQuantity}`,
               duration: 3000,
             });
-            
+
             return { items: updatedItems };
           } else {
             // Si es un producto nuevo, verificar stock disponible
@@ -76,16 +76,16 @@ const useCartStore = create<CartState>()(
               });
               return state; // No hacer cambios si excede el stock
             }
-            
+
             // Si no excede el stock, agregarlo al carrito
             const newItem = new CartItemClass(product, quantity);
-            
+
             // Notificación para producto nuevo
             toast.success("Producto agregado al carrito", {
               description: `${product.name} - Cantidad: ${quantity}`,
               duration: 3000,
             });
-            
+
             return { items: [...state.items, newItem] };
           }
         });
@@ -94,7 +94,7 @@ const useCartStore = create<CartState>()(
       removeItem: (productId: number) => {
         set((state) => {
           const itemToRemove = state.items.find((item) => item.product.id === productId);
-          
+
           // Notificación para producto eliminado
           if (itemToRemove) {
             toast.error("Producto eliminado del carrito", {
@@ -102,7 +102,7 @@ const useCartStore = create<CartState>()(
               duration: 3000,
             });
           }
-          
+
           return {
             items: state.items.filter((item) => item.product.id !== productId),
           };
@@ -117,11 +117,11 @@ const useCartStore = create<CartState>()(
 
         set((state) => {
           const itemToUpdate = state.items.find((item) => item.product.id === productId);
-          
+
           if (!itemToUpdate) {
             return state; // No hacer cambios si no se encuentra el item
           }
-          
+
           // Verificar si la nueva cantidad excede el stock
           if (quantity > itemToUpdate.product.stock) {
             // Notificación de error por exceder stock
@@ -131,13 +131,13 @@ const useCartStore = create<CartState>()(
             });
             return state; // No hacer cambios si excede el stock
           }
-          
+
           // Notificación para cantidad actualizada
           toast.info("Cantidad actualizada", {
             description: `${itemToUpdate.product.name} - Nueva cantidad: ${quantity}`,
             duration: 3000,
           });
-          
+
           return {
             items: state.items.map((item) =>
               item.product.id === productId
@@ -151,7 +151,7 @@ const useCartStore = create<CartState>()(
       clearCart: () => {
         set((state) => {
           const itemCount = state.items.length;
-          
+
           // Notificación para carrito vaciado
           if (itemCount > 0) {
             toast.warning("Carrito vaciado", {
@@ -159,7 +159,7 @@ const useCartStore = create<CartState>()(
               duration: 3000,
             });
           }
-          
+
           return { items: [] };
         });
       },
@@ -177,15 +177,19 @@ const useCartStore = create<CartState>()(
       },
 
       getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
+        return get().items.reduce((acc, item) => acc + item.quantity, 0);
       },
 
       getTotalPrice: () => {
-        return get().items.reduce((total, item) => total + item.total, 0);
+        return get().items.reduce((acc, item) => {
+          const unitPrice = item.product.discount ?? item.product.price;
+          return acc + unitPrice * item.quantity;
+        }, 0);
       },
 
       getFormattedTotal: () => {
         const total = get().getTotalPrice();
+        console.log("Total price computed:", total);
         return `$${total.toFixed(2)}`;
       },
 

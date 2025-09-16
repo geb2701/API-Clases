@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
 import { useCartContext } from "@/context/cart-context";
 import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import ImageLazy from "@/components/image-lazy";
 import {
 	ShoppingCart,
 	CreditCard,
@@ -22,10 +24,18 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CartItemClass } from "@/types/cart";
+import { Product } from "@/types/product";
+import { fromObject } from "@/lib/utils";
 
 const CheckoutPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { items, getFormattedTotal, clearCart } = useCartContext();
+
+	const cartItems = items.map(item => {
+		const product = fromObject<Product>(Product, item.product);
+		return new CartItemClass(product, item.quantity);
+	});
 
 	const [currentStep, setCurrentStep] = useState(1);
 
@@ -149,7 +159,7 @@ const CheckoutPage: React.FC = () => {
 		if (currentStep === 1) {
 			// Validar campos de facturación
 			form.trigger(['billing.firstName', 'billing.lastName', 'billing.dni', 'billing.address', 'billing.city', 'billing.postalCode']);
-			
+
 			// Si no es la misma dirección, validar también campos de envío
 			if (!formData.sameAddress) {
 				form.trigger(['shipping.firstName', 'shipping.lastName', 'shipping.address', 'shipping.city', 'shipping.postalCode']);
@@ -158,7 +168,7 @@ const CheckoutPage: React.FC = () => {
 
 		if (validateCurrentStep(currentStep)) {
 			setCurrentStep(prev => prev + 1);
-			
+
 			// Mostrar notificación de éxito al avanzar
 			if (currentStep === 1) {
 				toast.success("Información de facturación completada", {
@@ -176,7 +186,7 @@ const CheckoutPage: React.FC = () => {
 	const onSubmit = (data: CheckoutData) => {
 		// Demo: Mostrar mensaje en consola
 		console.log("=== DATOS DE COMPRA ===");
-		console.log("Productos:", items);
+		console.log("Productos:", cartItems);
 		console.log("Total:", getFormattedTotal());
 		console.log("Datos de facturación:", data.billing);
 		console.log("Datos de envío:", data.sameAddress ? data.billing : data.shipping);
@@ -201,7 +211,7 @@ const CheckoutPage: React.FC = () => {
 	const handleFormSubmit = () => {
 		// Forzar validación de todos los campos de pago
 		form.trigger(['payment.cardNumber', 'payment.cardholderName', 'payment.expiryDate', 'payment.cvv']);
-		
+
 		if (validateCurrentStep(2)) {
 			handleSubmit(onSubmit)();
 		}
@@ -209,7 +219,7 @@ const CheckoutPage: React.FC = () => {
 
 	const handleSameAddressChange = (checked: boolean) => {
 		setValue("sameAddress", checked);
-		
+
 		// Si se marca como misma dirección, copiar datos de facturación a envío
 		if (checked) {
 			const billingData = formData.billing;
@@ -242,7 +252,7 @@ const CheckoutPage: React.FC = () => {
 		return cleaned;
 	};
 
-	if (items.length === 0) {
+	if (cartItems.length === 0) {
 		return (
 			<div className="container mx-auto px-4 py-8">
 				<Card className="max-w-md mx-auto">
@@ -342,114 +352,114 @@ const CheckoutPage: React.FC = () => {
 										</div>
 									</div>
 
-											<div>
-												<Label htmlFor="dni">DNI o CUIT *</Label>
-												<Controller
-													name="billing.dni"
-													control={control}
-													render={({ field, fieldState }) => (
-													<>
-														<Input
-															{...field}
-															id="dni"
-															className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
-															maxLength={11}
-															placeholder="12345678"
-															onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))}
-														/>
-														{fieldState.error && (
-															<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-																<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-																	<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-																</svg>
-																{fieldState.error.message}
-															</p>
-														)}
-													</>
-												)}
-												/>
-											</div>
+									<div>
+										<Label htmlFor="dni">DNI o CUIT *</Label>
+										<Controller
+											name="billing.dni"
+											control={control}
+											render={({ field, fieldState }) => (
+												<>
+													<Input
+														{...field}
+														id="dni"
+														className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
+														maxLength={11}
+														placeholder="12345678"
+														onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ''))}
+													/>
+													{fieldState.error && (
+														<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+															<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+																<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+															</svg>
+															{fieldState.error.message}
+														</p>
+													)}
+												</>
+											)}
+										/>
+									</div>
 
-											<div>
-												<Label htmlFor="address">Dirección/Domicilio *</Label>
-												<Controller
-													name="billing.address"
-													control={control}
-													render={({ field, fieldState }) => (
-													<>
-														<Input
-															{...field}
-															id="address"
-															className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
-															maxLength={100}
-															placeholder="Av. Corrientes 1234"
-														/>
-														{fieldState.error && (
-															<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-																<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-																	<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-																</svg>
-																{fieldState.error.message}
-															</p>
-														)}
-													</>
-												)}
-												/>
-											</div>
+									<div>
+										<Label htmlFor="address">Dirección/Domicilio *</Label>
+										<Controller
+											name="billing.address"
+											control={control}
+											render={({ field, fieldState }) => (
+												<>
+													<Input
+														{...field}
+														id="address"
+														className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
+														maxLength={100}
+														placeholder="Av. Corrientes 1234"
+													/>
+													{fieldState.error && (
+														<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+															<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+																<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+															</svg>
+															{fieldState.error.message}
+														</p>
+													)}
+												</>
+											)}
+										/>
+									</div>
 
 									<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-													<div>
-														<Label htmlFor="city">Ciudad *</Label>
-														<Controller
-															name="billing.city"
-															control={control}
-															render={({ field, fieldState }) => (
-																<>
-																	<Input
-																		{...field}
-																		id="city"
-																		className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
-																		maxLength={50}
-																		placeholder="Buenos Aires"
-																	/>
-																	{fieldState.error && (
-																		<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-																			<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-																				<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-																			</svg>
-																			{fieldState.error.message}
-																		</p>
-																	)}
-																</>
-															)}
+										<div>
+											<Label htmlFor="city">Ciudad *</Label>
+											<Controller
+												name="billing.city"
+												control={control}
+												render={({ field, fieldState }) => (
+													<>
+														<Input
+															{...field}
+															id="city"
+															className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
+															maxLength={50}
+															placeholder="Buenos Aires"
 														/>
-													</div>
-													<div>
-														<Label htmlFor="postalCode">Código postal *</Label>
-														<Controller
-															name="billing.postalCode"
-															control={control}
-															render={({ field, fieldState }) => (
-																<>
-																	<Input
-																		{...field}
-																		id="postalCode"
-																		className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
-																		maxLength={10}
-																		placeholder="1043"
-																	/>
-																	{fieldState.error && (
-																		<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
-																			<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-																				<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-																			</svg>
-																			{fieldState.error.message}
-																		</p>
-																	)}
-																</>
-															)}
+														{fieldState.error && (
+															<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+																<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+																	<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+																</svg>
+																{fieldState.error.message}
+															</p>
+														)}
+													</>
+												)}
+											/>
+										</div>
+										<div>
+											<Label htmlFor="postalCode">Código postal *</Label>
+											<Controller
+												name="billing.postalCode"
+												control={control}
+												render={({ field, fieldState }) => (
+													<>
+														<Input
+															{...field}
+															id="postalCode"
+															className={fieldState.error ? "border-red-500 focus:border-red-500" : ""}
+															maxLength={10}
+															placeholder="1043"
 														/>
-													</div>
+														{fieldState.error && (
+															<p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+																<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+																	<path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+																</svg>
+																{fieldState.error.message}
+															</p>
+														)}
+													</>
+												)}
+											/>
+										</div>
 									</div>
 
 									<Separator />
@@ -772,35 +782,66 @@ const CheckoutPage: React.FC = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardContent>
-								<div className="space-y-4">
-									{items.map((item) => (
-										<div key={item.product.id} className="flex gap-3">
-											<div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
-												<img
-													src={`http://localhost:3000/${item.product.image}`}
-													alt={item.product.name}
-													className="h-full w-full object-cover"
-												/>
+								<div className="space-y-3">
+									{/* Lista de productos */}
+									<div className="space-y-2">
+										{cartItems.map((item) => (
+											<div key={item.product.id} className="flex gap-2 p-2 rounded-md border bg-card">
+												<div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
+													<ImageLazy
+														src={`http://localhost:3000/${item.product.image}`}
+														alt={item.product.name}
+														className="h-full w-full object-cover"
+													/>
+												</div>
+												<div className="flex-1 min-w-0">
+													<h4 className="text-xs font-medium line-clamp-1 mb-1">
+														{item.product.name}
+													</h4>
+													<div className="space-y-0.5">
+														<div className="flex items-center justify-between text-xs text-muted-foreground">
+															<span>Precio:</span>
+															<span className="font-medium text-xs">
+																{item.product.hasDiscount()
+																	? item.product.getFormattedDiscountPrice()
+																	: item.product.getFormattedPrice()
+																}
+															</span>
+														</div>
+														<div className="flex items-center justify-between text-xs text-muted-foreground">
+															<span>Cant:</span>
+															<span className="font-medium text-xs">{item.quantity}</span>
+														</div>
+														{item.product.hasDiscount() && (
+															<div className="flex items-center justify-between text-xs text-muted-foreground">
+																<span>Original:</span>
+																<span className="line-through text-xs">{item.product.getFormattedPrice()}</span>
+															</div>
+														)}
+													</div>
+													<div className="flex items-center justify-between mt-1 pt-1 border-t">
+														<span className="text-xs font-semibold">Subtotal:</span>
+														<span className="text-xs font-bold text-primary">
+															{item.formattedTotal}
+														</span>
+													</div>
+												</div>
 											</div>
-											<div className="flex-1 min-w-0">
-												<h4 className="text-sm font-medium truncate">
-													{item.product.name}
-												</h4>
-												<p className="text-xs text-muted-foreground">
-													Cantidad: {item.quantity}
-												</p>
-												<p className="text-sm font-medium">
-													{item.formattedTotal}
-												</p>
-											</div>
-										</div>
-									))}
+										))}
+									</div>
 
 									<Separator />
 
-									<div className="flex items-center justify-between">
-										<span className="text-lg font-semibold">Total:</span>
-										<span className="text-lg font-bold">{getFormattedTotal()}</span>
+									{/* Resumen de totales */}
+									<div className="space-y-1">
+										<div className="flex items-center justify-between text-xs">
+											<span>Productos ({items.length}):</span>
+											<span>{items.reduce((acc, item) => acc + item.quantity, 0)} unidades</span>
+										</div>
+										<div className="flex items-center justify-between text-sm font-semibold">
+											<span>Total:</span>
+											<span className="text-base font-bold text-primary">{getFormattedTotal()}</span>
+										</div>
 									</div>
 								</div>
 							</CardContent>
