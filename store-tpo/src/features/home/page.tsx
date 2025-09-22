@@ -19,9 +19,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Star, Clock, Zap, Package } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { useProducts } from "../product/hooks/use-products";
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product-card";
+
+// Función helper para convertir nombre de categoría a slug
+const categoryToSlug = (category: string): string => {
+  return category
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .trim();
+};
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -217,8 +228,14 @@ const HomePage = () => {
                   {product.name}
                 </CardTitle>
                 <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="w-fit">
-                    {product.category}
+                  <Badge 
+                    variant="secondary" 
+                    className="w-fit cursor-pointer hover:bg-secondary/80 transition-colors"
+                    asChild
+                  >
+                    <Link to="/productos/categorias/$nombre" params={{ nombre: categoryToSlug(product.category) }}>
+                      {product.category}
+                    </Link>
                   </Badge>
                   {/* Indicador de stock textual */}
                   <span

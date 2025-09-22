@@ -1,4 +1,4 @@
-import React, { useId, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -14,6 +14,16 @@ import { Link } from "@tanstack/react-router";
 import ImageLazy from "./image-lazy";
 import type { Product } from "@/types/product";
 import { useCartContext } from "@/context/cart-context";
+
+// Función helper para convertir nombre de categoría a slug
+const categoryToSlug = (category: string): string => {
+  return category
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .trim();
+};
 
 type ProductCardProps = {
   product: Product;
@@ -56,9 +66,6 @@ export const ProductCard = ({
     addItem(p, quantity);
   };
 
-  const onViewDetail = (id: number) => {
-    // La navegación se maneja con el Link component
-  };
 
   return (
     <Card className={`overflow-hidden group ${className ?? ""}`}>
@@ -75,8 +82,14 @@ export const ProductCard = ({
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base leading-tight">{p.name}</CardTitle>
-          <Badge variant="secondary" className="shrink-0">
-            {p.category}
+          <Badge 
+            variant="secondary" 
+            className="shrink-0 cursor-pointer hover:bg-secondary/80 transition-colors"
+            asChild
+          >
+            <Link to="/productos/categorias/$nombre" params={{ nombre: categoryToSlug(p.category) }}>
+              {p.category}
+            </Link>
           </Badge>
         </div>
       </CardHeader>
