@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
+import { NoProductsFound } from "@/components/no-products-found";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -69,6 +70,7 @@ const ProductosPage = () => {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const start = (page - 1) * pageSize;
   const items = sorted.slice(start, start + pageSize);
+
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
@@ -129,11 +131,18 @@ const ProductosPage = () => {
         </div>
       </header>
 
-      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-        {items.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
+      {items.length > 0 ? (
+        <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+          {items.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      ) : (
+        <NoProductsFound
+          searchQuery={query}
+          category={category}
+        />
+      )}
 
       {/* Paginación */}
       <div className="flex items-center justify-center gap-3">

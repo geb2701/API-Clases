@@ -24,6 +24,7 @@ import { useProducts } from "../product/hooks/use-products";
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product-card";
 import { ImageModal } from "@/components/image-modal";
+import { NoProductsFound } from "@/components/no-products-found";
 
 // Función helper para convertir nombre de categoría a slug
 const categoryToSlug = (category: string): string => {
@@ -134,6 +135,7 @@ const HomePage = () => {
   const addToCart = (product: Product) => {
     addItem(product);
   };
+
 
   return (
     <div className="space-y-8 my-2">
@@ -443,12 +445,20 @@ const HomePage = () => {
           </div>
         </header>
 
-        {/* Grid de Productos */}
-        <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        {/* Grid de Productos o Mensaje de No Encontrado */}
+        {items.length > 0 ? (
+          <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+            {items.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        ) : (
+          <NoProductsFound
+            searchQuery={query}
+            category={category}
+            showOffers={showOffers}
+          />
+        )}
 
         {/* Paginación */}
         {totalPages > 1 && (
