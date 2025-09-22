@@ -23,6 +23,7 @@ import { Link } from "@tanstack/react-router";
 import { useProducts } from "../product/hooks/use-products";
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product-card";
+import { ImageModal } from "@/components/image-modal";
 
 // Función helper para convertir nombre de categoría a slug
 const categoryToSlug = (category: string): string => {
@@ -201,11 +202,17 @@ const HomePage = () => {
               className="overflow-hidden group hover:shadow-lg transition-shadow"
             >
               <div className="aspect-square w-full overflow-hidden bg-muted/30 relative">
-                <img
+                <ImageModal
                   src={`http://localhost:3000/${product.image}`}
                   alt={product.name}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
+                  trigger={
+                    <img
+                      src={`http://localhost:3000/${product.image}`}
+                      alt={product.name}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                      loading="lazy"
+                    />
+                  }
                 />
                 <Badge className="absolute top-2 left-2 bg-red-500">
                   Destacado
@@ -299,10 +306,16 @@ const HomePage = () => {
                     {categoryProducts.map((product) => (
                       <div key={product.id} className="flex items-center gap-3">
                         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
-                          <img
+                          <ImageModal
                             src={`http://localhost:3000/${product.image}`}
                             alt={product.name}
-                            className="h-full w-full object-cover"
+                            trigger={
+                              <img
+                                src={`http://localhost:3000/${product.image}`}
+                                alt={product.name}
+                                className="h-full w-full object-cover cursor-pointer"
+                              />
+                            }
                           />
                         </div>
                         <div className="flex-1 min-w-0">

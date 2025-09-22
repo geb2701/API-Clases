@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus, ArrowLeft, ShoppingCart } from "lucide-react";
 import ImageLazy from "@/components/image-lazy";
+import { ImageModal } from "@/components/image-modal";
 import { useCartContext } from "@/context/cart-context";
 import { Route } from "@/routes/productos/$id";
 import { useProducts } from "../hooks/use-products";
@@ -56,10 +57,18 @@ export const ProductDetailPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Imagen del producto */}
         <div className="aspect-square w-full overflow-hidden bg-muted/30 rounded-lg flex items-center justify-center">
-          <ImageLazy
+          <ImageModal
             src={`http://localhost:3000${product.image}`}
             alt={product.name}
-            className="block max-h-full max-w-full object-contain"
+            trigger={
+              <div className="block max-h-full max-w-full object-contain cursor-pointer">
+                <ImageLazy
+                  src={`http://localhost:3000${product.image}`}
+                  alt={product.name}
+                  className="block max-h-full max-w-full object-contain"
+                />
+              </div>
+            }
           />
         </div>
 

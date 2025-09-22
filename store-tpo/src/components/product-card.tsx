@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import ImageLazy from "./image-lazy";
+import { ImageModal } from "./image-modal";
 import type { Product } from "@/types/product";
 import { useCartContext } from "@/context/cart-context";
 
@@ -71,10 +72,18 @@ export const ProductCard = ({
     <Card className={`overflow-hidden group ${className ?? ""}`}>
       {/* Imagen */}
       <div className="aspect-square w-full overflow-hidden bg-muted/30 flex items-center justify-center">
-        <ImageLazy
+        <ImageModal
           src={`http://localhost:3000/${p.image}`}
           alt={p.name}
-          className="block max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+          trigger={
+            <div className="block max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer">
+              <ImageLazy
+                src={`http://localhost:3000/${p.image}`}
+                alt={p.name}
+                className="block max-h-full max-w-full object-contain"
+              />
+            </div>
+          }
         />
       </div>
 
