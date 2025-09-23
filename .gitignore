@@ -1,24 +1,103 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# === OS Files ===
+.DS_Store
 
-node_modules
-dist
-dist-ssr
-*.local
+# === IDEs and Editors ===
+.c9/
+.idea/
+.project
+.classpath
+.settings/
+*.launch
+*.sublime-workspace
 
-# Editor directories and files
+# VSCode
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.vscode-test
+
+# === Dependency Directories ===
+bower_components/
+jspm_packages/
+node_modules/
+web_modules/
+
+# === Build Output ===
+build/
+build/Release/
+dist/
+.next/
+.nuxt/
+.vuepress/dist/
+.vitepress/dist/
+out/
+
+# === Logs and Reports ===
+*.log
+.npm
+npm-debug.log*
+.pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*storybook.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# === Runtime Data ===
+*.pid
+*.pid.lock
+*.seed
+pids
+.node_repl_history
+.tern-port
+
+# === Test Coverage and Instrumentation ===
+coverage/
+*.lcov
+.nyc_output/
+.grunt/
+lib-cov/
+.docusaurus/
+src/routeTree.gen.ts
+
+# === Caches and Temp Files ===
+.cache/
+.parcel-cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.temp/
+.tmp/
+.fusebox/
+.dynamodb/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# === TypeScript ===
+*.tsbuildinfo
+metadata.ts
+
+# === ESLint and Stylelint ===
+.eslintcache
+.stylelintcache
+
+# === Misc Output ===
+*.tgz
+.lock-wscript
+
+# === Dotenv Files ===
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# === SQLite Databases ===
+prisma/*.db
+prisma/*.db-journal
