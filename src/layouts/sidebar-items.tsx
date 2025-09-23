@@ -17,7 +17,7 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "@tanstack/react-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { SidebarSearchStore } from "./storage/sidebar-search-store";
 
 export interface SidebarItem {
@@ -60,8 +60,11 @@ const getCleanedUrl = (url?: string) =>
 export const SidebarItems = ({ items, level = 0 }: NavMainProps) => {
 	const { filterValue } = SidebarSearchStore();
 
-	const aux = items.filter((x) => isFilter(x, filterValue));
-	const itemsFilter = aux.length > 0 || level === 0 ? aux : items;
+	const itemsFilter = useMemo(() => {
+		const aux = items.filter((x) => isFilter(x, filterValue));
+		console.log(aux);
+		return aux.length > 0 || level === 0 ? aux : items;
+	}, [items, filterValue, level, isFilter]);
 
 	return (
 		<>
@@ -69,7 +72,7 @@ export const SidebarItems = ({ items, level = 0 }: NavMainProps) => {
 			{
 				//hacemos primero el filtrado por el filtro que es menos costoso
 				itemsFilter
-					.map((item) => (
+					.map((item, idx) => (
 						//   <motion.div
 						//     key={item.title}
 						//     /* initial={{ opacity: 0, scale: 0.9 }}
@@ -81,7 +84,11 @@ export const SidebarItems = ({ items, level = 0 }: NavMainProps) => {
 						//     exit={{ opacity: 0, y: -10, scale: 0.9 }}
 						//     transition={{ duration: 0.3, ease: "easeInOut" }}
 						//     layout>
-						<NavItem key={item.title} item={item} level={level + 1} />
+						<NavItem
+							key={`${item.url ?? ''}|${item.title ?? ''}|${idx}`}
+							item={item}
+							level={level + 1}
+						/>
 						// </motion.div>
 					))
 			}
