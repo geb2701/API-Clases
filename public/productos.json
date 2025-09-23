@@ -278,5 +278,192 @@
     "image": "/images/mesa.png",
     "stock": 10,
     "discount": 64.5
+  },
+  {
+    "id": 31,
+    "name": "Cámara Digital 4K",
+    "description": "Cámara compacta con grabación 4K y estabilización óptica",
+    "price": 450,
+    "category": "Tecnología",
+    "image": "/images/CamaraDigital4k.png",
+    "stock": 8,
+    "discount": 425
+  },
+  {
+    "id": 32,
+    "name": "Pantalón Cargo Tech",
+    "description": "Pantalón cargo con múltiples bolsillos para gadgets",
+    "price": 55,
+    "category": "Ropa",
+    "image": "/images/PantalonCargo_sin_fondo.png",
+    "stock": 15
+  },
+  {
+    "id": 33,
+    "name": "Estantería Modular",
+    "description": "Estantería de madera con módulos intercambiables",
+    "price": 85,
+    "category": "Hogar",
+    "image": "/images/EstanteriaModular_sin_fondo.png",
+    "stock": 6,
+    "discount": 78
+  },
+  {
+    "id": 34,
+    "name": "Reloj Inteligente Fitness",
+    "description": "Smartwatch con GPS y monitoreo de actividad física",
+    "price": 180,
+    "category": "Tecnología",
+    "image": "/images/RelojInteligente_sin_fondo.png",
+    "stock": 12
+  },
+  {
+    "id": 35,
+    "name": "Bufanda de Lana Premium",
+    "description": "Bufanda tejida a mano con lana 100% natural",
+    "price": 35,
+    "category": "Ropa",
+    "image": "/images/43422601_0_1_20220921152310_sin_fondo.png",
+    "stock": 20
+  },
+  {
+    "id": 36,
+    "name": "Kit de Herramientas Digitales",
+    "description": "Set completo de herramientas para desarrolladores",
+    "price": 25,
+    "category": "Accesorios",
+    "image": "/images/KitHerramientasDigitales_sin_fondo.png",
+    "stock": 25
+  },
+  {
+    "id": 37,
+    "name": "Libro de Algoritmos",
+    "description": "Guía completa de algoritmos y estructuras de datos",
+    "price": 65,
+    "category": "Libros",
+    "image": "/images/GuiaAlgoritmos.png",
+    "stock": 10,
+    "discount": 58
+  },
+  {
+    "id": 38,
+    "name": "Lámpara de Pared LED",
+    "description": "Lámpara de pared con luz regulable y sensor de movimiento",
+    "price": 45,
+    "category": "Hogar",
+    "image": "/images/lampara.png",
+    "stock": 18
+  },
+  {
+    "id": 39,
+    "name": "Portátil Gaming 15.6",
+    "description": "Laptop gaming con RTX 4060 y pantalla 144Hz",
+    "price": 1200,
+    "category": "Tecnología",
+    "image": "/images/monPortatilGamer_sin_fondoitor.png",
+    "stock": 5,
+    "discount": 1100
+  },
+  {
+    "id": 40,
+    "name": "Chaqueta Bomber Tech",
+    "description": "Chaqueta bomber con forro térmico y bolsillos internos",
+    "price": 75,
+    "category": "Ropa",
+    "image": "/images/chaquetaBomber_sin_fondo.png",
+    "stock": 8
+  },
+  {
+    "id": 41,
+    "name": "Organizador de Escritorio",
+    "description": "Organizador modular con compartimentos para cables y accesorios",
+    "price": 32,
+    "category": "Accesorios",
+    "image": "/images/61e4cFFg6XL._AC_SL1001__sin_fondo.png",
+    "stock": 22
+  },
+  {
+    "id": 42,
+    "name": "Cuadro Minimalista Abstracto",
+    "description": "Cuadro moderno con diseño abstracto en tonos neutros",
+    "price": 45,
+    "category": "Decoración",
+    "image": "/images/CuadroMinimalista_sin_fondo.png",
+    "stock": 14
+  },
+  {
+    "id": 43,
+    "name": "Manual de Seguridad Cibernética",
+    "description": "Guía práctica para proteger sistemas y datos",
+    "price": 42,
+    "category": "Libros",
+    "image": "/images/ManualSeguridadCibernetica.png",
+    "stock": 16
+  },
+  {
+    "id": 44,
+    "name": "Sofá Modular 3 Plazas",
+    "description": "Sofá modular con chaise longue y tapizado premium",
+    "price": 650,
+    "category": "Hogar",
+    "image": "/images/sisillon3plazas_sin_fondolla.png",
+    "stock": 3,
+    "discount": 580
+  },
+  {
+    "id": 45,
+    "name": "Tablet Pro 12.9",
+    "description": "Tablet profesional con lápiz óptico incluido",
+    "price": 800,
+    "category": "Tecnología",
+    "image": "/images/monitortabltpro_sin_fondo.png",
+    "stock": 7
+  },
+  {
+    "id": 46,
+    "name": "Zapatos Deportivos Urbanos",
+    "description": "Zapatillas con tecnología de amortiguación avanzada",
+    "price": 95,
+    "category": "Ropa",
+    "image": "/images/ZapatosDeportivosUrbanos_sin_fondo.png",
+    "stock": 12,
+    "discount": 85
+  },
+  {
+    "id": 47,
+    "name": "Set de Cables Premium",
+    "description": "Kit completo de cables USB-C, HDMI y Lightning",
+    "price": 28,
+    "category": "Accesorios",
+    "image": "/images/cargD_NQ_NP_859818-MLA79523608172_102024-O_sin_fondoador.png",
+    "stock": 30
+  },
+  {
+    "id": 48,
+    "name": "Escultura Moderna",
+    "description": "Escultura de metal con acabado satinado",
+    "price": 120,
+    "category": "Decoración",
+    "image": "/images/cuEsculturamoderna_sin_fondoadro.png",
+    "stock": 4
+  },
+  {
+    "id": 49,
+    "name": "Guía de Machine Learning",
+    "description": "Introducción práctica al machine learning con Python",
+    "price": 55,
+    "category": "Libros",
+    "image": "/images/GuiaMachineLearning_sin_fondo.png",
+    "stock": 18
+  },
+  {
+    "id": 50,
+    "name": "Cama King Size",
+    "description": "Cama king size con cabecero tapizado y somier",
+    "price": 480,
+    "category": "Hogar",
+    "image": "/images/cama_sin_fondo.png",
+    "stock": 2,
+    "discount": 430
   }
 ]

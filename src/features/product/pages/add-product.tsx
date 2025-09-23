@@ -25,15 +25,12 @@ const productSchema = z.object({
 type ProductFormData = z.infer<typeof productSchema>;
 
 const categories = [
-  "Electrónicos",
-  "Ropa",
+  "Accesorios",
+  "Decoración",
   "Hogar",
-  "Deportes",
   "Libros",
-  "Juguetes",
-  "Belleza",
-  "Automotriz",
-  "Otros"
+  "Ropa",
+  "Tecnología"
 ];
 
 export default function AddProduct() {

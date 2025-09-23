@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
-import { NoProductsFound } from "@/components/no-products-found";
 import { Route } from "@/routes/productos/categorias/$nombre";
 
 type SortKey = "name" | "price";
@@ -79,7 +78,6 @@ export const CategoryPage = () => {
   const start = (page - 1) * pageSize;
   const items = sorted.slice(start, start + pageSize);
 
-
   React.useEffect(() => {
     setPage(1);
   }, [q, sortKey, sortDir, slug]);
@@ -124,19 +122,17 @@ export const CategoryPage = () => {
         </div>
       </header>
 
-      {/* Grid o Mensaje de No Encontrado */}
-      {items.length > 0 ? (
-        <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      ) : (
-        <NoProductsFound
-          searchQuery={query}
-          category={displayTitle}
-        />
-      )}
+      {/* Grid */}
+      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+        {items.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
+        {items.length === 0 && (
+          <div className="col-span-full py-10 text-center text-sm text-muted-foreground">
+            No hay productos que coincidan con tu búsqueda.
+          </div>
+        )}
+      </div>
 
       {/* Paginación */}
       {totalPages > 1 && (
