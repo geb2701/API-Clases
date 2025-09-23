@@ -360,7 +360,7 @@
     "description": "Laptop gaming con RTX 4060 y pantalla 144Hz",
     "price": 1200,
     "category": "Tecnología",
-    "image": "/images/monPortatilGamer_sin_fondoitor.png",
+    "image": "/images/PortatilGamer_sin_fondo.png",
     "stock": 5,
     "discount": 1100
   },
@@ -406,7 +406,7 @@
     "description": "Sofá modular con chaise longue y tapizado premium",
     "price": 650,
     "category": "Hogar",
-    "image": "/images/sisillon3plazas_sin_fondolla.png",
+    "image": "/images/sillon3plazas_sin_fondo.png",
     "stock": 3,
     "discount": 580
   },
@@ -416,7 +416,7 @@
     "description": "Tablet profesional con lápiz óptico incluido",
     "price": 800,
     "category": "Tecnología",
-    "image": "/images/monitortabltpro_sin_fondo.png",
+    "image": "/images/tabltpro_sin_fondo.png",
     "stock": 7
   },
   {
@@ -435,7 +435,7 @@
     "description": "Kit completo de cables USB-C, HDMI y Lightning",
     "price": 28,
     "category": "Accesorios",
-    "image": "/images/cargD_NQ_NP_859818-MLA79523608172_102024-O_sin_fondoador.png",
+    "image": "/images/D_NQ_NP_859818-MLA79523608172_102024-O_sin_fondo.png",
     "stock": 30
   },
   {
@@ -444,7 +444,7 @@
     "description": "Escultura de metal con acabado satinado",
     "price": 120,
     "category": "Decoración",
-    "image": "/images/cuEsculturamoderna_sin_fondoadro.png",
+    "image": "/images/Esculturamoderna_sin_fondo.png",
     "stock": 4
   },
   {
