@@ -152,15 +152,30 @@ Nota: Si genera algun error de tipo "'root'@'localhost' (using password: YES) Co
 
 ## 👥 Integrantes
 
-- **Pedro Alvarez**
-  - Legajo: 12345678
-  - GitHub: [githubLink](githubLink)
+- **Augusto Roubineau**
+  - Legajo: 
+  - GitHub: [AugstR](https://github.com/AugstR)
  **Tomas Angulo**
   - Legajo: 1153717
   - GitHub: [TomasaDev](https://github.com/TomasADev)
    **Tobías Traverso**
   - Legajo: 1117470
   - GitHub: [Tobias024](https://github.com/Tobias024)
+     **Matias Pedemonte**
+  - Legajo: 1180644
+  - GitHub: [catafrulo](https://github.com/catafrulo)
+     **Dahiana Poggi**
+  - Legajo: 1151380
+  - GitHub: [Dahianapoggi](https://github.com/Dahianapoggi)
+     **Paloma Irigoyen Ochoa**
+  - Legajo: 1171277
+  - GitHub: [pirigoyenochoa](https://github.com/pirigoyenochoa)
+       **Salvatierra Valentino**
+  - Legajo: 1150644
+  - GitHub: [tinacho05](https://github.com/tinacho05)
+       **Gustavo Bruno**
+  - Legajo: 1172421
+  - GitHub: [geb2701](https://github.com/geb2701)
 ---
 
 ## 📌 Objetivo
