@@ -1,0 +1,6 @@
+# Ignorar todas las imágenes subidas
+*
+
+# Pero mantener esta carpeta en el repositorio
+!.gitignore
+

@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
+/** biome-ignore-all lint/correctness/useUniqueElementIds: Multiple inputs with same ID pattern needed for form functionality */
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -10,19 +10,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import ImageLazy from "@/components/image-lazy";
-import { Product } from "@/types/product";
-import { ArrowLeft, Save, RotateCcw } from "lucide-react";
+import type { Product } from "@/types/product";
+import { ArrowLeft, Save, RotateCcw, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useProducts } from "../hooks/use-products";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { uploadImage, getImageUrl } from "../services/upload-service";
+import { updateProduct } from "../services/product-service";
+import { useNavigate } from "@tanstack/react-router";
 
 const productSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
   description: z.string().min(1, "La descripción es requerida").max(500, "La descripción es muy larga"),
   price: z.number().min(0.01, "El precio debe ser mayor a 0"),
   category: z.string().min(1, "La categoría es requerida"),
-  image: z.string().url("Debe ser una URL válida"),
+  image: z.string().min(1, "La imagen es requerida"),
   stock: z.number().min(0, "El stock no puede ser negativo").int("El stock debe ser un número entero"),
   discount: z.number().min(0, "El descuento no puede ser negativo").optional(),
 });
@@ -39,6 +42,7 @@ const categories = [
 ];
 
 export default function EditProduct() {
+  const navigate = useNavigate();
   const api = useProducts();
   const mockProducts = useSuspenseQuery(api.queryOptions.all()).data;
   const { productId } = useParams({ from: "/gestionar/editar/$productId" });
@@ -46,6 +50,8 @@ export default function EditProduct() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const {
     register,
@@ -70,7 +76,8 @@ export default function EditProduct() {
 
       if (foundProduct) {
         setProduct(foundProduct);
-        setPreviewImage(foundProduct.image);
+        // Construir URL completa de la imagen
+        setPreviewImage(getImageUrl(foundProduct.image));
 
         // Llenar formulario con datos del producto
         reset({
@@ -92,12 +99,76 @@ export default function EditProduct() {
     };
 
     loadProduct();
-  }, [productId, reset, mockProducts.find]);
+  }, [productId, reset, mockProducts]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setValue("image", value);
-    setPreviewImage(value);
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    // Validar tipo de archivo
+    if (!file.type.startsWith("image/")) {
+      toast.error("Archivo inválido", {
+        description: "Por favor selecciona una imagen válida (JPG, PNG, GIF, etc.)",
+      });
+      return;
+    }
+
+    // Validar tamaño (máximo 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("Archivo muy grande", {
+        description: "La imagen no debe superar los 5MB",
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Crear URL temporal para vista previa
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImage(previewUrl);
+
+    // Subir imagen inmediatamente
+    setIsUploadingImage(true);
+    try {
+      const uploadResponse = await uploadImage(file);
+      setValue("image", uploadResponse.fileName);
+
+      toast.success("Imagen actualizada", {
+        description: "La nueva imagen se ha subido correctamente",
+      });
+    } catch (error) {
+      toast.error("Error al subir imagen", {
+        description: error instanceof Error ? error.message : "No se pudo subir la imagen",
+      });
+      // Restaurar imagen original en caso de error
+      if (product) {
+        setPreviewImage(getImageUrl(product.image));
+        setValue("image", product.image);
+      }
+      setSelectedFile(null);
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleRemoveNewImage = () => {
+    setSelectedFile(null);
+
+    // Restaurar imagen original del producto
+    if (product) {
+      setPreviewImage(getImageUrl(product.image));
+      setValue("image", product.image);
+    }
+
+    // Limpiar el input file
+    const fileInput = document.getElementById("image") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   const onSubmit = async (data: ProductFormData) => {
@@ -106,23 +177,16 @@ export default function EditProduct() {
     setIsSubmitting(true);
 
     try {
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Crear producto actualizado
-      const updatedProduct = new Product(
-        product.id,
-        data.name,
-        data.description,
-        data.price,
-        data.category,
-        data.image,
-        data.stock,
-        data.discount
-      );
-
-      // Simular actualización exitosa
-      console.log("Producto actualizado:", updatedProduct);
+      // Actualizar producto usando la API
+      const updatedProduct = await updateProduct(product.id, {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        image: data.image,
+        stock: data.stock,
+        discount: data.discount,
+      });
 
       toast.success("¡Producto actualizado exitosamente!", {
         description: `El producto "${data.name}" ha sido modificado correctamente.`,
@@ -131,9 +195,14 @@ export default function EditProduct() {
       // Actualizar estado local
       setProduct(updatedProduct);
 
-    } catch {
+      // Redirigir a la página de gestión de productos después de un momento
+      setTimeout(() => {
+        navigate({ to: '/gestionar/productos' });
+      }, 1500);
+
+    } catch (error) {
       toast.error("Error al actualizar el producto", {
-        description: "Hubo un problema al modificar el producto. Inténtalo de nuevo.",
+        description: error instanceof Error ? error.message : "Hubo un problema al modificar el producto. Inténtalo de nuevo.",
       });
     } finally {
       setIsSubmitting(false);
@@ -151,7 +220,14 @@ export default function EditProduct() {
         stock: product.stock,
         discount: product.discount,
       });
-      setPreviewImage(product.image);
+      setPreviewImage(getImageUrl(product.image));
+      setSelectedFile(null);
+
+      // Limpiar el input file
+      const fileInput = document.getElementById("image") as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = "";
+      }
     }
   };
 
@@ -301,22 +377,52 @@ export default function EditProduct() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image">URL de la Imagen *</Label>
-              <Input
-                id="image"
-                type="url"
-                {...register("image")}
-                onChange={handleImageChange}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                className={errors.image ? "border-destructive" : ""}
-              />
+              <Label htmlFor="image">Imagen del Producto *</Label>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className={errors.image ? "border-destructive" : ""}
+                    disabled={isUploadingImage}
+                  />
+                </div>
+                {selectedFile && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={handleRemoveNewImage}
+                    disabled={isUploadingImage}
+                    title="Restaurar imagen original"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+              {isUploadingImage && (
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Upload className="w-4 h-4 animate-bounce" />
+                  Subiendo nueva imagen...
+                </p>
+              )}
               {errors.image && (
                 <p className="text-sm text-destructive">{errors.image.message}</p>
               )}
+              <p className="text-xs text-muted-foreground">
+                {selectedFile
+                  ? "Nueva imagen seleccionada. Se guardará al enviar el formulario."
+                  : "Selecciona una nueva imagen para reemplazar la actual (opcional)"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB
+              </p>
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button type="submit" disabled={isSubmitting} className="flex-1">
+              <Button type="submit" disabled={isSubmitting || isUploadingImage} className="flex-1">
                 <Save className="w-4 h-4 mr-2" />
                 {isSubmitting ? "Guardando..." : "Guardar Cambios"}
               </Button>
@@ -324,7 +430,7 @@ export default function EditProduct() {
                 type="button"
                 variant="outline"
                 onClick={handleReset}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isUploadingImage}
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Restaurar

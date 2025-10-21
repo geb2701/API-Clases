@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
+/** biome-ignore-all lint/correctness/useUniqueElementIds: Multiple inputs with same ID pattern needed for form functionality */
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,14 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageLazy from "@/components/image-lazy";
-import { Product } from "@/types/product";
+import { uploadImage } from "../services/upload-service";
+import { Upload, X } from "lucide-react";
+import { createProduct } from "../services/product-service";
+import { useNavigate } from "@tanstack/react-router";
 
 const productSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
   description: z.string().min(1, "La descripción es requerida").max(500, "La descripción es muy larga"),
   price: z.number().min(0.01, "El precio debe ser mayor a 0"),
   category: z.string().min(1, "La categoría es requerida"),
-  image: z.string().url("Debe ser una URL válida"),
+  image: z.string().min(1, "La imagen es requerida"),
   stock: z.number().min(0, "El stock no puede ser negativo").int("El stock debe ser un número entero"),
   discount: z.number().min(0, "El descuento no puede ser negativo").optional(),
 });
@@ -34,8 +37,11 @@ const categories = [
 ];
 
 export default function AddProduct() {
+  const navigate = useNavigate();
   const [previewImage, setPreviewImage] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const {
     register,
@@ -57,41 +63,102 @@ export default function AddProduct() {
     },
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setValue("image", value);
-    setPreviewImage(value);
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    // Validar tipo de archivo
+    if (!file.type.startsWith("image/")) {
+      toast.error("Archivo inválido", {
+        description: "Por favor selecciona una imagen válida (JPG, PNG, GIF, etc.)",
+      });
+      return;
+    }
+
+    // Validar tamaño (máximo 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("Archivo muy grande", {
+        description: "La imagen no debe superar los 5MB",
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Crear URL temporal para vista previa
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImage(previewUrl);
+
+    // Subir imagen inmediatamente
+    setIsUploadingImage(true);
+    try {
+      const uploadResponse = await uploadImage(file);
+      setValue("image", uploadResponse.fileName);
+
+      toast.success("Imagen cargada", {
+        description: "La imagen se ha subido correctamente",
+      });
+    } catch (error) {
+      toast.error("Error al subir imagen", {
+        description: error instanceof Error ? error.message : "No se pudo subir la imagen",
+      });
+      // Limpiar en caso de error
+      setSelectedFile(null);
+      setPreviewImage("");
+      setValue("image", "");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setPreviewImage("");
+    setValue("image", "");
+
+    // Limpiar el input file
+    const fileInput = document.getElementById("image") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   const onSubmit = async (data: ProductFormData) => {
     setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const newProduct = new Product(
-        Date.now(), // ID temporal
-        data.name,
-        data.description,
-        data.price,
-        data.category,
-        data.image,
-        data.stock,
-        data.discount
-      );
-
-      console.log("Producto creado:", newProduct);
+      // Crear producto usando la API
+      await createProduct({
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        image: data.image,
+        stock: data.stock,
+        discount: data.discount,
+      });
 
       toast.success("¡Producto agregado exitosamente!", {
         description: `El producto "${data.name}" ha sido creado correctamente.`,
       });
 
+      // Limpiar formulario
       reset();
       setPreviewImage("");
+      setSelectedFile(null);
 
-    } catch {
+      // Redirigir a la página de gestión de productos después de un momento
+      setTimeout(() => {
+        navigate({ to: '/gestionar/productos' });
+      }, 1500);
+
+    } catch (error) {
       toast.error("Error al agregar el producto", {
-        description: "Hubo un problema al crear el producto. Inténtalo de nuevo.",
+        description: error instanceof Error ? error.message : "Hubo un problema al crear el producto. Inténtalo de nuevo.",
       });
     } finally {
       setIsSubmitting(false);
@@ -204,22 +271,46 @@ export default function AddProduct() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image">URL de la Imagen *</Label>
-              <Input
-                id="image"
-                type="url"
-                {...register("image")}
-                onChange={handleImageChange}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                className={errors.image ? "border-destructive" : ""}
-              />
+              <Label htmlFor="image">Imagen del Producto *</Label>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className={errors.image ? "border-destructive" : ""}
+                    disabled={isUploadingImage}
+                  />
+                </div>
+                {selectedFile && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={handleRemoveImage}
+                    disabled={isUploadingImage}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+              {isUploadingImage && (
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Upload className="w-4 h-4 animate-bounce" />
+                  Subiendo imagen...
+                </p>
+              )}
               {errors.image && (
                 <p className="text-sm text-destructive">{errors.image.message}</p>
               )}
+              <p className="text-xs text-muted-foreground">
+                Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB
+              </p>
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button type="submit" disabled={isSubmitting} className="flex-1">
+              <Button type="submit" disabled={isSubmitting || isUploadingImage} className="flex-1">
                 {isSubmitting ? "Agregando..." : "Agregar Producto"}
               </Button>
               <Button
@@ -228,8 +319,10 @@ export default function AddProduct() {
                 onClick={() => {
                   reset();
                   setPreviewImage("");
+                  setSelectedFile(null);
+                  handleRemoveImage();
                 }}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isUploadingImage}
               >
                 Limpiar
               </Button>
@@ -259,14 +352,22 @@ export default function AddProduct() {
                       {watch("description") || "Descripción del producto"}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-2xl font-bold">
-                        {watch("price") ? `$${watch("price").toFixed(2)}` : "$0.00"}
-                      </span>
-                      {watch("discount") && watch("discount") < watch("price") && (
-                        <span className="text-lg text-muted-foreground line-through">
-                          ${watch("price").toFixed(2)}
-                        </span>
-                      )}
+                      {(() => {
+                        const price = watch("price");
+                        const discount = watch("discount");
+                        return (
+                          <>
+                            <span className="text-2xl font-bold">
+                              {price ? `$${price.toFixed(2)}` : "$0.00"}
+                            </span>
+                            {discount && price && discount < price && (
+                              <span className="text-lg text-muted-foreground line-through">
+                                ${price.toFixed(2)}
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                     <p className="text-sm text-muted-foreground">
                       Categoría: {watch("category") || "Sin categoría"}

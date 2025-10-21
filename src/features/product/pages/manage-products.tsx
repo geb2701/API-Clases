@@ -11,6 +11,8 @@ import type { Product } from "@/types/product";
 import { Edit, Trash2, Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProducts } from "../hooks/use-products";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { getImageUrl } from "../services/upload-service";
+import { deleteProduct } from "../services/product-service";
 
 export const ManageProductsPage = () => {
   const api = useProducts();
@@ -51,17 +53,26 @@ export const ManageProductsPage = () => {
     }
   };
 
-  const confirmDelete = () => {
-    if (selectedProduct) {
-      // Simular delay de API
-      setTimeout(() => {
-        setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
-        toast.success("Producto eliminado", {
-          description: `"${selectedProduct.name}" ha sido eliminado correctamente.`,
-        });
-        setIsDeleteDialogOpen(false);
-        setSelectedProduct(null);
-      }, 500);
+  const confirmDelete = async () => {
+    if (!selectedProduct) return;
+
+    try {
+      // Eliminar producto usando la API
+      await deleteProduct(selectedProduct.id);
+
+      // Actualizar lista local
+      setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
+
+      toast.success("Producto eliminado", {
+        description: `"${selectedProduct.name}" ha sido eliminado correctamente.`,
+      });
+
+      setIsDeleteDialogOpen(false);
+      setSelectedProduct(null);
+    } catch (error) {
+      toast.error("Error al eliminar producto", {
+        description: error instanceof Error ? error.message : "No se pudo eliminar el producto. Inténtalo de nuevo.",
+      });
     }
   };
 
@@ -163,7 +174,7 @@ export const ManageProductsPage = () => {
                 <div className="aspect-square relative">
                   <div className="aspect-square w-full overflow-hidden bg-muted/30 flex items-center justify-center">
                     <ImageLazy
-                      src={`http://localhost:3000/${product.image}`}
+                      src={getImageUrl(product.image)}
                       alt={product.name}
                       className="block max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
                     />

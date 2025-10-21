@@ -25,6 +25,7 @@ import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product-card";
 import { ImageModal } from "@/components/image-modal";
 import { NoProductsFound } from "@/components/no-products-found";
+import { getImageUrl } from "../product/services/upload-service";
 
 // Función helper para convertir nombre de categoría a slug
 const categoryToSlug = (category: string): string => {
@@ -205,11 +206,11 @@ const HomePage = () => {
             >
               <div className="aspect-square w-full overflow-hidden bg-muted/30 relative">
                 <ImageModal
-                  src={`http://localhost:3000/${product.image}`}
+                  src={getImageUrl(product.image)}
                   alt={product.name}
                   trigger={
                     <img
-                      src={`http://localhost:3000/${product.image}`}
+                      src={getImageUrl(product.image)}
                       alt={product.name}
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                       loading="lazy"
@@ -237,8 +238,8 @@ const HomePage = () => {
                   {product.name}
                 </CardTitle>
                 <div className="flex items-center justify-between">
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className="w-fit cursor-pointer hover:bg-secondary/80 transition-colors"
                     asChild
                   >
@@ -309,11 +310,11 @@ const HomePage = () => {
                       <div key={product.id} className="flex items-center gap-3">
                         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
                           <ImageModal
-                            src={`http://localhost:3000/${product.image}`}
+                            src={getImageUrl(product.image)}
                             alt={product.name}
                             trigger={
                               <img
-                                src={`http://localhost:3000/${product.image}`}
+                                src={getImageUrl(product.image)}
                                 alt={product.name}
                                 className="h-full w-full object-cover cursor-pointer"
                               />

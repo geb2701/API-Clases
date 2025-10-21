@@ -11,6 +11,7 @@ import { useCartContext } from "@/context/cart-context";
 import { Route } from "@/routes/productos/$id";
 import { useProducts } from "../hooks/use-products";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { getImageUrl } from "../services/upload-service";
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(Math.max(v, min), max);
@@ -58,12 +59,12 @@ export const ProductDetailPage = () => {
         {/* Imagen del producto */}
         <div className="aspect-square w-full overflow-hidden bg-muted/30 rounded-lg flex items-center justify-center">
           <ImageModal
-            src={`http://localhost:3000${product.image}`}
+            src={getImageUrl(product.image)}
             alt={product.name}
             trigger={
               <div className="block max-h-full max-w-full object-contain cursor-pointer">
                 <ImageLazy
-                  src={`http://localhost:3000${product.image}`}
+                  src={getImageUrl(product.image)}
                   alt={product.name}
                   className="block max-h-full max-w-full object-contain"
                 />

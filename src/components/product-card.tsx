@@ -14,6 +14,7 @@ import { Link } from "@tanstack/react-router";
 import ImageLazy from "./image-lazy";
 import { ImageModal } from "./image-modal";
 import type { Product } from "@/types/product";
+import { getImageUrl } from "@/features/product/services/upload-service";
 import { useCartContext } from "@/context/cart-context";
 
 // Función helper para convertir nombre de categoría a slug
@@ -68,17 +69,19 @@ export const ProductCard = ({
   };
 
 
+  const imageUrl = getImageUrl(p.image);
+
   return (
     <Card className={`overflow-hidden group ${className ?? ""}`}>
       {/* Imagen */}
       <div className="aspect-square w-full overflow-hidden bg-muted/30 flex items-center justify-center">
         <ImageModal
-          src={`http://localhost:3000/${p.image}`}
+          src={imageUrl}
           alt={p.name}
           trigger={
             <div className="block max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer">
               <ImageLazy
-                src={`http://localhost:3000/${p.image}`}
+                src={imageUrl}
                 alt={p.name}
                 className="block max-h-full max-w-full object-contain"
               />
@@ -91,8 +94,8 @@ export const ProductCard = ({
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base leading-tight">{p.name}</CardTitle>
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className="shrink-0 cursor-pointer hover:bg-secondary/80 transition-colors"
             asChild
           >

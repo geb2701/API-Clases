@@ -24,6 +24,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { getImageUrl } from "@/features/product/services/upload-service";
 
 const CheckoutPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -783,7 +784,7 @@ const CheckoutPage: React.FC = () => {
 											<div key={item.product.id} className="flex gap-2 p-2 rounded-md border bg-card">
 												<div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
 													<ImageLazy
-														src={`http://localhost:3000/${item.product.image}`}
+														src={getImageUrl(item.product.image)}
 														alt={item.product.name}
 														className="h-full w-full object-cover"
 													/>

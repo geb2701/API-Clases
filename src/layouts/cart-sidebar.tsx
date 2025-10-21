@@ -16,6 +16,7 @@ import {
   ShoppingBag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getImageUrl } from "@/features/product/services/upload-service";
 
 interface CartSidebarProps {
   className?: string;
@@ -84,7 +85,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                     <div className="flex gap-3 p-3">
                       <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
                         <img
-                          src={`http://localhost:3000/${item.product.image}`}
+                          src={getImageUrl(item.product.image)}
                           alt={item.product.name}
                           className="h-full w-full object-cover"
                         />
