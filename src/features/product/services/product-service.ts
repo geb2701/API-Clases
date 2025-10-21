@@ -4,28 +4,30 @@ import { Product } from "@/types/product";
 
 
 export const getProducts = async() => {
-  const response = await apiClient.get('productos.json');
+  const response = await apiClient.get('products');
 
-  const responseData = await response.json<object[]>();
-  if (!Array.isArray(responseData)) {
-    throw new Error('Invalid response format: expected an array');
+  const responseData = await response.json<{
+    content: object[],
+    totalElements: number,
+    totalPages: number,
+    size: number,
+    number: number
+  }>();
+  
+  if (!responseData.content || !Array.isArray(responseData.content)) {
+    throw new Error('Invalid response format: expected an array in content field');
   }
 
-  return responseData.map((item) => fromObject(Product, item));
+  return responseData.content.map((item) => fromObject(Product, item));
 };
 
 export const getProductById = async(id: number): Promise<Product> => {
-  const response = await apiClient.get('productos.json');
+  const response = await apiClient.get(`products/${id}`);
   
-  const responseData = await response.json<object[]>();
-  if (!Array.isArray(responseData)) {
-    throw new Error('Invalid response format: expected an array');
-  }
-
-  const productData = responseData.find((item: any) => item.id === id);
-  if (!productData) {
+  const responseData = await response.json<object>();
+  if (!responseData) {
     throw new Error(`Product with id ${id} not found`);
   }
 
-  return fromObject(Product, productData);
+  return fromObject(Product, responseData);
 };
