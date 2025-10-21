@@ -51,17 +51,28 @@ export const ManageProductsPage = () => {
     }
   };
 
-  const confirmDelete = () => {
-    if (selectedProduct) {
-      // Simular delay de API
-      setTimeout(() => {
-        setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
-        toast.success("Producto eliminado", {
-          description: `"${selectedProduct.name}" ha sido eliminado correctamente.`,
-        });
-        setIsDeleteDialogOpen(false);
-        setSelectedProduct(null);
-      }, 500);
+  const confirmDelete = async () => {
+    if (!selectedProduct) return;
+
+    try {
+      // Llamar a la API para eliminar el producto
+      const { deleteProduct } = await import("../services/product-service");
+      await deleteProduct(selectedProduct.id);
+
+      // Actualizar lista local
+      setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
+
+      toast.success("Producto eliminado", {
+        description: `"${selectedProduct.name}" ha sido eliminado correctamente.`,
+      });
+
+      setIsDeleteDialogOpen(false);
+      setSelectedProduct(null);
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
+      toast.error("Error al eliminar el producto", {
+        description: "Hubo un problema al eliminar el producto. Inténtalo de nuevo.",
+      });
     }
   };
 

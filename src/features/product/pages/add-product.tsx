@@ -67,18 +67,18 @@ export default function AddProduct() {
     setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Llamar a la API para crear el producto
+      const { createProduct } = await import("../services/product-service");
 
-      const newProduct = new Product(
-        Date.now(), // ID temporal
-        data.name,
-        data.description,
-        data.price,
-        data.category,
-        data.image,
-        data.stock,
-        data.discount
-      );
+      const newProduct = await createProduct({
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        image: data.image,
+        stock: data.stock,
+        discount: data.discount,
+      });
 
       console.log("Producto creado:", newProduct);
 
@@ -89,7 +89,8 @@ export default function AddProduct() {
       reset();
       setPreviewImage("");
 
-    } catch {
+    } catch (error) {
+      console.error("Error al crear producto:", error);
       toast.error("Error al agregar el producto", {
         description: "Hubo un problema al crear el producto. Inténtalo de nuevo.",
       });

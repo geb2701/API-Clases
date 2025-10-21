@@ -106,22 +106,19 @@ export default function EditProduct() {
     setIsSubmitting(true);
 
     try {
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Llamar a la API para actualizar el producto
+      const { updateProduct } = await import("../services/product-service");
 
-      // Crear producto actualizado
-      const updatedProduct = new Product(
-        product.id,
-        data.name,
-        data.description,
-        data.price,
-        data.category,
-        data.image,
-        data.stock,
-        data.discount
-      );
+      const updatedProduct = await updateProduct(product.id, {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        image: data.image,
+        stock: data.stock,
+        discount: data.discount,
+      });
 
-      // Simular actualización exitosa
       console.log("Producto actualizado:", updatedProduct);
 
       toast.success("¡Producto actualizado exitosamente!", {
@@ -131,7 +128,8 @@ export default function EditProduct() {
       // Actualizar estado local
       setProduct(updatedProduct);
 
-    } catch {
+    } catch (error) {
+      console.error("Error al actualizar producto:", error);
       toast.error("Error al actualizar el producto", {
         description: "Hubo un problema al modificar el producto. Inténtalo de nuevo.",
       });

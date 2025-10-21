@@ -2,73 +2,111 @@ import { User } from "@/types/user";
 import { createContext, useContext, type ReactNode } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import * as authService from "@/features/auth/services/auth-service";
+import { toast } from "sonner";
 
 type SignupValues = { name: string; surname?: string; email: string; password: string };
 
 export interface AuthState {
   isLogged: boolean;
   user: User | null;
-  registeredUsers: Array<SignupValues & { id: number }>;
   signup: (values: SignupValues) => Promise<boolean>;
   login: (usernameOrEmail: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  resetToTestUser: () => void;
+  logout: () => Promise<void>;
   setUser: (updater: Partial<User> | ((prev: User) => User)) => void;
 }
-
-const testUser = new User(1, "Usuario", "Prueba", "test@example.com");
-const newId = () => Date.now();
 
 const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      isLogged: true,
-      user: testUser,
-      registeredUsers: [],
+      isLogged: false,
+      user: null,
 
+      /**
+       * Registrar usuario usando la API
+       * POST /api/auth/register
+       */
       signup: async (values) => {
-        await new Promise((r) => setTimeout(r, 400));
-        const email = values.email.trim().toLowerCase();
-        const exists = get().registeredUsers.some((u) => u.email === email);
-        if (exists) return false;
+        try {
+          const user = await authService.register({
+            name: values.name,
+            surname: values.surname,
+            email: values.email,
+            password: values.password,
+          });
 
-        const id = newId();
-        const toSave = {
-          id,
-          name: values.name.trim(),
-          surname: (values.surname ?? "").trim(),
-          email,
-          password: values.password, // demo
-        };
-
-        set((state) => ({ registeredUsers: [...state.registeredUsers, toSave] }));
-        const newUser = new User(id, toSave.name, toSave.surname, toSave.email);
-        set({ isLogged: true, user: newUser });
-        return true;
-      },
-
-      login: async (usernameOrEmail, password) => {
-        await new Promise((r) => setTimeout(r, 400));
-        const u = usernameOrEmail.trim();
-
-        if (u === "demo" && password === "demo123") {
-          set({ isLogged: true, user: testUser });
+          set({ isLogged: true, user });
+          toast.success("¡Registro exitoso!", {
+            description: `Bienvenido/a ${user.name}`,
+          });
           return true;
+        } catch (error: any) {
+          console.error("Error en registro:", error);
+
+          // Manejar errores específicos
+          if (error?.response?.status === 400) {
+            toast.error("Error en el registro", {
+              description: "El email ya está registrado",
+            });
+          } else {
+            toast.error("Error en el registro", {
+              description: "No se pudo completar el registro. Intenta de nuevo.",
+            });
+          }
+          return false;
         }
-
-        const email = u.toLowerCase();
-        const found = get().registeredUsers.find(
-          (ru) => ru.email === email && ru.password === password
-        );
-        if (!found) return false;
-
-        const logged = new User(found.id, found.name, found.surname, found.email);
-        set({ isLogged: true, user: logged });
-        return true;
       },
 
-      logout: () => set({ isLogged: false, user: null }),
-      resetToTestUser: () => set({ isLogged: true, user: testUser }),
+      /**
+       * Login usando la API
+       * POST /api/auth/login
+       */
+      login: async (usernameOrEmail, password) => {
+        try {
+          const user = await authService.login({
+            email: usernameOrEmail.trim(),
+            password: password,
+          });
+
+          set({ isLogged: true, user });
+          toast.success("¡Login exitoso!", {
+            description: `Bienvenido/a ${user.name}`,
+          });
+          return true;
+        } catch (error: any) {
+          console.error("Error en login:", error);
+
+          // Manejar errores específicos
+          if (error?.response?.status === 401) {
+            toast.error("Error de autenticación", {
+              description: "Email o contraseña incorrectos",
+            });
+          } else {
+            toast.error("Error en el login", {
+              description: "No se pudo iniciar sesión. Intenta de nuevo.",
+            });
+          }
+          return false;
+        }
+      },
+
+      /**
+       * Logout usando la API
+       * POST /api/auth/logout
+       */
+      logout: async () => {
+        try {
+          await authService.logout();
+          set({ isLogged: false, user: null });
+          toast.info("Sesión cerrada", {
+            description: "Has cerrado sesión correctamente",
+          });
+        } catch (error) {
+          console.error("Error en logout:", error);
+          // Igual cerramos la sesión localmente
+          set({ isLogged: false, user: null });
+        }
+      },
 
       setUser: (updater) =>
         set((state) => {
@@ -91,7 +129,6 @@ const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         isLogged: state.isLogged,
         user: state.user,
-        registeredUsers: state.registeredUsers,
       }),
     }
   )
