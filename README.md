@@ -140,6 +140,15 @@ En el archivo `package.json` están definidos los siguientes comandos:
   Ejecuta todas las verificaciones integradas de **Biome** (lint, formateo, etc.).
 
 ---
+## Configurar Base de Datos
+
+1. Instalar XAMPP
+2. Iniciar MySQL
+3. Abrir phpMyAdmin (http://localhost/phpmyadmin)
+4. Ir a pestaña "SQL"
+5. Copiar y pegar el contenido de `database/schema.sql`
+6. Ejecutar
+7. Configurar `application.properties` sin password para root
 
 ## 👥 Integrantes
 
@@ -149,6 +158,9 @@ En el archivo `package.json` están definidos los siguientes comandos:
  **Tomas Angulo**
   - Legajo: 1153717
   - GitHub: [TomasaDev](https://github.com/TomasADev)
+   **Tobías Traverso**
+  - Legajo: 1134990165
+  - GitHub: [Tobias024](https://github.com/Tobias024)
 ---
 
 ## 📌 Objetivo
