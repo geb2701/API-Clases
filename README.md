@@ -148,7 +148,7 @@ En el archivo `package.json` están definidos los siguientes comandos:
 4. Ir a pestaña "SQL"
 5. Copiar y pegar el contenido de `database/schema.sql`
 6. Ejecutar
-7. Configurar `application.properties` sin password para root
+Nota: Si genera algun error de tipo "'root'@'localhost' (using password: YES) Configurar `application.properties` sin password
 
 ## 👥 Integrantes
 
@@ -159,7 +159,7 @@ En el archivo `package.json` están definidos los siguientes comandos:
   - Legajo: 1153717
   - GitHub: [TomasaDev](https://github.com/TomasADev)
    **Tobías Traverso**
-  - Legajo: 1134990165
+  - Legajo: 1117470
   - GitHub: [Tobias024](https://github.com/Tobias024)
 ---
 
