@@ -14,6 +14,8 @@ import { uploadImage } from "../services/upload-service";
 import { Upload, X } from "lucide-react";
 import { createProduct } from "../services/product-service";
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useProducts } from "../hooks/use-products";
 
 const productSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
@@ -38,6 +40,8 @@ const categories = [
 
 export default function AddProduct() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { invalidateKeys } = useProducts();
   const [previewImage, setPreviewImage] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,6 +150,9 @@ export default function AddProduct() {
         description: `El producto "${data.name}" ha sido creado correctamente.`,
       });
 
+      // Invalidar caché de productos para refrescar la lista
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
+
       // Limpiar formulario
       reset();
       setPreviewImage("");
@@ -154,7 +161,7 @@ export default function AddProduct() {
       // Redirigir a la página de gestión de productos después de un momento
       setTimeout(() => {
         navigate({ to: '/gestionar/productos' });
-      }, 1500);
+      }, 1000);
 
     } catch (error) {
       toast.error("Error al agregar el producto", {

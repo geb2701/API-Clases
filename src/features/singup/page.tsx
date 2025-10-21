@@ -2,6 +2,7 @@
 import { SignupComponent } from "@/components/auth/signup-Component";
 import { useAuthContext } from "@/context/auth-context";
 import { useRouter } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 export const SignupPage = () => {
   const { signup } = useAuthContext();
@@ -12,8 +13,16 @@ export const SignupPage = () => {
       <SignupComponent
         onSuccess={async (values) => {
           const ok = await signup(values);
-          if (ok) router.navigate({ to: "/" });
-          else alert("Ya existe un usuario con ese email");
+          if (ok) {
+            toast.success("¡Cuenta creada!", {
+              description: "Tu cuenta ha sido creada exitosamente. Bienvenido!",
+            });
+            router.navigate({ to: "/" });
+          } else {
+            toast.error("Error al registrarse", {
+              description: "Ya existe un usuario con ese email. Intenta con otro.",
+            });
+          }
         }}
       />
     </div>

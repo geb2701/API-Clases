@@ -10,12 +10,14 @@ import ImageLazy from "@/components/image-lazy";
 import type { Product } from "@/types/product";
 import { Edit, Trash2, Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProducts } from "../hooks/use-products";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { getImageUrl } from "../services/upload-service";
 import { deleteProduct } from "../services/product-service";
 
 export const ManageProductsPage = () => {
+  const queryClient = useQueryClient();
   const api = useProducts();
+  const { invalidateKeys } = api;
   const mockProducts = useSuspenseQuery(api.queryOptions.all()).data;
 
   const [products, setProducts] = useState<Product[]>(mockProducts);
@@ -59,6 +61,9 @@ export const ManageProductsPage = () => {
     try {
       // Eliminar producto usando la API
       await deleteProduct(selectedProduct.id);
+
+      // Invalidar caché para refrescar la lista
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
 
       // Actualizar lista local
       setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));

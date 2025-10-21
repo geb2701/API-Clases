@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getImageUrl } from "@/features/product/services/upload-service";
+import { createOrder } from "@/features/order/services/order-service";
 
 const CheckoutPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -69,8 +70,8 @@ const CheckoutPage: React.FC = () => {
 
 	// Función para validar el paso actual
 	const validateCurrentStep = (step: number): boolean => {
-		let stepErrors: string[] = [];
-		let emptyFields: string[] = [];
+		const stepErrors: string[] = [];
+		const emptyFields: string[] = [];
 
 		if (step === 1) {
 			// Verificar campos vacíos de facturación
@@ -178,29 +179,61 @@ const CheckoutPage: React.FC = () => {
 		setCurrentStep(prev => prev - 1);
 	};
 
-	const onSubmit = (data: CheckoutData) => {
-		// Demo: Mostrar mensaje en consola
-		console.log("=== DATOS DE COMPRA ===");
-		console.log("Productos:", items);
-		console.log("Total:", getFormattedTotal());
-		console.log("Datos de facturación:", data.billing);
-		console.log("Datos de envío:", data.sameAddress ? data.billing : data.shipping);
-		console.log("Datos de pago:", data.payment);
-		console.log("=======================");
+	const onSubmit = async (data: CheckoutData) => {
+		try {
+			// Preparar items de la orden
+			const orderItems = items.map(item => ({
+				productId: item.product.id,
+				quantity: item.quantity
+			}));
 
-		// Mostrar notificación de éxito
-		toast.success("¡Compra realizada con éxito!", {
-			description: `Tu pedido por ${getFormattedTotal()} ha sido procesado correctamente.`,
-			duration: 5000,
-		});
+			// Crear orden usando la API
+			const order = await createOrder({
+				billing: {
+					firstName: data.billing.firstName,
+					lastName: data.billing.lastName,
+					dni: data.billing.dni,
+					address: data.billing.address,
+					city: data.billing.city,
+					postalCode: data.billing.postalCode
+				},
+				shipping: data.sameAddress ? undefined : {
+					firstName: data.shipping.firstName,
+					lastName: data.shipping.lastName,
+					dni: data.billing.dni, // Usar mismo DNI
+					address: data.shipping.address,
+					city: data.shipping.city,
+					postalCode: data.shipping.postalCode
+				},
+				payment: {
+					cardNumber: data.payment.cardNumber,
+					expiryDate: data.payment.expiryDate,
+					cvv: data.payment.cvv,
+					cardholderName: data.payment.cardholderName
+				},
+				items: orderItems
+			});
 
-		// Limpiar carrito
-		clearCart();
+			// Mostrar notificación de éxito
+			toast.success("¡Compra realizada con éxito!", {
+				description: `Tu pedido #${order.id} por ${getFormattedTotal()} ha sido procesado correctamente.`,
+				duration: 5000,
+			});
 
-		// Redireccionar a la página principal después de un breve delay
-		setTimeout(() => {
-			navigate({ to: "/" });
-		}, 2000);
+			// Limpiar carrito
+			clearCart();
+
+			// Redireccionar a la página principal después de un breve delay
+			setTimeout(() => {
+				navigate({ to: "/" });
+			}, 2000);
+
+		} catch (error) {
+			toast.error("Error al procesar la compra", {
+				description: error instanceof Error ? error.message : "No se pudo procesar tu pedido. Por favor, inténtalo de nuevo.",
+				duration: 5000,
+			});
+		}
 	};
 
 	const handleFormSubmit = () => {

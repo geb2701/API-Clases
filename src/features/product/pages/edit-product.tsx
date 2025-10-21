@@ -15,7 +15,7 @@ import { ArrowLeft, Save, RotateCcw, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useProducts } from "../hooks/use-products";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { uploadImage, getImageUrl } from "../services/upload-service";
 import { updateProduct } from "../services/product-service";
 import { useNavigate } from "@tanstack/react-router";
@@ -43,7 +43,9 @@ const categories = [
 
 export default function EditProduct() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const api = useProducts();
+  const { invalidateKeys } = api;
   const mockProducts = useSuspenseQuery(api.queryOptions.all()).data;
   const { productId } = useParams({ from: "/gestionar/editar/$productId" });
   const [product, setProduct] = useState<Product | null>(null);
@@ -192,13 +194,16 @@ export default function EditProduct() {
         description: `El producto "${data.name}" ha sido modificado correctamente.`,
       });
 
+      // Invalidar caché de productos para refrescar la lista
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
+
       // Actualizar estado local
       setProduct(updatedProduct);
 
       // Redirigir a la página de gestión de productos después de un momento
       setTimeout(() => {
         navigate({ to: '/gestionar/productos' });
-      }, 1500);
+      }, 1000);
 
     } catch (error) {
       toast.error("Error al actualizar el producto", {

@@ -10,9 +10,10 @@ export const useProducts = () =>
 		return queryOptions({
 			queryKey: queryKeyPaginated,
 			queryFn: async () => getProducts(),
-			staleTime: Number.POSITIVE_INFINITY,
-			refetchOnWindowFocus: false,
-			refetchOnReconnect: false,
+			// Reducir staleTime para que se actualice con cambios del servidor
+			staleTime: 1000 * 60 * 5, // 5 minutos
+			refetchOnWindowFocus: true,
+			refetchOnReconnect: true,
 		});
 	};
 
@@ -21,6 +22,11 @@ export const useProducts = () =>
 			all,
 			queryKey,
 			queryKeyPaginated,
+		},
+		// Helper para invalidar la caché
+		invalidateKeys: {
+			all: queryKey,
+			paginated: queryKeyPaginated,
 		},
 	};
 };
