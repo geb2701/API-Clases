@@ -218,7 +218,7 @@ export const ManageProductsPage = () => {
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                    <span className="truncate">{product.category}</span>
+                    <span className="truncate">{product.category.name}</span>
                     <span>{product.stock}u</span>
                   </div>
 

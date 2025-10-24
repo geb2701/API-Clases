@@ -19,6 +19,7 @@ import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { uploadImage, getImageUrl } from "../services/upload-service";
 import { updateProduct } from "../services/product-service";
 import { useNavigate } from "@tanstack/react-router";
+import { useCategories } from "@/features/category/hooks/use-categories";
 
 const productSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
@@ -32,21 +33,15 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-const categories = [
-  "Accesorios",
-  "Decoración",
-  "Hogar",
-  "Libros",
-  "Ropa",
-  "Tecnología"
-];
-
 export default function EditProduct() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const api = useProducts();
   const { invalidateKeys } = api;
   const mockProducts = useSuspenseQuery(api.queryOptions.all()).data;
+  const categoriesApi = useCategories();
+  const categoriesData = useSuspenseQuery(categoriesApi.queryOptions.all()).data;
+  const categories = categoriesData.map((cat) => cat.name).sort();
   const { productId } = useParams({ from: "/gestionar/editar/$productId" });
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -220,7 +215,7 @@ export default function EditProduct() {
         name: product.name,
         description: product.description,
         price: product.price,
-        category: product.category,
+        category: product.category.name,
         image: product.image,
         stock: product.stock,
         discount: product.discount,
@@ -350,7 +345,7 @@ export default function EditProduct() {
 
             <div className="space-y-2">
               <Label htmlFor="category">Categoría *</Label>
-              <Select onValueChange={(value) => setValue("category", value)} defaultValue={product.category}>
+              <Select onValueChange={(value) => setValue("category", value)} defaultValue={product.category.name}>
                 <SelectTrigger className={errors.category ? "border-destructive" : ""}>
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>

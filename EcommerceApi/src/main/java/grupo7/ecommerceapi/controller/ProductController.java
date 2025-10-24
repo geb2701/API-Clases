@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
-@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:5173" })
 public class ProductController {
 
     private final ProductService productService;
@@ -128,39 +128,11 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    // GET /api/products/sort/name - Ordenar por nombre
-    @GetMapping("/sort/name")
-    public ResponseEntity<Page<Product>> getProductsSortedByName(
-            @RequestParam(defaultValue = "asc") String direction,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Product> products = productService.getProductsSortedByName(direction, pageable);
-        return ResponseEntity.ok(products);
-    }
-
-    // GET /api/products/sort/price - Ordenar por precio
-    @GetMapping("/sort/price")
-    public ResponseEntity<Page<Product>> getProductsSortedByPrice(
-            @RequestParam(defaultValue = "asc") String direction,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Product> products = productService.getProductsSortedByPrice(direction, pageable);
-        return ResponseEntity.ok(products);
-    }
-
     // POST /api/products - Crear producto (Admin)
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        try {
-            Product createdProduct = productService.createProduct(product);
-            return ResponseEntity.ok(createdProduct);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Product createdProduct = productService.createProduct(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
     // PUT /api/products/{id} - Actualizar producto (Admin)

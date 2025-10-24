@@ -28,8 +28,8 @@ import { NoProductsFound } from "@/components/no-products-found";
 import { getImageUrl } from "../product/services/upload-service";
 
 // Función helper para convertir nombre de categoría a slug
-const categoryToSlug = (category: string): string => {
-  return category
+const categoryToSlug = (categoryName: string): string => {
+  return categoryName
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
@@ -61,7 +61,7 @@ const HomePage = () => {
   };
 
   const categories = React.useMemo(
-    () => Array.from(new Set(products.map((p) => p.category))).sort(),
+    () => Array.from(new Set(products.map((p) => p.category.name))).sort(),
     [products]
   );
 
@@ -75,7 +75,7 @@ const HomePage = () => {
   const filtered = React.useMemo(() => {
     const productsToFilter = showOffers ? discountedProducts : products;
     return productsToFilter.filter((p) => {
-      const matchCat = category ? p.category === category : true;
+      const matchCat = category ? p.category.name === category : true;
       const matchText =
         q.length === 0 ||
         p.name.toLowerCase().includes(q) ||
@@ -111,10 +111,11 @@ const HomePage = () => {
   // Productos por categoría para ofertas (solo los que tienen descuento)
   const productsByCategory = React.useMemo(() => {
     const grouped = discountedProducts.reduce((acc, product) => {
-      if (!acc[product.category]) {
-        acc[product.category] = [];
+      const categoryName = product.category.name;
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
       }
-      acc[product.category].push(product);
+      acc[categoryName].push(product);
       return acc;
     }, {} as Record<string, typeof discountedProducts>);
 
@@ -243,8 +244,8 @@ const HomePage = () => {
                     className="w-fit cursor-pointer hover:bg-secondary/80 transition-colors"
                     asChild
                   >
-                    <Link to="/productos/categorias/$nombre" params={{ nombre: categoryToSlug(product.category) }}>
-                      {product.category}
+                    <Link to="/productos/categorias/$nombre" params={{ nombre: categoryToSlug(product.category.name) }}>
+                      {product.category.name}
                     </Link>
                   </Badge>
                   {/* Indicador de stock textual */}

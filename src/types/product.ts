@@ -1,9 +1,16 @@
+export interface Category {
+  id: number;
+  name: string;
+  description?: string;
+  isActive?: boolean;
+}
+
 export class Product {
   id: number;
   name: string;
   description: string;
   price: number;
-  category: string;
+  category: Category;
   image: string;
   stock: number;
   discount?: number; // Precio con descuento (opcional)
@@ -13,7 +20,7 @@ export class Product {
     name: string,
     description: string,
     price: number,
-    category: string,
+    category: Category,
     image: string,
     stock: number,
     discount?: number

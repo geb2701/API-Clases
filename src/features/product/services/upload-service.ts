@@ -56,12 +56,27 @@ export const deleteImage = async (fileName: string): Promise<void> => {
  * @returns URL completa de la imagen
  */
 export const getImageUrl = (fileName: string): string => {
-  // Si ya es una URL completa, devolverla tal cual
+  // 1. Si ya es una URL completa (de internet), devolverla tal cual
   if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
     return fileName;
   }
   
-  // Si es un nombre de archivo, construir la URL del servidor
-  return `http://localhost:8080/api/files/${fileName}`;
+  // 2. Si ya tiene una ruta completa, usarla tal cual
+  if (fileName.startsWith("/images/") || fileName.startsWith("/api/")) {
+    return fileName;
+  }
+  
+  // 3. Detectar si es una imagen nueva (subida por admin)
+  // Las imágenes nuevas tienen UUID al inicio: "abc123-def456-nombre.png"
+  const hasUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(fileName);
+  
+  if (hasUUID) {
+    // Imagen nueva subida al backend → usar endpoint de archivos
+    return `http://localhost:8080/api/files/${fileName}`;
+  }
+  
+  // 4. Imágenes antiguas (sin UUID) → usar carpeta public/images
+  // Vite sirve archivos de public/ directamente
+  return `/images/${fileName}`;
 };
 

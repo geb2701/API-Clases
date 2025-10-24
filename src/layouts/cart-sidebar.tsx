@@ -98,7 +98,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                               {item.product.name}
                             </h4>
                             <p className="text-xs text-muted-foreground">
-                              {item.product.category}
+                              {item.product.category.name}
                             </p>
                           </div>
                           <Button

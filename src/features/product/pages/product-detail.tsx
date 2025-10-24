@@ -79,7 +79,7 @@ export const ProductDetailPage = () => {
             <div className="flex items-start justify-between gap-4 mb-4">
               <h1 className="text-3xl font-bold">{product.name}</h1>
               <Badge variant="secondary" className="text-sm">
-                {product.category}
+                {product.category.name}
               </Badge>
             </div>
 
@@ -178,7 +178,7 @@ export const ProductDetailPage = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Categoría:</span>
-                <span className="font-medium">{product.category}</span>
+                <span className="font-medium">{product.category.name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Precio unitario:</span>

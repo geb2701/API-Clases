@@ -99,8 +99,8 @@ export const ProductCard = ({
             className="shrink-0 cursor-pointer hover:bg-secondary/80 transition-colors"
             asChild
           >
-            <Link to="/productos/categorias/$nombre" params={{ nombre: categoryToSlug(p.category) }}>
-              {p.category}
+            <Link to="/productos/categorias/$nombre" params={{ nombre: categoryToSlug(p.category.name) }}>
+              {p.category.name}
             </Link>
           </Badge>
         </div>

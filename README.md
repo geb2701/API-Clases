@@ -1,168 +1,205 @@
-# Store TPO
+# 🛍️ E-Commerce Full Stack
 
-Frontend de una tienda online desarrollado con **React**, **TypeScript** y un stack moderno de librerías que optimizan la construcción de interfaces, la navegación y el manejo de datos.
-
-## 🚀 Tecnologías utilizadas
-
-### [React](https://es.react.dev)
-
-Framework de **JavaScript** para construir interfaces de usuario.
-
-- Permite crear componentes reutilizables.
-- Maneja el estado de forma eficiente con su sistema de renderizado reactivo.
-- Base del proyecto para construir la tienda online.
-
-### [TypeScript](https://www.typescriptlang.org)
-
-Superset de **JavaScript** con tipado estático.
-
-- Ayuda a prevenir errores en tiempo de desarrollo.
-- Mejora la mantenibilidad del código.
-- Facilita el trabajo en equipo gracias a la autocompletación y documentación automática.
-
-### [ShadCn UI](https://ui.shadcn.com)
-
-Colección de componentes de interfaz construidos sobre **Radix UI** y estilizados con **TailwindCSS**.
-
-- Ofrece componentes modernos y accesibles listos para usar.
-- Se integran fácilmente en proyectos React + TypeScript.
-- Útil para crear el diseño consistente de la tienda (botones, formularios, menús, tablas, etc.).
-
-### [Vite](https://vite.dev)
-
-Herramienta de construcción de aplicaciones modernas.
-
-- Reemplazo de **Webpack** mucho más rápido y simple.
-- Ofrece un servidor de desarrollo con **Hot Module Replacement (HMR)**.
-- Mejora los tiempos de build y optimización de la app para producción.
-
-### [TanStack Query](https://tanstack.com/query/latest)
-
-Librería para el manejo de estado remoto y consultas a API.
-
-- Simplifica el **fetching, caching y sincronización** de datos.
-- Ideal para consumir los endpoints del backend de la tienda (productos, usuarios, carrito, etc.).
-- Evita reescribir lógica repetitiva de `fetch` y estados de carga/error.
-
-### [TanStack Router](https://tanstack.com/router/latest)
-
-Router moderno para aplicaciones React.
-
-- Facilita la navegación declarativa dentro de la app.
-- Permite crear rutas anidadas, loaders y protección de rutas.
-- Fundamental para estructurar secciones de la tienda (inicio, catálogo, detalle de producto, carrito, checkout).
-
-### [Biome](https://biomejs.dev)
-
-Herramienta todo en uno para formateo, linting y análisis de código.
-
-- **Reemplazo moderno** de ESLint + Prettier.
-- Asegura un estilo de código consistente y detecta errores comunes.
-- Rápido y fácil de integrar en proyectos TypeScript.
-- Mejora la productividad y calidad del código en equipo.
+> Sistema completo de e-commerce con React + TypeScript (Frontend) y Spring Boot (Backend)
 
 ---
 
-## ⚙️ Comandos principales
+## 📂 Estructura del Proyecto
 
-### 1. Instalar pnpm
-
-El proyecto utiliza **pnpm** como gestor de paquetes. Si no lo tenés instalado:
-
-```bash
-npm install -g pnpm
+```
+API-Clases/
+├── EcommerceApi/              ← BACKEND (Spring Boot + MySQL)
+│   ├── src/main/
+│   │   ├── java/grupo7/ecommerceapi/
+│   │   └── resources/application.properties
+│   ├── pom.xml
+│   └── mvnw.cmd
+│
+├── src/                       ← FRONTEND (React + TypeScript)
+│   ├── features/              (Módulos por funcionalidad)
+│   ├── components/            (Componentes reutilizables)
+│   ├── context/               (Estado global)
+│   └── lib/                   (Utilidades)
+│
+├── public/                    (Assets estáticos)
+├── package.json              (Dependencias frontend)
+└── vite.config.ts            (Configuración Vite)
 ```
 
-### 2. Instalar dependencias del proyecto
+---
 
-Dentro de la carpeta raíz del proyecto, ejecutar:
+## 🚀 Inicio Rápido
 
-```bash
-pnpm install
+### 1. Base de Datos
+
+```sql
+CREATE DATABASE ecommerce_db;
 ```
 
-### 3. Scripts disponibles
+O ejecuta el script: `init_database.bat`
 
-En el archivo `package.json` están definidos los siguientes comandos:
+### 2. Backend
 
-- **Iniciar en modo desarrollo**
+**Opción A - IntelliJ (Recomendado):**
+1. Abre el proyecto en IntelliJ IDEA
+2. Navega a: `EcommerceApi/src/main/java/grupo7/ecommerceapi/EcommerceApiApplication.java`
+3. Click derecho → Run
+4. Espera: `Started EcommerceApiApplication`
 
-  ```bash
-  pnpm dev
-  ```
+**Opción B - Terminal:**
+```bash
+cd EcommerceApi
+./mvnw.cmd spring-boot:run
+```
 
-  Inicia el servidor de desarrollo en el puerto **3000**.
+### 3. Frontend
 
-- **Iniciar (alias de dev)**
+```bash
+npm install
+npm run dev
+```
 
-  ```bash
-  pnpm start
-  ```
+### 4. Abrir Aplicación
 
-  También levanta el servidor de desarrollo en el puerto **3000**.
-
-- **Compilar para producción**
-
-  ```bash
-  pnpm build
-  ```
-
-  Genera la build optimizada del proyecto con **Vite** y corre **TypeScript (tsc)**.
-
-- **Previsualizar build**
-
-  ```bash
-  pnpm serve
-  ```
-
-  Sirve la aplicación generada en la carpeta `dist`.
-
-- **Formatear código**
-
-  ```bash
-  pnpm format
-  ```
-
-  Aplica formato al código usando **Biome**.
-
-- **Linting**
-
-  ```bash
-  pnpm lint
-  ```
-
-  Analiza el código con **Biome** para detectar problemas de estilo y errores comunes.
-
-- **Check**
-  ```bash
-  pnpm check
-  ```
-  Ejecuta todas las verificaciones integradas de **Biome** (lint, formateo, etc.).
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8080/api
 
 ---
-## Configurar Base de Datos
 
-1. Instalar XAMPP
-2. Iniciar MySQL
-3. Abrir phpMyAdmin (http://localhost/phpmyadmin)
-4. Ir a pestaña "SQL"
-5. Copiar y pegar el contenido de `database/schema.sql`
-6. Ejecutar
-Nota: Si genera algun error de tipo "'root'@'localhost' (using password: YES) Configurar `application.properties` sin password
+## 🛠️ Tecnologías
 
-## 👥 Integrantes
+### Frontend
+- React 18+
+- TypeScript
+- Vite
+- TanStack Router & Query
+- Zustand (State)
+- Tailwind CSS
+- Shadcn/UI
 
-- **Pedro Alvarez**
-  - Legajo: 12345678
-  - GitHub: [githubLink](githubLink)
- **Tomas Angulo**
-  - Legajo: 1153717
-  - GitHub: [TomasaDev](https://github.com/TomasADev)
-   **Tobías Traverso**
-  - Legajo: 1117470
-  - GitHub: [Tobias024](https://github.com/Tobias024)
+### Backend
+- Java 17+
+- Spring Boot 3.5
+- Spring Data JPA
+- Spring Security
+- MySQL 8.0
+- Maven
+
 ---
 
-## 📌 Objetivo
+## 📚 Documentación
 
-Construir un **frontend moderno, modular y escalable** para una tienda online, aplicando buenas prácticas de desarrollo con **React** y apoyándonos en librerías que optimicen la experiencia de usuario, el flujo de datos y la calidad del código.
+- **[COMO_EJECUTAR.md](COMO_EJECUTAR.md)** - Guía detallada de instalación
+- **[CONFIGURACION_FINAL.md](CONFIGURACION_FINAL.md)** - Configuración del sistema
+- **[database_schema.sql](database_schema.sql)** - Schema de base de datos
+- **[poblar_productos.sql](poblar_productos.sql)** - Datos de ejemplo
+
+---
+
+## ✨ Funcionalidades
+
+- ✅ Catálogo de productos con búsqueda y filtros
+- ✅ Carrito de compras (localStorage)
+- ✅ Checkout completo
+- ✅ Gestión de órdenes
+- ✅ Autenticación de usuarios
+- ✅ Panel de administración
+- ✅ CRUD de productos
+- ✅ Upload de imágenes
+- ✅ Responsive design
+
+---
+
+## 📡 API Endpoints
+
+### Productos
+```
+GET    /api/products
+POST   /api/products
+PUT    /api/products/{id}
+DELETE /api/products/{id}
+```
+
+### Usuarios
+```
+POST   /api/users/register
+POST   /api/users/login
+```
+
+### Órdenes
+```
+POST   /api/orders/create-from-cart
+GET    /api/orders
+```
+
+Ver más en: [CONFIGURACION_FINAL.md](CONFIGURACION_FINAL.md)
+
+---
+
+## 🔧 Configuración
+
+### Backend - application.properties
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce_db
+spring.datasource.username=root
+spring.datasource.password=
+
+server.port=8080
+server.servlet.context-path=/api
+```
+
+### Frontend - .env (opcional)
+
+```env
+VITE_API_URL=http://localhost:8080/api
+```
+
+---
+
+## 📝 Scripts Disponibles
+
+### Frontend
+```bash
+npm run dev          # Desarrollo
+npm run build        # Producción
+npm run preview      # Preview build
+```
+
+### Backend
+```bash
+./mvnw spring-boot:run    # Ejecutar
+./mvnw test              # Tests
+./mvnw clean install     # Build
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Error 403 en API
+- Verifica que el backend esté corriendo
+- Revisa la configuración CORS en `SecurityConfig.java`
+
+### Error de Base de Datos
+- Asegúrate que MySQL esté corriendo
+- Verifica credenciales en `application.properties`
+
+### Puerto ocupado
+```bash
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
+```
+
+---
+
+## 👥 Desarrollado por
+
+Grupo 7 - Proyecto E-Commerce
+
+---
+
+## 📄 Licencia
+
+Este proyecto es de uso educativo.

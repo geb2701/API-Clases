@@ -14,8 +14,9 @@ import { uploadImage } from "../services/upload-service";
 import { Upload, X } from "lucide-react";
 import { createProduct } from "../services/product-service";
 import { useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useProducts } from "../hooks/use-products";
+import { useCategories } from "@/features/category/hooks/use-categories";
 
 const productSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
@@ -29,19 +30,14 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-const categories = [
-  "Accesorios",
-  "Decoración",
-  "Hogar",
-  "Libros",
-  "Ropa",
-  "Tecnología"
-];
-
 export default function AddProduct() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { invalidateKeys } = useProducts();
+  const categoriesApi = useCategories();
+  const categoriesData = useSuspenseQuery(categoriesApi.queryOptions.all()).data;
+  const categories = categoriesData.map((cat) => cat.name).sort();
+
   const [previewImage, setPreviewImage] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
