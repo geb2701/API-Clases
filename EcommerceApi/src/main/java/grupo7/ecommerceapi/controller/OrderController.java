@@ -50,21 +50,26 @@ public class OrderController {
         return ResponseEntity.ok(orderItems);
     }
 
-    // POST /api/orders/create-from-cart - Crear pedido desde carrito
-    @PostMapping("/create-from-cart")
-    public ResponseEntity<Order> createOrderFromCart(@RequestBody CreateOrderRequest request) {
-        try {
-            Order order = orderService.createOrderFromCart(
-                    request.getSessionId(),
-                    request.getUserId(),
-                    request.getBillingAddress(),
-                    request.getShippingAddress(),
-                    request.getPaymentInfo());
-            return ResponseEntity.ok(order);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    // TODO: Re-enable when Cart feature is implemented
+    /*
+     * // POST /api/orders/create-from-cart - Crear pedido desde carrito
+     * 
+     * @PostMapping("/create-from-cart")
+     * public ResponseEntity<Order> createOrderFromCart(@RequestBody
+     * CreateOrderRequest request) {
+     * try {
+     * Order order = orderService.createOrderFromCart(
+     * request.getSessionId(),
+     * request.getUserId(),
+     * request.getBillingAddress(),
+     * request.getShippingAddress(),
+     * request.getPaymentInfo());
+     * return ResponseEntity.ok(order);
+     * } catch (RuntimeException e) {
+     * return ResponseEntity.badRequest().build();
+     * }
+     * }
+     */
 
     // PUT /api/orders/{orderId}/status - Actualizar estado del pedido
     @PutMapping("/{orderId}/status")

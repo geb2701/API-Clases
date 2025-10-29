@@ -140,15 +140,141 @@ En el archivo `package.json` están definidos los siguientes comandos:
   Ejecuta todas las verificaciones integradas de **Biome** (lint, formateo, etc.).
 
 ---
-## Configurar Base de Datos
 
-1. Instalar XAMPP
+## 🐳 Ejecución con Docker (Recomendado)
+
+La forma más sencilla de ejecutar el proyecto completo es usando Docker Compose.
+
+📖 **Documentación Docker:**
+- 🚀 **[Inicio Rápido](./INICIO_RAPIDO.md)** - ¡Empieza en 3 pasos!
+- 📚 **[Guía Completa](./DOCKER.md)** - Instrucciones detalladas, troubleshooting y comandos avanzados
+- ✅ **[Checklist](./CHECKLIST.md)** - Verifica que todo funcione correctamente
+- 📋 **[Resumen Docker](./RESUMEN_DOCKER.md)** - Cambios realizados y arquitectura
+
+### Prerequisitos
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Inicio Rápido
+
+**Opción 1: Scripts automáticos** (Recomendado)
+
+```bash
+# Windows
+.\start.bat
+
+# Linux/Mac
+./start.sh
+```
+
+**Opción 2: Docker Compose manual**
+
+1. **Clonar el repositorio**
+```bash
+git clone <url-del-repositorio>
+cd API-Clases
+```
+
+2. **Iniciar todos los servicios**
+```bash
+docker-compose up -d --build
+```
+
+Esto iniciará:
+- **MySQL** en puerto 3306 (con datos iniciales)
+- **Backend Spring Boot** en puerto 8080
+- **Frontend React** en puerto 80
+
+3. **Acceder a la aplicación**
+- Frontend: http://localhost
+- Backend API: http://localhost:8080/api
+- MySQL: localhost:3306
+
+4. **Ver logs**
+```bash
+# Todos los servicios
+docker-compose logs -f
+
+# Solo backend
+docker-compose logs -f backend
+
+# Solo frontend
+docker-compose logs -f frontend
+```
+
+5. **Detener los servicios**
+
+```bash
+# Con scripts
+.\stop.bat      # Windows
+./stop.sh       # Linux/Mac
+
+# Manual
+docker-compose down
+```
+
+6. **Detener y eliminar datos (reset completo)**
+```bash
+docker-compose down -v
+```
+
+### Comandos útiles
+
+```bash
+# Reconstruir imágenes (después de cambios en el código)
+docker-compose up -d --build
+
+# Reiniciar un servicio específico
+docker-compose restart backend
+
+# Ver estado de los contenedores
+docker-compose ps
+
+# Acceder a la consola de MySQL
+docker-compose exec mysql mysql -u ecommerce_user -pecommerce_pass ecommerce_db
+```
+
+---
+
+## ⚙️ Ejecución Manual (Sin Docker)
+
+### Configurar Base de Datos
+
+1. Instalar XAMPP o MySQL
 2. Iniciar MySQL
-3. Abrir phpMyAdmin (http://localhost/phpmyadmin)
-4. Ir a pestaña "SQL"
-5. Copiar y pegar el contenido de `database/schema.sql`
-6. Ejecutar
-Nota: Si genera algun error de tipo "'root'@'localhost' (using password: YES) Configurar `application.properties` sin password
+3. Crear la base de datos:
+```sql
+CREATE DATABASE ecommerce_db;
+```
+4. Ejecutar los scripts SQL en orden:
+   - `db/database_schema.sql`
+   - `db/poblar_base_datos_completa.sql`
+
+Nota: Si genera algún error de tipo "'root'@'localhost' (using password: YES)", configurar `EcommerceApi/src/main/resources/application.properties` sin password
+
+### Ejecutar Backend
+
+1. Abrir `EcommerceApi` en IntelliJ IDEA
+2. Esperar a que descargue las dependencias Maven
+3. Ejecutar `EcommerceApiApplication.java`
+4. El backend estará disponible en http://localhost:8080/api
+
+### Ejecutar Frontend
+
+```bash
+# Instalar pnpm si no lo tienes
+npm install -g pnpm
+
+# Instalar dependencias
+pnpm install
+
+# Iniciar en modo desarrollo
+pnpm dev
+```
+
+El frontend estará disponible en http://localhost:3000
+
+---
 
 ## 👥 Integrantes
 

@@ -134,3 +134,29 @@ dist
 
 # tanstack/react-router
 routeTree.gen.ts
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+
+# Docker
+.env
+
+# Uploads
+uploads/

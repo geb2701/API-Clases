@@ -43,12 +43,12 @@ export const CategoryPage = () => {
 
   // filtrar por categoría fija de la URL
   const inCategory = React.useMemo(
-    () => products.filter((p) => norm(p.category) === norm(slug)),
+    () => products.filter((p) => norm(p.category.name) === norm(slug)),
     [products, slug]
   );
 
   // título bonito: usamos la categoría real si existe, si no el slug
-  const displayTitle = inCategory[0]?.category ?? slug;
+  const displayTitle = inCategory[0]?.category.name ?? slug;
 
   // búsqueda
   const q = query.trim().toLowerCase();

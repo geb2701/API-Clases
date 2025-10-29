@@ -20,3 +20,4 @@ SET FOREIGN_KEY_CHECKS = 1;
 SELECT '¡Tablas de carrito eliminadas exitosamente!' as Resultado;
 SELECT 'El carrito ahora funciona 100% con localStorage en el navegador' as Info;
 
+

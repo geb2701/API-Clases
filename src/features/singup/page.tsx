@@ -1,5 +1,5 @@
 
-import { SignupComponent } from "@/components/auth/signup-Component";
+import { SignupComponent } from "@/components/auth/signup-component";
 import { useAuthContext } from "@/context/auth-context";
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";

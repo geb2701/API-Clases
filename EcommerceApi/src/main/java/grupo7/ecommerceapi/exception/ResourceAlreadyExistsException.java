@@ -9,3 +9,4 @@ public class ResourceAlreadyExistsException extends RuntimeException {
     super(String.format("%s ya existe con %s: '%s'", resourceName, fieldName, fieldValue));
   }
 }
+

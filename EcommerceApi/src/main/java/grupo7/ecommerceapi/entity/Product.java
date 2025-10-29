@@ -73,9 +73,11 @@ public class Product {
     private LocalDateTime updatedAt;
 
     // Relaciones
-    @JsonIgnore
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CartItem> cartItems;
+    // TODO: Re-enable when Cart feature is implemented
+    // @JsonIgnore
+    // @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch =
+    // FetchType.LAZY)
+    // private List<CartItem> cartItems;
 
     @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

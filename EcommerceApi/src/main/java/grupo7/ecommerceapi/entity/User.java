@@ -62,9 +62,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orders;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CartSession> cartSessions;
+    // TODO: Re-enable when Cart feature is implemented
+    // @JsonIgnore
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch =
+    // FetchType.LAZY)
+    // private List<CartSession> cartSessions;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
