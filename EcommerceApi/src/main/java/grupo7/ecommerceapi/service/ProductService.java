@@ -23,8 +23,21 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
 
+    @Transactional(readOnly = true)
     public Page<Product> getAllProducts(Pageable pageable) {
-        return productRepository.findAllActive(pageable);
+        Page<Product> products = productRepository.findAllActive(pageable);
+        // Forzar carga de categorías para evitar problemas de serialización
+        // Acceder a todos los campos necesarios dentro de la transacción
+        products.getContent().forEach(product -> {
+            if (product.getCategory() != null) {
+                Category cat = product.getCategory();
+                cat.getId();
+                cat.getName();
+                cat.getDescription();
+                cat.getIsActive();
+            }
+        });
+        return products;
     }
 
     public Optional<Product> getProductById(Long id) {

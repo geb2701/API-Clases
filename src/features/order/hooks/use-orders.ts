@@ -8,7 +8,7 @@ export const useOrders = () => {
 		return queryOptions({
 			queryKey: [...queryKey, "my-orders"],
 			queryFn: async () => getMyOrders(),
-			staleTime: 1000 * 60 * 2, // 2 minutos
+			staleTime: 1000 * 30, // 30 segundos (reducido para refrescar más rápido)
 			refetchOnWindowFocus: true,
 			refetchOnReconnect: true,
 		});
@@ -43,6 +43,7 @@ export const useOrders = () => {
 		},
 		invalidateKeys: {
 			all: queryKey,
+			myOrders: [...queryKey, "my-orders"],
 		},
 	};
 };

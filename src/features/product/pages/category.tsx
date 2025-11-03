@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { Route } from "@/routes/productos/categorias/$nombre";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";
@@ -39,6 +41,7 @@ export const CategoryPage = () => {
   const [sortKey, setSortKey] = React.useState<SortKey>("name");
   const [sortDir, setSortDir] = React.useState<SortDir>("asc");
   const [page, setPage] = React.useState(1);
+  const [showOffers, setShowOffers] = React.useState(false);
   const pageSize = 12;
 
   // filtrar por categoría fija de la URL
@@ -47,19 +50,25 @@ export const CategoryPage = () => {
     [products, slug]
   );
 
+  // Productos con descuento en esta categoría
+  const discountedProducts = React.useMemo(() => {
+    return inCategory.filter((product) => product.hasDiscount());
+  }, [inCategory]);
+
   // título bonito: usamos la categoría real si existe, si no el slug
   const displayTitle = inCategory[0]?.category.name ?? slug;
 
   // búsqueda
   const q = query.trim().toLowerCase();
   const filtered = React.useMemo(() => {
-    if (!q) return inCategory;
-    return inCategory.filter(
+    const productsToFilter = showOffers ? discountedProducts : inCategory;
+    if (!q) return productsToFilter;
+    return productsToFilter.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q)
     );
-  }, [inCategory, q]);
+  }, [inCategory, discountedProducts, q, showOffers]);
 
   // orden
   const sorted = React.useMemo(() => {
@@ -80,7 +89,7 @@ export const CategoryPage = () => {
 
   React.useEffect(() => {
     setPage(1);
-  }, [q, sortKey, sortDir, slug]);
+  }, [q, sortKey, sortDir, slug, showOffers]);
 
   return (
     <div className="space-y-5">
@@ -88,12 +97,23 @@ export const CategoryPage = () => {
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {displayTitle}
+            {showOffers ? `Ofertas en ${displayTitle}` : displayTitle}
           </h1>
           <p className="text-sm text-muted-foreground">{total} resultados</p>
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          {/* Toggle para mostrar solo ofertas */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-muted/50">
+            <Switch
+              id="show-offers"
+              checked={showOffers}
+              onCheckedChange={setShowOffers}
+            />
+            <Label htmlFor="show-offers" className="text-sm font-medium cursor-pointer">
+              Solo ofertas
+            </Label>
+          </div>
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

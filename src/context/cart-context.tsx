@@ -14,7 +14,7 @@ interface CartState {
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
-  clearCart: () => void;
+  clearCart: (silent?: boolean) => void;
   getProducts: () => CartItemClass[];
 
   // Acciones de UI
@@ -150,12 +150,12 @@ const useCartStore = create<CartState>()(
         });
       },
 
-      clearCart: () => {
+      clearCart: (silent: boolean = false) => {
         set((state) => {
           const itemCount = state.items.length;
 
-          // Notificación para carrito vaciado
-          if (itemCount > 0) {
+          // Notificación para carrito vaciado (solo si no es silencioso)
+          if (itemCount > 0 && !silent) {
             toast.warning("Carrito vaciado", {
               description: `Se eliminaron ${itemCount} producto${itemCount > 1 ? 's' : ''} del carrito`,
               duration: 3000,

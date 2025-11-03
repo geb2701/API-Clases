@@ -1,5 +1,6 @@
 import { CategoryPage } from "@/features/product/pages/category";
 import { createFileRoute } from "@tanstack/react-router";
+import { getProducts } from "@/features/product/services/product-service";
 
 const titleFromSlug = (s: string) =>
   decodeURIComponent(s)
@@ -10,9 +11,16 @@ const titleFromSlug = (s: string) =>
 
 export const Route = createFileRoute("/productos/categorias/$nombre")({
   component: CategoryPage,
-  loader: ({ params }) => ({
-    crumb: {
-      label: titleFromSlug(params.nombre),
-    },
-  }),
+  loader: async ({ context, params }) => {
+    // Precargar productos para filtrar por categoría
+    await context.queryClient.ensureQueryData({
+      queryKey: ["productos-paginated"],
+      queryFn: getProducts,
+    });
+    return {
+      crumb: {
+        label: titleFromSlug(params.nombre),
+      },
+    };
+  },
 });

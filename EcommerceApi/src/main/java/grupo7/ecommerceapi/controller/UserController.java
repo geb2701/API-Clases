@@ -1,5 +1,6 @@
 package grupo7.ecommerceapi.controller;
 
+import grupo7.ecommerceapi.dto.OrderResponseDTO;
 import grupo7.ecommerceapi.entity.Order;
 import grupo7.ecommerceapi.entity.User;
 import grupo7.ecommerceapi.service.OrderService;
@@ -32,7 +33,7 @@ public class UserController {
     // GET /api/users/me/orders - Obtener pedidos del usuario autenticado (debe ir
     // antes de /{id})
     @GetMapping("/me/orders")
-    public ResponseEntity<List<Order>> getMyOrders() {
+    public ResponseEntity<List<OrderResponseDTO>> getMyOrders() {
         try {
             // Obtener usuario autenticado
             Optional<User> userOpt = securityUtil.getCurrentUser();
@@ -45,14 +46,14 @@ public class UserController {
             System.out.println(
                     "DEBUG: Usuario autenticado encontrado: " + user.getEmail() + " (ID: " + user.getId() + ")");
 
-            List<Order> orders = orderService.getOrdersByUserId(user.getId());
+            List<OrderResponseDTO> orders = orderService.getOrdersByUserIdAsDTO(user.getId());
             System.out.println("DEBUG: Se encontraron " + orders.size() + " órdenes para el usuario");
 
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             System.out.println("DEBUG: Error en getMyOrders: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

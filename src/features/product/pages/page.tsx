@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { ProductCard } from "@/components/product-card";
 
 type SortKey = "name" | "price";
@@ -27,6 +29,7 @@ const ProductosPage = () => {
   const [sortKey, setSortKey] = React.useState<SortKey>("name");
   const [sortDir, setSortDir] = React.useState<SortDir>("asc");
   const [page, setPage] = React.useState(1);
+  const [showOffers, setShowOffers] = React.useState(false);
 
   const setSort = (k: SortKey, d: SortDir) => {
     setSortKey(k);
@@ -40,8 +43,14 @@ const ProductosPage = () => {
 
   const q = query.trim().toLowerCase();
 
+  // Productos con descuento
+  const discountedProducts = React.useMemo(() => {
+    return products.filter((product) => product.hasDiscount());
+  }, [products]);
+
   const filtered = React.useMemo(() => {
-    return products.filter((p) => {
+    const productsToFilter = showOffers ? discountedProducts : products;
+    return productsToFilter.filter((p) => {
       const matchCat = category ? p.category.name === category : true;
       const matchText =
         q.length === 0 ||
@@ -49,7 +58,7 @@ const ProductosPage = () => {
         p.description.toLowerCase().includes(q);
       return matchCat && matchText;
     });
-  }, [products, category, q]);
+  }, [products, discountedProducts, category, q, showOffers]);
 
   const sorted = React.useMemo(() => {
     const arr = [...filtered];
@@ -73,18 +82,31 @@ const ProductosPage = () => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     setPage(1);
-  }, [q, category, sortKey, sortDir]);
+  }, [q, category, sortKey, sortDir, showOffers]);
 
   return (
     <div className="space-y-5">
       {/* Header */}
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Productos</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {showOffers ? "Ofertas Especiales" : "Productos"}
+          </h1>
           <p className="text-sm text-muted-foreground">{total} resultados</p>
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          {/* Toggle para mostrar solo ofertas */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-muted/50">
+            <Switch
+              id="show-offers"
+              checked={showOffers}
+              onCheckedChange={setShowOffers}
+            />
+            <Label htmlFor="show-offers" className="text-sm font-medium cursor-pointer">
+              Solo ofertas
+            </Label>
+          </div>
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

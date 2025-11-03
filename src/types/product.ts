@@ -48,7 +48,7 @@ export class Product {
   }
 
   hasDiscount(): boolean {
-    return this.discount !== undefined && this.discount < this.price;
+    return this.discount != null && this.discount > 0 && this.discount < this.price;
   }
 
   getDiscountPercentage(): number {

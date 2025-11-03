@@ -26,9 +26,24 @@ const productSchema = z.object({
   description: z.string().min(1, "La descripción es requerida").max(500, "La descripción es muy larga"),
   price: z.number().min(0.01, "El precio debe ser mayor a 0"),
   category: z.string().min(1, "La categoría es requerida"),
-  image: z.string().min(1, "La imagen es requerida"),
+  image: z.string().min(1, "La imagen es requerida").refine(
+    (val) => {
+      // Aceptar URLs completas (http/https) o rutas que empiecen con /
+      return val.startsWith("http://") || val.startsWith("https://") || val.startsWith("/");
+    },
+    { message: "Ingresa una URL válida (http/https) o una ruta que empiece con /" }
+  ),
   stock: z.number().min(0, "El stock no puede ser negativo").int("El stock debe ser un número entero"),
-  discount: z.number().min(0, "El descuento no puede ser negativo").optional(),
+  discount: z.preprocess(
+    (val) => {
+      if (val === "" || val === null || val === undefined || isNaN(Number(val))) {
+        return undefined;
+      }
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    },
+    z.number().min(0, "El descuento no puede ser negativo").optional()
+  ),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -190,6 +205,7 @@ export default function EditProduct() {
 
       // Invalidar caché de productos para refrescar la lista
       await queryClient.invalidateQueries({ queryKey: invalidateKeys.myProducts });
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
 
       // Actualizar estado local
       setProduct(updatedProduct);
@@ -319,7 +335,7 @@ export default function EditProduct() {
                   step="0.01"
                   {...register("price", { valueAsNumber: true })}
                   placeholder="0.00"
-                  className={errors.price ? "border-destructive" : ""}
+                  className={`${errors.price ? "border-destructive" : ""} [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                 />
                 {errors.price && (
                   <p className="text-sm text-destructive">{errors.price.message}</p>
@@ -332,9 +348,17 @@ export default function EditProduct() {
                   id="discount"
                   type="number"
                   step="0.01"
-                  {...register("discount", { valueAsNumber: true })}
+                  {...register("discount", { 
+                    setValueAs: (value) => {
+                      if (value === "" || value === null || value === undefined) {
+                        return undefined;
+                      }
+                      const num = Number(value);
+                      return isNaN(num) ? undefined : num;
+                    }
+                  })}
                   placeholder="0.00"
-                  className={errors.discount ? "border-destructive" : ""}
+                  className={`${errors.discount ? "border-destructive" : ""} [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                 />
                 {errors.discount && (
                   <p className="text-sm text-destructive">{errors.discount.message}</p>
@@ -368,7 +392,7 @@ export default function EditProduct() {
                 type="number"
                 {...register("stock", { valueAsNumber: true })}
                 placeholder="0"
-                className={errors.stock ? "border-destructive" : ""}
+                className={`${errors.stock ? "border-destructive" : ""} [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
               />
               {errors.stock && (
                 <p className="text-sm text-destructive">{errors.stock.message}</p>
@@ -461,14 +485,25 @@ export default function EditProduct() {
                         {watch("description") || "Descripción del producto"}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="text-2xl font-bold">
-                          {watch("price") ? `$${watch("price").toFixed(2)}` : "$0.00"}
-                        </span>
-                        {watch("discount") && watch("discount") < watch("price") && (
-                          <span className="text-lg text-muted-foreground line-through">
-                            ${watch("price").toFixed(2)}
-                          </span>
-                        )}
+                        {(() => {
+                          const price = watch("price");
+                          const discount = watch("discount");
+                          const priceNum = typeof price === "number" && !isNaN(price) ? price : 0;
+                          const discountNum = typeof discount === "number" && !isNaN(discount) && discount > 0 ? discount : null;
+                          
+                          return (
+                            <>
+                              <span className="text-2xl font-bold">
+                                ${priceNum.toFixed(2)}
+                              </span>
+                              {discountNum && discountNum < priceNum && (
+                                <span className="text-lg text-muted-foreground line-through">
+                                  ${priceNum.toFixed(2)}
+                                </span>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {(() => {

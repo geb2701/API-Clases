@@ -35,6 +35,12 @@ export const ManageProductsPage = () => {
 
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(mockProducts);
+
+  // Sincronizar estado local cuando cambie la query
+  useEffect(() => {
+    setProducts(mockProducts);
+    setFilteredProducts(mockProducts);
+  }, [mockProducts]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -77,6 +83,7 @@ export const ManageProductsPage = () => {
 
       // Invalidar caché para refrescar la lista
       await queryClient.invalidateQueries({ queryKey: invalidateKeys.myProducts });
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
 
       // Actualizar lista local
       setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
@@ -237,14 +244,14 @@ export const ManageProductsPage = () => {
 
                 <CardContent className="pt-0 px-3 pb-3">
                   <div className="flex items-center gap-1 mb-2">
-                    <span className="text-sm font-bold">
-                      {product.getFormattedDiscountPrice()}
-                    </span>
                     {product.hasDiscount() && (
-                      <span className="text-xs text-muted-foreground line-through">
+                      <span className="text-sm text-muted-foreground line-through">
                         {product.getFormattedPrice()}
                       </span>
                     )}
+                    <span className="text-sm font-bold text-green-600">
+                      {product.getFormattedDiscountPrice()}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">

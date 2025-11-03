@@ -58,12 +58,15 @@ public class Order {
     private LocalDateTime updatedAt;
 
     // Relaciones
+    @JsonIgnoreProperties({"order"})
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
 
+    @JsonIgnoreProperties({"order", "user"})
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BillingAddress> billingAddresses;
 
+    @JsonIgnoreProperties({"order", "user"})
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ShippingAddress> shippingAddresses;
 

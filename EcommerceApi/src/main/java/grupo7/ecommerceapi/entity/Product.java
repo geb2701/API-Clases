@@ -48,6 +48,7 @@ public class Product {
     @NotNull(message = "La categoría es requerida")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonIgnoreProperties({"products"})
     private Category category;
 
     @JsonIgnore

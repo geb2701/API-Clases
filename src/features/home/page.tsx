@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { ShoppingCart, Star, Clock, Zap, Package } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useProducts } from "../product/hooks/use-products";
@@ -394,6 +396,17 @@ const HomePage = () => {
           </div>
 
           <div className="flex flex-col gap-2 md:flex-row md:items-center">
+            {/* Toggle para mostrar solo ofertas */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-muted/50">
+              <Switch
+                id="show-offers"
+                checked={showOffers}
+                onCheckedChange={setShowOffers}
+              />
+              <Label htmlFor="show-offers" className="text-sm font-medium cursor-pointer">
+                Solo ofertas
+              </Label>
+            </div>
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}

@@ -10,8 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageLazy from "@/components/image-lazy";
-import { uploadImage, getImageUrl } from "../services/upload-service";
-import { Upload, X } from "lucide-react";
+import { getImageUrl } from "../services/upload-service";
 import { createProduct } from "../services/product-service";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
@@ -23,9 +22,24 @@ const productSchema = z.object({
   description: z.string().min(1, "La descripción es requerida").max(500, "La descripción es muy larga"),
   price: z.number().min(0.01, "El precio debe ser mayor a 0"),
   category: z.string().min(1, "La categoría es requerida"),
-  image: z.string().min(1, "La imagen es requerida"),
+  image: z.string().min(1, "La imagen es requerida").refine(
+    (val) => {
+      // Aceptar URLs completas (http/https) o rutas que empiecen con /
+      return val.startsWith("http://") || val.startsWith("https://") || val.startsWith("/");
+    },
+    { message: "Ingresa una URL válida (http/https) o una ruta que empiece con /" }
+  ),
   stock: z.number().min(0, "El stock no puede ser negativo").int("El stock debe ser un número entero"),
-  discount: z.number().min(0, "El descuento no puede ser negativo").optional(),
+  discount: z.preprocess(
+    (val) => {
+      if (val === "" || val === null || val === undefined || isNaN(Number(val))) {
+        return undefined;
+      }
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    },
+    z.number().min(0, "El descuento no puede ser negativo").optional()
+  ),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -39,9 +53,7 @@ export default function AddProduct() {
   const categories = categoriesData.map((cat) => cat.name).sort();
 
   const [previewImage, setPreviewImage] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const {
     register,
@@ -63,82 +75,6 @@ export default function AddProduct() {
     },
   });
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    // Validar tipo de archivo
-    if (!file.type.startsWith("image/")) {
-      toast.error("Archivo inválido", {
-        description: "Por favor selecciona una imagen válida (JPG, PNG, GIF, etc.)",
-      });
-      return;
-    }
-
-    // Validar tamaño (máximo 5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      toast.error("Archivo muy grande", {
-        description: "La imagen no debe superar los 5MB",
-      });
-      return;
-    }
-
-    setSelectedFile(file);
-
-    // Crear URL temporal para vista previa
-    const previewUrl = URL.createObjectURL(file);
-    setPreviewImage(previewUrl);
-
-    // Subir imagen inmediatamente
-    setIsUploadingImage(true);
-    try {
-      const uploadResponse = await uploadImage(file);
-      console.log('add-product: Image uploaded, response:', uploadResponse);
-      console.log('add-product: Setting image field to:', uploadResponse.fileName);
-      setValue("image", uploadResponse.fileName);
-      
-      // Liberar la URL temporal
-      URL.revokeObjectURL(previewUrl);
-      
-      // Actualizar la preview con la URL del servidor
-      const imageUrl = getImageUrl(uploadResponse.fileName);
-      console.log('add-product: Generated image URL:', imageUrl);
-      setPreviewImage(imageUrl);
-
-      toast.success("Imagen cargada", {
-        description: "La imagen se ha subido correctamente",
-      });
-    } catch (error) {
-      // Liberar la URL temporal en caso de error
-      URL.revokeObjectURL(previewUrl);
-      
-      toast.error("Error al subir imagen", {
-        description: error instanceof Error ? error.message : "No se pudo subir la imagen",
-      });
-      // Limpiar en caso de error
-      setSelectedFile(null);
-      setPreviewImage("");
-      setValue("image", "");
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setSelectedFile(null);
-    setPreviewImage("");
-    setValue("image", "");
-
-    // Limpiar el input file
-    const fileInput = document.getElementById("image") as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = "";
-    }
-  };
 
   const onSubmit = async (data: ProductFormData) => {
     setIsSubmitting(true);
@@ -149,7 +85,7 @@ export default function AddProduct() {
         image: data.image,
         imageUrl: getImageUrl(data.image || '')
       });
-      
+
       // Crear producto usando la API
       const createdProduct = await createProduct({
         name: data.name,
@@ -160,7 +96,7 @@ export default function AddProduct() {
         stock: data.stock,
         discount: data.discount,
       });
-      
+
       console.log('add-product: Product created:', createdProduct);
       console.log('add-product: Created product image field:', createdProduct.image);
 
@@ -168,13 +104,17 @@ export default function AddProduct() {
         description: `El producto "${data.name}" ha sido creado correctamente.`,
       });
 
-      // Invalidar caché de productos para refrescar la lista
-      await queryClient.invalidateQueries({ queryKey: invalidateKeys.myProducts });
+      // Invalidar y refetch todas las queries relacionadas con productos
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: invalidateKeys.myProducts }),
+        queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated }),
+        queryClient.refetchQueries({ queryKey: invalidateKeys.myProducts }),
+        queryClient.refetchQueries({ queryKey: invalidateKeys.paginated }),
+      ]);
 
       // Limpiar formulario
       reset();
       setPreviewImage("");
-      setSelectedFile(null);
 
       // Redirigir a la página de gestión de productos después de un momento
       setTimeout(() => {
@@ -239,7 +179,7 @@ export default function AddProduct() {
                   step="0.01"
                   {...register("price", { valueAsNumber: true })}
                   placeholder="0.00"
-                  className={errors.price ? "border-destructive" : ""}
+                  className={`${errors.price ? "border-destructive" : ""} [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                 />
                 {errors.price && (
                   <p className="text-sm text-destructive">{errors.price.message}</p>
@@ -252,9 +192,17 @@ export default function AddProduct() {
                   id="discount"
                   type="number"
                   step="0.01"
-                  {...register("discount", { valueAsNumber: true })}
+                  {...register("discount", {
+                    setValueAs: (value) => {
+                      if (value === "" || value === null || value === undefined) {
+                        return undefined;
+                      }
+                      const num = Number(value);
+                      return isNaN(num) ? undefined : num;
+                    }
+                  })}
                   placeholder="0.00"
-                  className={errors.discount ? "border-destructive" : ""}
+                  className={`${errors.discount ? "border-destructive" : ""} [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                 />
                 {errors.discount && (
                   <p className="text-sm text-destructive">{errors.discount.message}</p>
@@ -288,7 +236,7 @@ export default function AddProduct() {
                 type="number"
                 {...register("stock", { valueAsNumber: true })}
                 placeholder="0"
-                className={errors.stock ? "border-destructive" : ""}
+                className={`${errors.stock ? "border-destructive" : ""} [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
               />
               {errors.stock && (
                 <p className="text-sm text-destructive">{errors.stock.message}</p>
@@ -296,78 +244,38 @@ export default function AddProduct() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image">Imagen del Producto *</Label>
-              <div className="flex flex-col gap-2">
-                {/* Subir archivo local */}
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className={errors.image ? "border-destructive" : ""}
-                      disabled={isUploadingImage}
-                    />
-                  </div>
-                  {selectedFile && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={handleRemoveImage}
-                      disabled={isUploadingImage}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-                {isUploadingImage && (
-                  <p className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Upload className="w-4 h-4 animate-bounce" />
-                    Subiendo imagen...
-                  </p>
-                )}
-
-                {/* O URL pública */}
-                <div className="relative">
-                  <Input
-                    id="image-url"
-                    type="url"
-                    placeholder="https://ejemplo.com/imagen.png o /images/archivo.png"
-                    onChange={(e) => {
-                      const val = e.target.value.trim();
-                      setValue("image", val);
-                      if (val) {
-                        try {
-                          const url = getImageUrl(val);
-                          setPreviewImage(url);
-                          setSelectedFile(null);
-                        } catch {
-                          // si falla, no actualizar preview
-                        }
-                      } else {
-                        setPreviewImage("");
-                      }
-                    }}
-                    className={errors.image ? "border-destructive" : ""}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    También puedes pegar una URL pública (http/https) o una ruta del proyecto (/images/...).
-                  </p>
-                </div>
-
-                {errors.image && (
-                  <p className="text-sm text-destructive">{errors.image.message}</p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Formatos permitidos (archivo local): JPG, PNG, GIF. Tamaño máximo: 5MB
-                </p>
-              </div>
+              <Label htmlFor="image">URL de la Imagen del Producto *</Label>
+              <Input
+                id="image"
+                type="text"
+                {...register("image")}
+                placeholder="https://ejemplo.com/imagen.png o /images/archivo.png"
+                onChange={(e) => {
+                  const val = e.target.value.trim();
+                  setValue("image", val);
+                  if (val) {
+                    try {
+                      const url = getImageUrl(val);
+                      setPreviewImage(url);
+                    } catch {
+                      // si falla, no actualizar preview
+                    }
+                  } else {
+                    setPreviewImage("");
+                  }
+                }}
+                className={errors.image ? "border-destructive" : ""}
+              />
+              {errors.image && (
+                <p className="text-sm text-destructive">{errors.image.message}</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Ingresa una URL pública (http/https) o una ruta del proyecto (/images/...).
+              </p>
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button type="submit" disabled={isSubmitting || isUploadingImage} className="flex-1">
+              <Button type="submit" disabled={isSubmitting} className="flex-1">
                 {isSubmitting ? "Agregando..." : "Agregar Producto"}
               </Button>
               <Button
@@ -376,10 +284,8 @@ export default function AddProduct() {
                 onClick={() => {
                   reset();
                   setPreviewImage("");
-                  setSelectedFile(null);
-                  handleRemoveImage();
                 }}
-                disabled={isSubmitting || isUploadingImage}
+                disabled={isSubmitting}
               >
                 Limpiar
               </Button>
@@ -412,14 +318,17 @@ export default function AddProduct() {
                       {(() => {
                         const price = watch("price");
                         const discount = watch("discount");
+                        const priceNum = typeof price === "number" && !isNaN(price) ? price : 0;
+                        const discountNum = typeof discount === "number" && !isNaN(discount) && discount > 0 ? discount : null;
+
                         return (
                           <>
                             <span className="text-2xl font-bold">
-                              {price ? `$${price.toFixed(2)}` : "$0.00"}
+                              ${priceNum.toFixed(2)}
                             </span>
-                            {discount && price && discount < price && (
+                            {discountNum && discountNum < priceNum && (
                               <span className="text-lg text-muted-foreground line-through">
-                                ${price.toFixed(2)}
+                                ${priceNum.toFixed(2)}
                               </span>
                             )}
                           </>

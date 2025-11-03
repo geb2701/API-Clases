@@ -35,6 +35,7 @@ public class OrderItem {
     @NotNull(message = "El producto es requerido")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnoreProperties({"orderItems", "createdBy", "category", "createdAt", "updatedAt", "isActive"})
     private Product product;
     
     @NotNull(message = "La cantidad es requerida")

@@ -59,7 +59,6 @@ export const ProductCard = ({
     addItem(p, quantity);
   };
 
-
   const imageUrl = getImageUrl(p.image);
 
   return (

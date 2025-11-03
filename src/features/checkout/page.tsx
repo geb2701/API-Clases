@@ -27,6 +27,9 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getImageUrl } from "@/features/product/services/upload-service";
 import { createOrder } from "@/features/order/services/order-service";
+import { useQueryClient } from "@tanstack/react-query";
+import { useProducts } from "@/features/product/hooks/use-products";
+import { useOrders } from "@/features/order/hooks/use-orders";
 
 const CHECKOUT_STORAGE_KEY = "checkout_data";
 
@@ -71,8 +74,11 @@ const loadCheckoutData = (): Partial<CheckoutData> | null => {
 
 const CheckoutPage: React.FC = () => {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const { getProducts, getFormattedTotal, clearCart } = useCartContext();
 	const { isLogged } = useAuthContext();
+	const { invalidateKeys: productInvalidateKeys } = useProducts();
+	const { invalidateKeys: orderInvalidateKeys } = useOrders();
 
 	const items = getProducts();
 
@@ -254,19 +260,19 @@ const CheckoutPage: React.FC = () => {
 				const authStoreRaw = localStorage.getItem('auth-store');
 				const parsed = authStoreRaw ? JSON.parse(authStoreRaw) : null;
 				console.log('Token (auth-store):', parsed?.state?.token ? 'Presente' : 'FALTA');
-			} catch {}
+			} catch { }
 			console.log('Payload completo (previo):', JSON.stringify({
 				billing: data.billing,
 				shipping: data.sameAddress ? undefined : data.shipping,
 				payment: {
-					cardNumber: data.payment.cardNumber ? `${data.payment.cardNumber.slice(0,4)}...` : '' ,
+					cardNumber: data.payment.cardNumber ? `${data.payment.cardNumber.slice(0, 4)}...` : '',
 					expiryDate: data.payment.expiryDate,
 					cvv: data.payment.cvv ? '***' : '',
 					cardholderName: data.payment.cardholderName
 				},
 				items: itemsForOrder
 			}, null, 2));
-		} catch {}
+		} catch { }
 
 		// Verificar autenticación
 		if (!isLogged) {
@@ -327,8 +333,25 @@ const CheckoutPage: React.FC = () => {
 				duration: 5000,
 			});
 
-			// Limpiar carrito
-			clearCart();
+			// Invalidar y refetch caché de órdenes y productos para refrescar los datos
+			// Primero invalidar todas las queries relacionadas
+			await queryClient.invalidateQueries({ queryKey: orderInvalidateKeys.all });
+			await queryClient.invalidateQueries({ queryKey: productInvalidateKeys.paginated });
+
+			// Luego forzar refetch inmediato de las queries específicas
+			await Promise.all([
+				queryClient.refetchQueries({
+					queryKey: orderInvalidateKeys.myOrders,
+					exact: true
+				}),
+				queryClient.refetchQueries({
+					queryKey: productInvalidateKeys.paginated,
+					exact: true
+				}),
+			]);
+
+			// Limpiar carrito (silenciosamente, sin mostrar mensaje)
+			clearCart(true);
 
 			// Limpiar datos guardados en localStorage
 			try {
