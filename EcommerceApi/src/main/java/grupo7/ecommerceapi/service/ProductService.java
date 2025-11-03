@@ -102,12 +102,13 @@ public class ProductService {
     public boolean updateStock(Long productId, Integer quantity) {
         return productRepository.findActiveById(productId)
                 .map(product -> {
-                    if (product.getStock() >= quantity) {
-                        product.setStock(product.getStock() - quantity);
-                        productRepository.save(product);
-                        return true;
+                    int newStock = product.getStock() + quantity; // Permite valores negativos para descontar
+                    if (newStock < 0) {
+                        return false; // No permitir stock negativo
                     }
-                    return false;
+                    product.setStock(newStock);
+                    productRepository.save(product);
+                    return true;
                 })
                 .orElse(false);
     }

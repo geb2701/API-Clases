@@ -27,11 +27,51 @@ public class OrderService {
     private final UserRepository userRepository;
 
     public List<Order> getOrdersByUserId(Long userId) {
-        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        // Cargar relaciones lazy para que se serialicen en JSON
+        for (Order order : orders) {
+            // Cargar items de la orden desde el repositorio
+            List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getId());
+            order.setOrderItems(orderItems);
+            
+            // Forzar carga de productos en cada item
+            for (OrderItem item : orderItems) {
+                if (item.getProduct() != null) {
+                    item.getProduct().getName(); // Forzar carga del producto
+                }
+            }
+            
+            // Cargar direcciones desde sus repositorios
+            List<BillingAddress> billingAddresses = billingAddressRepository.findAllByOrderId(order.getId());
+            order.setBillingAddresses(billingAddresses);
+            
+            List<ShippingAddress> shippingAddresses = shippingAddressRepository.findAllByOrderId(order.getId());
+            order.setShippingAddresses(shippingAddresses);
+        }
+        return orders;
     }
 
     public Optional<Order> getOrderById(Long orderId) {
-        return orderRepository.findById(orderId);
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            // Forzar carga de relaciones lazy
+            if (order.getOrderItems() != null) {
+                order.getOrderItems().size();
+                order.getOrderItems().forEach(item -> {
+                    if (item.getProduct() != null) {
+                        item.getProduct().getName();
+                    }
+                });
+            }
+            if (order.getBillingAddresses() != null) {
+                order.getBillingAddresses().size();
+            }
+            if (order.getShippingAddresses() != null) {
+                order.getShippingAddresses().size();
+            }
+        }
+        return orderOpt;
     }
 
     public Optional<Order> getOrderByOrderNumber(String orderNumber) {
@@ -97,6 +137,7 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
         
         // Crear items de la orden
+        List<OrderItem> savedOrderItems = new java.util.ArrayList<>();
         for (OrderItemRequest itemRequest : items) {
             Product product = productService.getProductById(itemRequest.getProductId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
@@ -113,11 +154,18 @@ public class OrderService {
             orderItem.setUnitPrice(actualPrice);
             orderItem.setTotalPrice(actualPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
             
-            orderItemRepository.save(orderItem);
+            OrderItem savedItem = orderItemRepository.save(orderItem);
+            savedOrderItems.add(savedItem);
             
-            // Actualizar stock usando el método updateStock
-            productService.updateStock(product.getId(), itemRequest.getQuantity());
+            // Actualizar stock usando el método updateStock (descuenta del stock)
+            boolean stockUpdated = productService.updateStock(product.getId(), -itemRequest.getQuantity());
+            if (!stockUpdated) {
+                throw new RuntimeException("No se pudo actualizar el stock del producto: " + product.getName());
+            }
         }
+        
+        // Asociar items a la orden para que se serialicen correctamente
+        savedOrder.setOrderItems(savedOrderItems);
         
         // Crear direcciones
         if (billingAddress != null) {
