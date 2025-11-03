@@ -22,6 +22,7 @@ export interface UserResponse {
 export interface AuthResponse {
   success: boolean;
   user?: UserResponse;
+  token?: string;
   message?: string;
 }
 
