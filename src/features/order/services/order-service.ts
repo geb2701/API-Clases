@@ -96,6 +96,14 @@ export const createOrder = async (orderData: CreateOrderRequest): Promise<OrderR
           throw new Error(errorBody.error);
         }
       } catch (parseError) {
+        // Intentar leer como texto si no es JSON
+        try {
+          const text = await error.response.text();
+          if (text) {
+            throw new Error(text);
+          }
+        } catch {}
+
         // Si no se puede parsear, crear un error basado en el status
         const status = error.response?.status;
         const statusText = error.response?.statusText;

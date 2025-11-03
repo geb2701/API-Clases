@@ -61,6 +61,25 @@ export const getImageUrl = (fileName: string): string => {
     return '/placeholder.png';
   }
 
+  // Normalizar posibles rutas locales (Windows o Unix) para quedarnos con el nombre del archivo
+  let normalized = fileName.trim();
+  // Si es ruta file://, quitar prefijo
+  if (normalized.toLowerCase().startsWith('file://')) {
+    normalized = normalized.replace(/^file:\/\//i, '');
+  }
+  // Si contiene separadores de ruta, extraer el basename
+  if (normalized.includes('\\') || normalized.includes('/')) {
+    const parts = normalized.split(/[/\\]+/);
+    normalized = parts[parts.length - 1];
+  }
+  // Quitar prefijos comunes sin slash inicial
+  if (normalized.startsWith('publicimages')) {
+    normalized = normalized.replace(/^publicimages/i, '');
+  }
+  if (normalized.startsWith('images/')) {
+    normalized = normalized.replace(/^images\//i, '');
+  }
+
   // 1. Si ya es una URL completa (de internet), devolverla tal cual
   if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
     return fileName;
@@ -75,18 +94,18 @@ export const getImageUrl = (fileName: string): string => {
   // Las imágenes nuevas tienen UUID al inicio: "abc123-def456-7890-1234-567890abcdef.png"
   // El formato UUID es: 8-4-4-4-12 caracteres hexadecimales separados por guiones
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
-  const hasUUID = uuidRegex.test(fileName);
+  const hasUUID = uuidRegex.test(normalized);
   
   if (hasUUID) {
     // Imagen nueva subida al backend → usar endpoint de archivos
-    const url = `http://localhost:8080/api/files/${fileName}`;
+    const url = `http://localhost:8080/api/files/${normalized}`;
     console.log('getImageUrl: UUID detected, returning:', url);
     return url;
   }
   
   // 4. Imágenes antiguas (sin UUID) → usar carpeta public/images
   // Vite sirve archivos de public/ directamente
-  console.log('getImageUrl: No UUID detected, using /images/', fileName);
-  return `/images/${fileName}`;
+  console.log('getImageUrl: No UUID detected, using /images/', normalized);
+  return `/images/${normalized}`;
 };
 

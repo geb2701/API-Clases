@@ -39,5 +39,40 @@ export const apiClient = ky.create({
 				}
 			},
 		],
+    afterResponse: [
+      async (request, _options, response) => {
+        // Manejo centralizado de expiración de token
+        if (response.status === 401 || response.status === 403) {
+          try {
+            // Limpiar token en localStorage
+            const authStoreRaw = localStorage.getItem("auth-store");
+            if (authStoreRaw) {
+              const parsed = JSON.parse(authStoreRaw);
+              if (parsed?.state) {
+                parsed.state.token = null;
+                parsed.state.isLogged = false;
+                localStorage.setItem("auth-store", JSON.stringify(parsed));
+              } else {
+                localStorage.removeItem("auth-store");
+              }
+            }
+
+            // Redirigir a login preservando destino
+            const currentUrl = window.location.pathname + window.location.search;
+            const loginUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
+            // Evitar bucle si ya estamos en login
+            if (!window.location.pathname.startsWith("/login")) {
+              // Notificar opcionalmente a la app
+              window.dispatchEvent(new CustomEvent("auth:expired"));
+              window.location.assign(loginUrl);
+            }
+          } catch {
+            // Ignorar errores de limpieza/redirect
+          }
+        }
+
+        return response;
+      }
+    ]
 	},
 });
