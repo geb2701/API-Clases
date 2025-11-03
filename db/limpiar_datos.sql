@@ -36,3 +36,4 @@ SET FOREIGN_KEY_CHECKS = 1;
 SELECT '¡Datos limpiados exitosamente!' as Resultado;
 
 
+

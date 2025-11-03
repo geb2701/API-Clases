@@ -58,3 +58,4 @@ export const searchCategories = async (query: string): Promise<Category[]> => {
 };
 
 
+
