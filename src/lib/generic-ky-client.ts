@@ -20,6 +20,11 @@ export const apiClient = ky.create({
 	prefixUrl: API_URL,
 	credentials: "include",
 	timeout: 15000,
+	// Asegurar que las respuestas se interpreten como UTF-8
+	headers: {
+		"Accept": "application/json; charset=utf-8",
+		"Accept-Charset": "utf-8",
+	},
 	hooks: {
 		beforeRequest: [
 			(request) => {
@@ -27,6 +32,10 @@ export const apiClient = ky.create({
 				const token = getAuthToken();
 				if (token) {
 					request.headers.set("Authorization", `Bearer ${token}`);
+				}
+				// Asegurar que el Content-Type use UTF-8 si hay body
+				if (request.body && request.headers.get("Content-Type")?.includes("application/json")) {
+					request.headers.set("Content-Type", "application/json; charset=utf-8");
 				}
 			},
 		],

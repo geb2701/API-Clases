@@ -5,19 +5,40 @@
 
 USE ecommerce_db;
 
+-- Configurar codificación UTF-8 para esta sesión (CRÍTICO para acentos)
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+SET CHARACTER_SET_CLIENT = utf8mb4;
+SET CHARACTER_SET_CONNECTION = utf8mb4;
+SET CHARACTER_SET_RESULTS = utf8mb4;
+SET COLLATION_CONNECTION = utf8mb4_unicode_ci;
+
 -- Deshabilitar temporalmente foreign keys para facilitar la inserción
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- Asegurar que las tablas usen utf8mb4
+ALTER TABLE categories MODIFY name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
+ALTER TABLE categories MODIFY description TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Asegurar que la tabla products también use utf8mb4
+ALTER TABLE products MODIFY name VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
+ALTER TABLE products MODIFY description TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 -- =====================================================
 -- 1. CATEGORÍAS
 -- =====================================================
-INSERT INTO categories (name, description, is_active, created_at, updated_at) VALUES
-('Accesorios', 'Accesorios y complementos tecnológicos', TRUE, NOW(), NOW()),
-('Decoración', 'Artículos decorativos modernos y minimalistas', TRUE, NOW(), NOW()),
-('Hogar', 'Muebles y productos para el hogar', TRUE, NOW(), NOW()),
-('Libros', 'Libros técnicos y material educativo', TRUE, NOW(), NOW()),
-('Ropa', 'Ropa y textiles con diseños geek', TRUE, NOW(), NOW()),
-('Tecnología', 'Productos tecnológicos y electrónicos', TRUE, NOW(), NOW());
+-- Limpiar categorías existentes para evitar duplicados
+DELETE FROM categories;
+
+-- Insertar categorías con nombres correctos en UTF-8
+-- Los caracteres especiales (ó, í) se guardarán correctamente gracias a SET NAMES utf8mb4
+INSERT INTO categories (id, name, description, is_active, created_at, updated_at) VALUES
+(1, 'Accesorios', 'Accesorios y complementos tecnológicos', TRUE, NOW(), NOW()),
+(2, 'Decoración', 'Artículos decorativos modernos y minimalistas', TRUE, NOW(), NOW()),
+(3, 'Hogar', 'Muebles y productos para el hogar', TRUE, NOW(), NOW()),
+(4, 'Libros', 'Libros técnicos y material educativo', TRUE, NOW(), NOW()),
+(5, 'Ropa', 'Ropa y textiles con diseños geek', TRUE, NOW(), NOW()),
+(6, 'Tecnología', 'Productos tecnológicos y electrónicos', TRUE, NOW(), NOW());
 
 -- =====================================================
 -- 2. USUARIOS DE PRUEBA
