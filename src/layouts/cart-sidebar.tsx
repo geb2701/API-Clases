@@ -6,7 +6,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   ShoppingCart,
   Plus,
@@ -67,6 +66,37 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
               <X className="h-4 w-4" />
             </Button>
           </div>
+
+          {/* Botones de acción y total - Parte superior */}
+          {items.length > 0 && (
+            <>
+              <div className="border-b px-6 py-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-semibold">Total:</span>
+                  <span className="text-lg font-bold">{getFormattedTotal()}</span>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={clearCart}
+                    className="flex-1"
+                  >
+                    Vaciar carrito
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={() => {
+                      closeCart();
+                      navigate({ to: "/checkout" });
+                    }}
+                  >
+                    Finalizar compra
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
@@ -155,37 +185,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
             )}
           </div>
 
-          {/* Footer */}
-          {items.length > 0 && (
-            <>
-              <Separator />
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold">Total:</span>
-                  <span className="text-lg font-bold">{getFormattedTotal()}</span>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={clearCart}
-                    className="flex-1"
-                  >
-                    Vaciar carrito
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={() => {
-                      closeCart();
-                      navigate({ to: "/checkout" });
-                    }}
-                  >
-                    Finalizar compra
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
+          {/* Footer - Reservado para posibles elementos adicionales */}
         </div>
       </div>
     </div>
