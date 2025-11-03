@@ -30,14 +30,22 @@ public class OrderService {
         List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
         // Cargar relaciones lazy para que se serialicen en JSON
         for (Order order : orders) {
+            // Ya no necesitamos cargar el usuario porque está marcado con @JsonIgnore
+            
             // Cargar items de la orden desde el repositorio
             List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getId());
             order.setOrderItems(orderItems);
             
-            // Forzar carga de productos en cada item
+            // Forzar carga de productos en cada item (sin cargar las relaciones del producto)
             for (OrderItem item : orderItems) {
                 if (item.getProduct() != null) {
-                    item.getProduct().getName(); // Forzar carga del producto
+                    // Solo acceder a campos básicos del producto para evitar referencia circular
+                    item.getProduct().getId();
+                    item.getProduct().getName();
+                    item.getProduct().getImage();
+                    item.getProduct().getPrice();
+                    item.getProduct().getDiscount();
+                    // No acceder a item.getProduct().getOrderItems() porque tiene @JsonIgnore
                 }
             }
             
@@ -82,112 +90,6 @@ public class OrderService {
         return orderItemRepository.findByOrderId(orderId);
     }
 
-    public Order createOrder(
-            BillingAddress billingAddress,
-            ShippingAddress shippingAddress,
-            PaymentInfo paymentInfo,
-            List<OrderItemRequest> items) {
-        
-        // Calcular total
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        
-        // Validar stock y calcular total
-        for (OrderItemRequest itemRequest : items) {
-            Optional<Product> productOpt = productService.getProductById(itemRequest.getProductId());
-            if (productOpt.isEmpty()) {
-                throw new RuntimeException("Producto con ID " + itemRequest.getProductId() + " no encontrado");
-            }
-            Product product = productOpt.get();
-            
-            if (product.getStock() < itemRequest.getQuantity()) {
-                throw new RuntimeException("Stock insuficiente para el producto: " + product.getName());
-            }
-            
-            BigDecimal actualPrice = product.getDiscount() != null && product.getDiscount().compareTo(BigDecimal.ZERO) > 0
-                    ? product.getDiscount()
-                    : product.getPrice();
-            totalAmount = totalAmount.add(actualPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
-        }
-        
-        // Crear orden
-        Order order = new Order();
-        
-        // Obtener usuario autenticado del SecurityContext
-        User user = null;
-        try {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof User) {
-                user = (User) principal;
-            } else {
-                // Si no hay usuario autenticado, usar usuario temporal (ID 1)
-                user = new User();
-                user.setId(1L);
-            }
-        } catch (Exception e) {
-            // Si hay error obteniendo el usuario, usar temporal
-            user = new User();
-            user.setId(1L);
-        }
-        
-        order.setUser(user);
-        order.setOrderNumber(generateOrderNumber());
-        order.setStatus(Order.OrderStatus.PENDING);
-        order.setTotalAmount(totalAmount);
-        
-        Order savedOrder = orderRepository.save(order);
-        
-        // Crear items de la orden
-        List<OrderItem> savedOrderItems = new java.util.ArrayList<>();
-        for (OrderItemRequest itemRequest : items) {
-            Product product = productService.getProductById(itemRequest.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(savedOrder);
-            orderItem.setProduct(product);
-            orderItem.setQuantity(itemRequest.getQuantity());
-            
-            BigDecimal actualPrice = product.getDiscount() != null && product.getDiscount().compareTo(BigDecimal.ZERO) > 0
-                    ? product.getDiscount()
-                    : product.getPrice();
-            
-            orderItem.setUnitPrice(actualPrice);
-            orderItem.setTotalPrice(actualPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
-            
-            OrderItem savedItem = orderItemRepository.save(orderItem);
-            savedOrderItems.add(savedItem);
-            
-            // Actualizar stock usando el método updateStock (descuenta del stock)
-            boolean stockUpdated = productService.updateStock(product.getId(), -itemRequest.getQuantity());
-            if (!stockUpdated) {
-                throw new RuntimeException("No se pudo actualizar el stock del producto: " + product.getName());
-            }
-        }
-        
-        // Asociar items a la orden para que se serialicen correctamente
-        savedOrder.setOrderItems(savedOrderItems);
-        
-        // Crear direcciones
-        if (billingAddress != null) {
-            billingAddress.setOrder(savedOrder);
-            billingAddress.setUser(user);
-            billingAddressRepository.save(billingAddress);
-        }
-        
-        if (shippingAddress != null) {
-            shippingAddress.setOrder(savedOrder);
-            shippingAddress.setUser(user);
-            shippingAddressRepository.save(shippingAddress);
-        }
-        
-        // Crear información de pago
-        if (paymentInfo != null) {
-            paymentInfo.setOrder(savedOrder);
-            paymentInfoRepository.save(paymentInfo);
-        }
-        
-        return savedOrder;
-    }
 
     // TODO: Re-enable when Cart feature is implemented
     /*
@@ -295,10 +197,8 @@ public class OrderService {
             Product product = productService.getProductById(itemRequest.getProductId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-            BigDecimal actualPrice = product.getDiscount() != null
-                    && product.getDiscount().compareTo(BigDecimal.ZERO) > 0
-                            ? product.getPrice().subtract(product.getDiscount())
-                            : product.getPrice();
+            // Usar getActualPrice() que ya maneja correctamente el descuento
+            BigDecimal actualPrice = product.getActualPrice();
 
             totalAmount = totalAmount.add(actualPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
         }
@@ -312,10 +212,8 @@ public class OrderService {
             Product product = productService.getProductById(itemRequest.getProductId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-            BigDecimal actualPrice = product.getDiscount() != null
-                    && product.getDiscount().compareTo(BigDecimal.ZERO) > 0
-                            ? product.getPrice().subtract(product.getDiscount())
-                            : product.getPrice();
+            // Usar getActualPrice() que ya maneja correctamente el descuento
+            BigDecimal actualPrice = product.getActualPrice();
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(savedOrder);

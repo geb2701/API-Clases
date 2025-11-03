@@ -143,9 +143,9 @@ export const getOrderById = async (id: number): Promise<OrderResponse> => {
  */
 export const getMyOrders = async (): Promise<OrderResponse[]> => {
   // Construir URL correctamente: prefixUrl + ruta
-  // prefixUrl es "http://localhost:8080/api/" y ruta es "orders/my-orders"
-  // Resultado: "http://localhost:8080/api/orders/my-orders"
-  const response = await apiClient.get('orders/my-orders');
+  // prefixUrl es "http://localhost:8080/api/" y ruta es "users/me/orders"
+  // Resultado: "http://localhost:8080/api/users/me/orders"
+  const response = await apiClient.get('users/me/orders');
   const data = await response.json<OrderResponse[]>();
   return data;
 };

@@ -33,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Si no hay header Authorization o no empieza con "Bearer ", continuar sin
         // autenticación
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.info("No Authorization header found for request: " + request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -45,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtUtil.validateToken(jwt)) {
                 String email = jwtUtil.extractEmail(jwt);
                 Long userId = jwtUtil.extractUserId(jwt);
+                logger.info("JWT validated successfully. Email: " + email + ", UserId: " + userId);
 
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     // Crear autenticación
@@ -55,7 +57,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.info("Authentication set for user: " + email);
                 }
+            } else {
+                logger.warning("JWT validation failed for request: " + request.getRequestURI());
             }
         } catch (Exception e) {
             // Si hay error al procesar el token, continuar sin autenticación

@@ -83,38 +83,11 @@ public class OrderController {
         }
     }
 
-    // GET /api/orders/my-orders - Obtener pedidos del usuario autenticado
-    @GetMapping("/my-orders")
-    public ResponseEntity<List<Order>> getMyOrders() {
-        try {
-            Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext()
-                    .getAuthentication().getPrincipal();
-            
-            if (principal == null || !(principal instanceof grupo7.ecommerceapi.entity.User)) {
-                return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
-            }
-            
-            grupo7.ecommerceapi.entity.User user = (grupo7.ecommerceapi.entity.User) principal;
-            List<Order> orders = orderService.getOrdersByUserId(user.getId());
-            return ResponseEntity.ok(orders);
-        } catch (Exception e) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
-        }
-    }
-
     // GET /api/orders/user/{userId} - Obtener pedidos de un usuario (para admin)
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
         List<Order> orders = orderService.getOrdersByUserId(userId);
         return ResponseEntity.ok(orders);
-    }
-
-    // GET /api/orders/{orderId} - Obtener pedido por ID
-    @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
-        Optional<Order> order = orderService.getOrderById(orderId);
-        return order.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
     }
 
     // GET /api/orders/number/{orderNumber} - Obtener pedido por número
@@ -125,11 +98,41 @@ public class OrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // GET /api/orders/status/{status} - Obtener pedidos por estado
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<Order>> getOrdersByStatus(@PathVariable Order.OrderStatus status) {
+        List<Order> orders = orderService.getOrdersByStatus(status);
+        return ResponseEntity.ok(orders);
+    }
+
     // GET /api/orders/{orderId}/items - Obtener items de un pedido
-    @GetMapping("/{orderId}/items")
+    @GetMapping("/{orderId:\\d+}/items")
     public ResponseEntity<List<OrderItem>> getOrderItems(@PathVariable Long orderId) {
         List<OrderItem> orderItems = orderService.getOrderItems(orderId);
         return ResponseEntity.ok(orderItems);
+    }
+
+    // PUT /api/orders/{orderId}/status - Actualizar estado del pedido
+    @PutMapping("/{orderId:\\d+}/status")
+    public ResponseEntity<Order> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestBody UpdateStatusRequest request) {
+
+        try {
+            Order order = orderService.updateOrderStatus(orderId, request.getStatus());
+            return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // GET /api/orders/{orderId} - Obtener pedido por ID (debe ir al final para
+    // evitar conflictos)
+    @GetMapping("/{orderId:\\d+}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+        Optional<Order> order = orderService.getOrderById(orderId);
+        return order.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // TODO: Re-enable when Cart feature is implemented
@@ -152,27 +155,6 @@ public class OrderController {
      * }
      * }
      */
-
-    // PUT /api/orders/{orderId}/status - Actualizar estado del pedido
-    @PutMapping("/{orderId}/status")
-    public ResponseEntity<Order> updateOrderStatus(
-            @PathVariable Long orderId,
-            @RequestBody UpdateStatusRequest request) {
-
-        try {
-            Order order = orderService.updateOrderStatus(orderId, request.getStatus());
-            return ResponseEntity.ok(order);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    // GET /api/orders/status/{status} - Obtener pedidos por estado
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<Order>> getOrdersByStatus(@PathVariable Order.OrderStatus status) {
-        List<Order> orders = orderService.getOrdersByStatus(status);
-        return ResponseEntity.ok(orders);
-    }
 
     // Clases internas para requests
     public static class AddressInfo {

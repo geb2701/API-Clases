@@ -70,8 +70,13 @@ const getStatusLabel = (status: string) => {
 	}
 };
 
-const ProfilePage: React.FC = () => {
+const ProfilePage = () => {
 	const { user } = useAuthContext();
+
+	const ordersQuery = useSuspenseQuery(
+		useOrders().queryOptions.myOrders()
+	);
+	const orders = ordersQuery.data || [];
 
 	if (!user) {
 		return (
@@ -87,16 +92,11 @@ const ProfilePage: React.FC = () => {
 		);
 	}
 
-	const ordersQuery = useSuspenseQuery(
-		useOrders().queryOptions.myOrders()
-	);
-	const orders = ordersQuery.data || [];
-
 	// Calcular estadísticas
 	const totalOrders = orders.length;
 	const totalSpent = orders.reduce((sum, order) => {
-		const amount = typeof order.totalAmount === "number" 
-			? order.totalAmount 
+		const amount = typeof order.totalAmount === "number"
+			? order.totalAmount
 			: parseFloat(order.totalAmount?.toString() || "0");
 		return sum + amount;
 	}, 0);
