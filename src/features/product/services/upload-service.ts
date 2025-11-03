@@ -58,7 +58,7 @@ export const deleteImage = async (fileName: string): Promise<void> => {
 export const getImageUrl = (fileName: string): string => {
   if (!fileName) {
     console.warn('getImageUrl: fileName is empty or undefined');
-    return '/placeholder.png';
+    return '/placeholder.svg';
   }
 
   // Normalizar posibles rutas locales (Windows o Unix) para quedarnos con el nombre del archivo

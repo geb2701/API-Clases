@@ -14,7 +14,7 @@ const ImageLazy = ({
   src,
   alt,
   className,
-  placeholder = "/placeholder.png",
+  placeholder = "/placeholder.svg",
   onError,
 }: ImageLazyProps) => {
   const [imgSrc, setImgSrc] = useState(src);

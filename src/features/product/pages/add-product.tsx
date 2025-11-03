@@ -297,41 +297,73 @@ export default function AddProduct() {
 
             <div className="space-y-2">
               <Label htmlFor="image">Imagen del Producto *</Label>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className={errors.image ? "border-destructive" : ""}
-                    disabled={isUploadingImage}
-                  />
+              <div className="flex flex-col gap-2">
+                {/* Subir archivo local */}
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className={errors.image ? "border-destructive" : ""}
+                      disabled={isUploadingImage}
+                    />
+                  </div>
+                  {selectedFile && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleRemoveImage}
+                      disabled={isUploadingImage}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
-                {selectedFile && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={handleRemoveImage}
-                    disabled={isUploadingImage}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+                {isUploadingImage && (
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Upload className="w-4 h-4 animate-bounce" />
+                    Subiendo imagen...
+                  </p>
                 )}
-              </div>
-              {isUploadingImage && (
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Upload className="w-4 h-4 animate-bounce" />
-                  Subiendo imagen...
+
+                {/* O URL pública */}
+                <div className="relative">
+                  <Input
+                    id="image-url"
+                    type="url"
+                    placeholder="https://ejemplo.com/imagen.png o /images/archivo.png"
+                    onChange={(e) => {
+                      const val = e.target.value.trim();
+                      setValue("image", val);
+                      if (val) {
+                        try {
+                          const url = getImageUrl(val);
+                          setPreviewImage(url);
+                          setSelectedFile(null);
+                        } catch {
+                          // si falla, no actualizar preview
+                        }
+                      } else {
+                        setPreviewImage("");
+                      }
+                    }}
+                    className={errors.image ? "border-destructive" : ""}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    También puedes pegar una URL pública (http/https) o una ruta del proyecto (/images/...).
+                  </p>
+                </div>
+
+                {errors.image && (
+                  <p className="text-sm text-destructive">{errors.image.message}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Formatos permitidos (archivo local): JPG, PNG, GIF. Tamaño máximo: 5MB
                 </p>
-              )}
-              {errors.image && (
-                <p className="text-sm text-destructive">{errors.image.message}</p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB
-              </p>
+              </div>
             </div>
 
             <div className="flex gap-4 pt-4">

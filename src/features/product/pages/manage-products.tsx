@@ -208,7 +208,7 @@ export const ManageProductsPage = () => {
                               imageField: product.image,
                               attemptedUrl: imageUrl
                             });
-                            e.currentTarget.src = '/placeholder.png';
+                            e.currentTarget.src = '/placeholder.svg';
                           }}
                         />
                       );
