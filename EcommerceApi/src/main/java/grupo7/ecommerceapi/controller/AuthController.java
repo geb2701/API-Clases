@@ -3,7 +3,6 @@ package grupo7.ecommerceapi.controller;
 import grupo7.ecommerceapi.entity.User;
 import grupo7.ecommerceapi.service.UserService;
 import grupo7.ecommerceapi.util.JwtUtil;
-import grupo7.ecommerceapi.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,6 @@ import java.util.Optional;
 public class AuthController {
 
   private final UserService userService;
-  private final JwtUtil jwtUtil;
   private final JwtUtil jwtUtil;
 
   /**
@@ -61,7 +59,6 @@ public class AuthController {
       userResponse.put("email", createdUser.getEmail());
 
       response.put("user", userResponse);
-      response.put("token", token);
       response.put("token", token);
       response.put("message", "Usuario registrado exitosamente");
 
@@ -109,7 +106,6 @@ public class AuthController {
         userResponse.put("email", user.getEmail());
 
         response.put("user", userResponse);
-        response.put("token", token);
         response.put("token", token);
         response.put("message", "Login exitoso");
 

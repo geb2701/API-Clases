@@ -2,6 +2,7 @@
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
 import { useCartContext } from "@/context/cart-context";
 import { useNavigate } from "@tanstack/react-router";
+import { useAuthContext } from "@/context/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,6 +72,7 @@ const loadCheckoutData = (): Partial<CheckoutData> | null => {
 const CheckoutPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { getProducts, getFormattedTotal, clearCart } = useCartContext();
+	const { isLogged } = useAuthContext();
 
 	const items = getProducts();
 
@@ -109,7 +111,7 @@ const CheckoutPage: React.FC = () => {
 		mode: "onChange" // Validar en tiempo real
 	});
 
-	const { control, handleSubmit, watch, setValue, formState: { errors } } = form;
+	const { control, watch, setValue, trigger, getValues, formState: { errors } } = form;
 	const formData = watch();
 
 	// Guardar datos automáticamente cuando cambian (con debounce)
@@ -118,14 +120,11 @@ const CheckoutPage: React.FC = () => {
 			const timeoutId = setTimeout(() => {
 				saveCheckoutData(formData);
 			}, 500); // Guardar después de 500ms de inactividad
-			
+
 			return () => clearTimeout(timeoutId);
 		}
-	}, [formData.billing?.firstName, formData.billing?.lastName, formData.billing?.dni, 
-	    formData.billing?.address, formData.billing?.city, formData.billing?.postalCode,
-	    formData.shipping?.firstName, formData.shipping?.lastName, formData.shipping?.address,
-	    formData.shipping?.city, formData.shipping?.postalCode, formData.sameAddress,
-	    formData.payment?.expiryDate, formData.payment?.cardholderName]);
+		// biome-ignore lint/correctness/useExhaustiveDependencies: formData contiene todas las dependencias necesarias
+	}, [formData]);
 
 	// Función para validar el paso actual
 	const validateCurrentStep = (step: number): boolean => {
@@ -213,11 +212,11 @@ const CheckoutPage: React.FC = () => {
 		// Forzar validación de todos los campos del paso actual
 		if (currentStep === 1) {
 			// Validar campos de facturación
-			form.trigger(['billing.firstName', 'billing.lastName', 'billing.dni', 'billing.address', 'billing.city', 'billing.postalCode']);
+			trigger(['billing.firstName', 'billing.lastName', 'billing.dni', 'billing.address', 'billing.city', 'billing.postalCode']);
 
 			// Si no es la misma dirección, validar también campos de envío
 			if (!formData.sameAddress) {
-				form.trigger(['shipping.firstName', 'shipping.lastName', 'shipping.address', 'shipping.city', 'shipping.postalCode']);
+				trigger(['shipping.firstName', 'shipping.lastName', 'shipping.address', 'shipping.city', 'shipping.postalCode']);
 			}
 		}
 
@@ -240,6 +239,17 @@ const CheckoutPage: React.FC = () => {
 
 	const onSubmit = async (data: CheckoutData) => {
 		console.log("onSubmit called with data:", data);
+
+		// Verificar autenticación
+		if (!isLogged) {
+			toast.error("Debes iniciar sesión", {
+				description: "Por favor, inicia sesión para realizar una compra.",
+				duration: 5000,
+			});
+			navigate({ to: "/login", search: { redirect: "/checkout" } });
+			return;
+		}
+
 		try {
 			// Preparar items de la orden
 			const orderItems = items.map(item => ({
@@ -285,7 +295,7 @@ const CheckoutPage: React.FC = () => {
 
 			// Mostrar notificación de éxito
 			toast.success("¡Compra realizada con éxito!", {
-				description: `Tu pedido #${order.id} por ${getFormattedTotal()} ha sido procesado correctamente.`,
+				description: `Tu pedido ${order.orderNumber} por ${getFormattedTotal()} ha sido procesado correctamente.`,
 				duration: 5000,
 			});
 
@@ -306,10 +316,22 @@ const CheckoutPage: React.FC = () => {
 
 		} catch (error) {
 			console.error("Error en onSubmit:", error);
-			const errorMessage = error instanceof Error ? error.message : 
-				(error instanceof Response ? `HTTP ${error.status}: ${error.statusText}` : 
-				"No se pudo procesar tu pedido. Por favor, inténtalo de nuevo.");
-			
+
+			let errorMessage = "No se pudo procesar tu pedido. Por favor, inténtalo de nuevo.";
+
+			if (error instanceof Error) {
+				errorMessage = error.message;
+			} else if (error && typeof error === 'object' && 'message' in error) {
+				errorMessage = String(error.message);
+			}
+
+			// Verificar si el error es de autenticación
+			if (errorMessage.toLowerCase().includes("no autenticado") ||
+				errorMessage.toLowerCase().includes("unauthorized") ||
+				errorMessage.toLowerCase().includes("401")) {
+				errorMessage = "Debes iniciar sesión para realizar una compra. Por favor, inicia sesión e intenta nuevamente.";
+			}
+
 			toast.error("Error al procesar la compra", {
 				description: errorMessage,
 				duration: 5000,
@@ -320,19 +342,30 @@ const CheckoutPage: React.FC = () => {
 	const handleFormSubmit = async (e?: React.MouseEvent) => {
 		e?.preventDefault();
 		console.log("handleFormSubmit called");
-		
-		// Forzar validación de todos los campos de pago
-		const isValid = await form.trigger(['payment.cardNumber', 'payment.cardholderName', 'payment.expiryDate', 'payment.cvv']);
+
+		// Primero validar manualmente el paso 2
+		const stepValid = validateCurrentStep(2);
+		console.log("Step 2 validation result:", stepValid);
+
+		if (!stepValid) {
+			console.log("Step 2 validation failed, aborting");
+			return;
+		}
+
+		// Forzar validación de todos los campos de pago con react-hook-form
+		const isValid = await trigger(['payment.cardNumber', 'payment.cardholderName', 'payment.expiryDate', 'payment.cvv']);
 		console.log("Form validation result:", isValid);
 
-		if (validateCurrentStep(2)) {
-			console.log("Step 2 validated, calling onSubmit");
-			// Usar handleSubmit que devuelve una función que podemos llamar
-			const submitHandler = handleSubmit(onSubmit);
-			submitHandler();
-		} else {
-			console.log("Step 2 validation failed");
+		// Si la validación falló, no continuar
+		if (!isValid) {
+			console.log("React-hook-form validation failed");
+			return;
 		}
+
+		// Si ambas validaciones pasaron, llamar directamente a onSubmit con los valores del formulario
+		console.log("All validations passed, calling onSubmit");
+		const formValues = getValues();
+		await onSubmit(formValues);
 	};
 
 	const handleSameAddressChange = (checked: boolean) => {

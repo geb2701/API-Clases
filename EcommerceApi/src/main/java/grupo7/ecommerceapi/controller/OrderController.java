@@ -113,56 +113,6 @@ public class OrderController {
         return ResponseEntity.ok(orderItems);
     }
 
-    // POST /api/orders - Crear nueva orden
-    @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest request) {
-        try {
-            // Crear direcciones
-            BillingAddress billingAddress = new BillingAddress();
-            billingAddress.setFirstName(request.getBilling().getFirstName());
-            billingAddress.setLastName(request.getBilling().getLastName());
-            billingAddress.setDni(request.getBilling().getDni());
-            billingAddress.setAddress(request.getBilling().getAddress());
-            billingAddress.setCity(request.getBilling().getCity());
-            billingAddress.setPostalCode(request.getBilling().getPostalCode());
-
-            ShippingAddress shippingAddress = null;
-            if (request.getShipping() != null) {
-                shippingAddress = new ShippingAddress();
-                shippingAddress.setFirstName(request.getShipping().getFirstName());
-                shippingAddress.setLastName(request.getShipping().getLastName());
-                shippingAddress.setAddress(request.getShipping().getAddress());
-                shippingAddress.setCity(request.getShipping().getCity());
-                shippingAddress.setPostalCode(request.getShipping().getPostalCode());
-            }
-
-            // Crear información de pago
-            PaymentInfo paymentInfo = new PaymentInfo();
-            paymentInfo.setCardNumberEncrypted(request.getPayment().getCardNumber()); // En producción debería estar
-                                                                                      // encriptado
-            paymentInfo.setExpiryDate(request.getPayment().getExpiryDate());
-            paymentInfo.setCvvEncrypted(request.getPayment().getCvv()); // En producción debería estar encriptado
-            paymentInfo.setCardholderName(request.getPayment().getCardholderName());
-
-            // Convertir items del request
-            List<OrderService.OrderItemRequest> items = request.getItems().stream()
-                    .map(item -> new OrderService.OrderItemRequest(
-                            item.getProductId(),
-                            item.getQuantity()))
-                    .toList();
-
-            Order order = orderService.createOrder(
-                    billingAddress,
-                    shippingAddress,
-                    paymentInfo,
-                    items);
-
-            return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(order);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     // TODO: Re-enable when Cart feature is implemented
     /*
      * // POST /api/orders/create-from-cart - Crear pedido desde carrito

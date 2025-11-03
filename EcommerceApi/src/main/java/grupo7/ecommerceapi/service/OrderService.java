@@ -304,28 +304,6 @@ public class OrderService {
         return savedOrder;
     }
 
-    // Clase interna para request de items
-    public static class OrderItemRequest {
-        private Long productId;
-        private Integer quantity;
-
-        public Long getProductId() {
-            return productId;
-        }
-
-        public void setProductId(Long productId) {
-            this.productId = productId;
-        }
-
-        public Integer getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(Integer quantity) {
-            this.quantity = quantity;
-        }
-    }
-
     private String generateOrderNumber() {
         return "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase() + "-" + System.currentTimeMillis();
     }

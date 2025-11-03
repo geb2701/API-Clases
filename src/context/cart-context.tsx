@@ -198,7 +198,6 @@ const useCartStore = create<CartState>()(
 
       getFormattedTotal: () => {
         const total = get().getTotalPrice();
-        console.log("Total price computed:", total);
         return `$${total.toFixed(2)}`;
       },
 
