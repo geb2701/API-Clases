@@ -11,7 +11,7 @@ export const useProducts = () =>
 			queryKey: queryKeyPaginated,
 			queryFn: async () => getProducts(),
 			// Reducir staleTime para que se actualice con cambios del servidor
-			staleTime: 1000 * 60 * 5, // 5 minutos
+			staleTime: 1000 * 30, // 30 segundos
 			refetchOnWindowFocus: true,
 			refetchOnReconnect: true,
 		});
@@ -21,7 +21,7 @@ export const useProducts = () =>
 		return queryOptions({
 			queryKey: [...queryKey, "byId", productId],
 			queryFn: async () => getProductById(productId),
-			staleTime: 1000 * 60 * 5, // 5 minutos
+			staleTime: 1000 * 30, // 30 segundos
 			refetchOnWindowFocus: true,
 			refetchOnReconnect: true,
 		});
