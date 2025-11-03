@@ -1,7 +1,9 @@
 package grupo7.ecommerceapi.controller;
 
+import grupo7.ecommerceapi.dto.CreateProductRequest;
 import grupo7.ecommerceapi.entity.Product;
 import grupo7.ecommerceapi.service.ProductService;
+import grupo7.ecommerceapi.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,29 @@ import java.util.Optional;
 public class ProductController {
 
     private final ProductService productService;
+    private final SecurityUtil securityUtil;
+
+    // GET /api/products/my-products - Obtener productos del usuario autenticado (debe ir antes de /{id})
+    @GetMapping("/my-products")
+    public ResponseEntity<Page<Product>> getMyProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        
+        var userOpt = securityUtil.getCurrentUser();
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Product> products = productService.getProductsByUserId(userOpt.get().getId(), pageable);
+        return ResponseEntity.ok(products);
+    }
 
     // GET /api/products - Listar todos los productos con paginación
     @GetMapping
@@ -128,11 +153,20 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    // POST /api/products - Crear producto (Admin)
+    // POST /api/products - Crear producto
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        Product createdProduct = productService.createProduct(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody CreateProductRequest request) {
+        var userOpt = securityUtil.getCurrentUser();
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        try {
+            Product createdProduct = productService.createProduct(request, userOpt.get());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     // PUT /api/products/{id} - Actualizar producto (Admin)

@@ -190,14 +190,14 @@ export default function EditProduct() {
       });
 
       // Invalidar caché de productos para refrescar la lista
-      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.myProducts });
 
       // Actualizar estado local
       setProduct(updatedProduct);
 
       // Redirigir a la página de gestión de productos después de un momento
       setTimeout(() => {
-        navigate({ to: '/gestionar/productos' });
+        navigate({ to: '/gestionar' });
       }, 1000);
 
     } catch (error) {

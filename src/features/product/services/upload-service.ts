@@ -56,6 +56,11 @@ export const deleteImage = async (fileName: string): Promise<void> => {
  * @returns URL completa de la imagen
  */
 export const getImageUrl = (fileName: string): string => {
+  if (!fileName) {
+    console.warn('getImageUrl: fileName is empty or undefined');
+    return '/placeholder.png';
+  }
+
   // 1. Si ya es una URL completa (de internet), devolverla tal cual
   if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
     return fileName;
@@ -67,16 +72,21 @@ export const getImageUrl = (fileName: string): string => {
   }
   
   // 3. Detectar si es una imagen nueva (subida por admin)
-  // Las imágenes nuevas tienen UUID al inicio: "abc123-def456-nombre.png"
-  const hasUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(fileName);
+  // Las imágenes nuevas tienen UUID al inicio: "abc123-def456-7890-1234-567890abcdef.png"
+  // El formato UUID es: 8-4-4-4-12 caracteres hexadecimales separados por guiones
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+  const hasUUID = uuidRegex.test(fileName);
   
   if (hasUUID) {
     // Imagen nueva subida al backend → usar endpoint de archivos
-    return `http://localhost:8080/api/files/${fileName}`;
+    const url = `http://localhost:8080/api/files/${fileName}`;
+    console.log('getImageUrl: UUID detected, returning:', url);
+    return url;
   }
   
   // 4. Imágenes antiguas (sin UUID) → usar carpeta public/images
   // Vite sirve archivos de public/ directamente
+  console.log('getImageUrl: No UUID detected, using /images/', fileName);
   return `/images/${fileName}`;
 };
 

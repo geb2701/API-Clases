@@ -33,6 +33,52 @@ export const getProducts = async () => {
   return allProducts.map((item) => fromObject(Product, item));
 };
 
+export const getMyProducts = async () => {
+  // Obtener solo los productos del usuario autenticado
+  let allProducts: object[] = [];
+  let page = 0;
+  const size = 100; // Obtener muchos productos por página
+  let totalPages = 1;
+
+  do {
+    const response = await apiClient.get(`products/my-products?page=${page}&size=${size}`);
+
+    const responseData = await response.json<{
+      content: object[],
+      totalElements: number,
+      totalPages: number,
+      size: number,
+      number: number
+    }>();
+
+    if (!responseData.content || !Array.isArray(responseData.content)) {
+      throw new Error('Invalid response format: expected an array in content field');
+    }
+
+    allProducts = allProducts.concat(responseData.content);
+    totalPages = responseData.totalPages;
+    page++;
+  } while (page < totalPages);
+
+  console.log('getMyProducts: Total products from backend:', allProducts.length);
+  console.log('getMyProducts: First product raw data:', allProducts[0]);
+  
+  const products = allProducts.map((item) => {
+    console.log('getMyProducts: Raw item from backend:', item);
+    const product = fromObject(Product, item);
+    console.log('getMyProducts: Product after fromObject:', {
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      imageType: typeof product.image,
+      hasImage: !!product.image
+    });
+    return product;
+  });
+  
+  return products;
+};
+
 export const getProductById = async (id: number): Promise<Product> => {
   const response = await apiClient.get(`products/${id}`);
 

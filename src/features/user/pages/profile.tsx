@@ -70,9 +70,10 @@ const getStatusLabel = (status: string) => {
 	}
 };
 
-const ProfilePage = () => {
+const ProfilePage: React.FC = () => {
 	const { user } = useAuthContext();
 
+	// Los hooks deben llamarse siempre, antes de cualquier return condicional
 	const ordersQuery = useSuspenseQuery(
 		useOrders().queryOptions.myOrders()
 	);
@@ -97,7 +98,7 @@ const ProfilePage = () => {
 	const totalSpent = orders.reduce((sum, order) => {
 		const amount = typeof order.totalAmount === "number"
 			? order.totalAmount
-			: parseFloat(order.totalAmount?.toString() || "0");
+			: parseFloat(String(order.totalAmount || "0"));
 		return sum + amount;
 	}, 0);
 	const pendingOrders = orders.filter(o => o.status?.toLowerCase() === "pending" || o.status?.toLowerCase() === "processing").length;
@@ -214,7 +215,9 @@ const ProfilePage = () => {
 								<Button
 									variant="outline"
 									className="mt-4"
-									onClick={() => window.location.href = "/"}
+									onClick={() => {
+										window.location.href = "/";
+									}}
 								>
 									Explorar Productos
 								</Button>
@@ -253,7 +256,7 @@ const ProfilePage = () => {
 																$
 																{typeof order.totalAmount === "number"
 																	? order.totalAmount.toFixed(2)
-																	: parseFloat(order.totalAmount?.toString() || "0").toFixed(2)}
+																	: parseFloat(String(order.totalAmount || "0")).toFixed(2)}
 															</span>
 														</div>
 													</div>

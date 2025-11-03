@@ -74,4 +74,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Productos con stock bajo
     @Query("SELECT p FROM Product p WHERE p.isActive = true AND p.stock <= :threshold")
     List<Product> findLowStockProducts(@Param("threshold") Integer threshold);
+    
+    // Productos por usuario (creador)
+    @Query("SELECT p FROM Product p WHERE p.createdBy.id = :userId AND p.isActive = true")
+    Page<Product> findByCreatedByIdAndActiveTrue(@Param("userId") Long userId, Pageable pageable);
 }

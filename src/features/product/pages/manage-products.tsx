@@ -18,7 +18,20 @@ export const ManageProductsPage = () => {
   const queryClient = useQueryClient();
   const api = useProducts();
   const { invalidateKeys } = api;
-  const mockProducts = useSuspenseQuery(api.queryOptions.all()).data;
+  const mockProducts = useSuspenseQuery(api.queryOptions.myProducts()).data;
+
+  // Debug: Log products to see image values
+  useEffect(() => {
+    console.log('ManageProductsPage: Products loaded:', mockProducts);
+    mockProducts.forEach((p, idx) => {
+      console.log(`Product ${idx}:`, {
+        id: p.id,
+        name: p.name,
+        image: p.image,
+        imageUrl: getImageUrl(p.image || '')
+      });
+    });
+  }, [mockProducts]);
 
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(mockProducts);
@@ -63,7 +76,7 @@ export const ManageProductsPage = () => {
       await deleteProduct(selectedProduct.id);
 
       // Invalidar caché para refrescar la lista
-      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.myProducts });
 
       // Actualizar lista local
       setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
@@ -178,11 +191,28 @@ export const ManageProductsPage = () => {
               <Card key={product.id} className="overflow-hidden">
                 <div className="aspect-square relative">
                   <div className="aspect-square w-full overflow-hidden bg-muted/30 flex items-center justify-center">
-                    <ImageLazy
-                      src={getImageUrl(product.image)}
-                      alt={product.name}
-                      className="block max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
+                    {(() => {
+                      const imageUrl = getImageUrl(product.image || '');
+                      console.log(`Product ${product.id} (${product.name}):`, {
+                        imageField: product.image,
+                        generatedUrl: imageUrl,
+                        hasImage: !!product.image
+                      });
+                      return (
+                        <ImageLazy
+                          src={imageUrl}
+                          alt={product.name}
+                          className="block max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            console.error('Error loading image for product:', product.id, {
+                              imageField: product.image,
+                              attemptedUrl: imageUrl
+                            });
+                            e.currentTarget.src = '/placeholder.png';
+                          }}
+                        />
+                      );
+                    })()}
                   </div>
                   <div className="absolute top-1 right-1">
                     <Badge variant={getStockBadgeVariant(product.stock)} className="text-xs px-1 py-0">

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageLazy from "@/components/image-lazy";
-import { uploadImage } from "../services/upload-service";
+import { uploadImage, getImageUrl } from "../services/upload-service";
 import { Upload, X } from "lucide-react";
 import { createProduct } from "../services/product-service";
 import { useNavigate } from "@tanstack/react-router";
@@ -97,12 +97,25 @@ export default function AddProduct() {
     setIsUploadingImage(true);
     try {
       const uploadResponse = await uploadImage(file);
+      console.log('add-product: Image uploaded, response:', uploadResponse);
+      console.log('add-product: Setting image field to:', uploadResponse.fileName);
       setValue("image", uploadResponse.fileName);
+      
+      // Liberar la URL temporal
+      URL.revokeObjectURL(previewUrl);
+      
+      // Actualizar la preview con la URL del servidor
+      const imageUrl = getImageUrl(uploadResponse.fileName);
+      console.log('add-product: Generated image URL:', imageUrl);
+      setPreviewImage(imageUrl);
 
       toast.success("Imagen cargada", {
         description: "La imagen se ha subido correctamente",
       });
     } catch (error) {
+      // Liberar la URL temporal en caso de error
+      URL.revokeObjectURL(previewUrl);
+      
       toast.error("Error al subir imagen", {
         description: error instanceof Error ? error.message : "No se pudo subir la imagen",
       });
@@ -131,8 +144,14 @@ export default function AddProduct() {
     setIsSubmitting(true);
 
     try {
+      console.log('add-product: Creating product with data:', {
+        ...data,
+        image: data.image,
+        imageUrl: getImageUrl(data.image || '')
+      });
+      
       // Crear producto usando la API
-      await createProduct({
+      const createdProduct = await createProduct({
         name: data.name,
         description: data.description,
         price: data.price,
@@ -141,13 +160,16 @@ export default function AddProduct() {
         stock: data.stock,
         discount: data.discount,
       });
+      
+      console.log('add-product: Product created:', createdProduct);
+      console.log('add-product: Created product image field:', createdProduct.image);
 
       toast.success("¡Producto agregado exitosamente!", {
         description: `El producto "${data.name}" ha sido creado correctamente.`,
       });
 
       // Invalidar caché de productos para refrescar la lista
-      await queryClient.invalidateQueries({ queryKey: invalidateKeys.paginated });
+      await queryClient.invalidateQueries({ queryKey: invalidateKeys.myProducts });
 
       // Limpiar formulario
       reset();
@@ -156,7 +178,7 @@ export default function AddProduct() {
 
       // Redirigir a la página de gestión de productos después de un momento
       setTimeout(() => {
-        navigate({ to: '/gestionar/productos' });
+        navigate({ to: '/gestionar' });
       }, 1000);
 
     } catch (error) {

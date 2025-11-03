@@ -1,6 +1,9 @@
 package grupo7.ecommerceapi.service;
 
+import grupo7.ecommerceapi.dto.CreateProductRequest;
+import grupo7.ecommerceapi.entity.Category;
 import grupo7.ecommerceapi.entity.Product;
+import grupo7.ecommerceapi.entity.User;
 import grupo7.ecommerceapi.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +21,7 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryService categoryService;
 
     public Page<Product> getAllProducts(Pageable pageable) {
         return productRepository.findAllActive(pageable);
@@ -47,6 +51,10 @@ public class ProductService {
         return productRepository.findByPriceRangeAndActiveTrue(minPrice, maxPrice, pageable);
     }
 
+    public Page<Product> getProductsByUserId(Long userId, Pageable pageable) {
+        return productRepository.findByCreatedByIdAndActiveTrue(userId, pageable);
+    }
+
     public Page<Product> getProductsSortedByName(String direction, Pageable pageable) {
         return "desc".equalsIgnoreCase(direction)
                 ? productRepository.findAllActiveOrderByNameDesc(pageable)
@@ -60,7 +68,29 @@ public class ProductService {
     }
 
     @Transactional
-    public Product createProduct(Product product) {
+    public Product createProduct(Product product, User user) {
+        product.setCreatedBy(user);
+        return productRepository.save(product);
+    }
+
+    @Transactional
+    public Product createProduct(CreateProductRequest request, User user) {
+        // Buscar la categoría por nombre
+        Category category = categoryService.getCategoryByName(request.getCategory())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada: " + request.getCategory()));
+
+        // Crear el producto
+        Product product = new Product();
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setCategory(category);
+        product.setImage(request.getImage());
+        product.setStock(request.getStock());
+        product.setDiscount(request.getDiscount());
+        product.setCreatedBy(user);
+        product.setIsActive(true);
+
         return productRepository.save(product);
     }
 
