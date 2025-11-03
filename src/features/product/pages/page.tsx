@@ -34,7 +34,7 @@ const ProductosPage = () => {
   };
 
   const categories = React.useMemo(
-    () => Array.from(new Set(products.map((p) => p.category))).sort(),
+    () => Array.from(new Set(products.map((p) => p.category.name))).sort(),
     [products]
   );
 
@@ -42,7 +42,7 @@ const ProductosPage = () => {
 
   const filtered = React.useMemo(() => {
     return products.filter((p) => {
-      const matchCat = category ? p.category === category : true;
+      const matchCat = category ? p.category.name === category : true;
       const matchText =
         q.length === 0 ||
         p.name.toLowerCase().includes(q) ||

@@ -50,7 +50,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	component: () => (
 		<>
 			<MainLayout />
-			{false && (
+			{true && (
 				<>
 					<ReactQueryDevtools buttonPosition="bottom-right" />
 					<TanStackRouterDevtools position="bottom-left" />

@@ -10,6 +10,7 @@ export function fromObject<T extends object>(
 	cls: new (...args: any[]) => T,
 	obj: Partial<T>,
 ): T {
-	const instance = new cls();
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const instance = Object.create(cls.prototype);
 	return Object.assign(instance, obj);
 }
