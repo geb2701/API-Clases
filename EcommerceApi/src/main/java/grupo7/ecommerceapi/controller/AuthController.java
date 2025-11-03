@@ -2,6 +2,7 @@ package grupo7.ecommerceapi.controller;
 
 import grupo7.ecommerceapi.entity.User;
 import grupo7.ecommerceapi.service.UserService;
+import grupo7.ecommerceapi.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class AuthController {
 
   private final UserService userService;
+  private final JwtUtil jwtUtil;
 
   /**
    * POST /api/auth/register - Registrar nuevo usuario
@@ -33,6 +35,9 @@ public class AuthController {
 
       User createdUser = userService.createUser(user);
 
+      // Generar token JWT
+      String token = jwtUtil.generateToken(createdUser.getEmail(), createdUser.getRole().name());
+
       // Preparar respuesta
       Map<String, Object> response = new HashMap<>();
       response.put("success", true);
@@ -44,6 +49,7 @@ public class AuthController {
       userResponse.put("email", createdUser.getEmail());
 
       response.put("user", userResponse);
+      response.put("token", token);
       response.put("message", "Usuario registrado exitosamente");
 
       return ResponseEntity.ok(response);
@@ -67,6 +73,9 @@ public class AuthController {
       if (userOpt.isPresent()) {
         User user = userOpt.get();
 
+        // Generar token JWT
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
 
@@ -77,6 +86,7 @@ public class AuthController {
         userResponse.put("email", user.getEmail());
 
         response.put("user", userResponse);
+        response.put("token", token);
         response.put("message", "Login exitoso");
 
         return ResponseEntity.ok(response);
