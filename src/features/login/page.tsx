@@ -1,5 +1,4 @@
 import { LoginComponent } from "@/components/auth/login-component";
-import { DebugAuth } from "@/components/auth/debug-auth";
 import { useAuthContext } from "@/context/auth-context";
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -8,12 +7,8 @@ export const LoginPage = () => {
   const { login } = useAuthContext();
   const router = useRouter();
 
-  // Mostrar debug solo en desarrollo
-  const showDebug = import.meta.env.DEV || window.location.search.includes("debug=true");
-
   return (
     <div className="container mx-auto px-4 py-8">
-      {showDebug && <DebugAuth />}
       <LoginComponent
         onSuccess={async ({ email, password }) => {
           try {
