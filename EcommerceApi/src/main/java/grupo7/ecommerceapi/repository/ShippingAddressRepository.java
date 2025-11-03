@@ -22,6 +22,9 @@ public interface ShippingAddressRepository extends JpaRepository<ShippingAddress
 
     @Query("SELECT sa FROM ShippingAddress sa WHERE sa.order.id = :orderId")
     Optional<ShippingAddress> findByOrder(@Param("orderId") Long orderId);
+    
+    @Query("SELECT sa FROM ShippingAddress sa WHERE sa.order.id = :orderId")
+    List<ShippingAddress> findAllByOrderId(@Param("orderId") Long orderId);
 
     @Query("SELECT sa FROM ShippingAddress sa WHERE sa.user.id = :userId ORDER BY sa.isDefault DESC, sa.createdAt DESC")
     List<ShippingAddress> findByUserOrderByDefaultAndCreatedAt(@Param("userId") Long userId);

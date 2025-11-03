@@ -22,6 +22,9 @@ public interface BillingAddressRepository extends JpaRepository<BillingAddress, 
 
     @Query("SELECT ba FROM BillingAddress ba WHERE ba.order.id = :orderId")
     Optional<BillingAddress> findByOrder(@Param("orderId") Long orderId);
+    
+    @Query("SELECT ba FROM BillingAddress ba WHERE ba.order.id = :orderId")
+    List<BillingAddress> findAllByOrderId(@Param("orderId") Long orderId);
 
     @Query("SELECT ba FROM BillingAddress ba WHERE ba.user.id = :userId ORDER BY ba.isDefault DESC, ba.createdAt DESC")
     List<BillingAddress> findByUserOrderByDefaultAndCreatedAt(@Param("userId") Long userId);

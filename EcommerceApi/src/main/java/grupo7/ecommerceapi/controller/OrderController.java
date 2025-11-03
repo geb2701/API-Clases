@@ -83,7 +83,26 @@ public class OrderController {
         }
     }
 
-    // GET /api/orders/user/{userId} - Obtener pedidos de un usuario
+    // GET /api/orders/my-orders - Obtener pedidos del usuario autenticado
+    @GetMapping("/my-orders")
+    public ResponseEntity<List<Order>> getMyOrders() {
+        try {
+            Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext()
+                    .getAuthentication().getPrincipal();
+            
+            if (principal == null || !(principal instanceof grupo7.ecommerceapi.entity.User)) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+            }
+            
+            grupo7.ecommerceapi.entity.User user = (grupo7.ecommerceapi.entity.User) principal;
+            List<Order> orders = orderService.getOrdersByUserId(user.getId());
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    // GET /api/orders/user/{userId} - Obtener pedidos de un usuario (para admin)
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
         List<Order> orders = orderService.getOrdersByUserId(userId);
