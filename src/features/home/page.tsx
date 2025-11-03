@@ -26,16 +26,7 @@ import { ProductCard } from "@/components/product-card";
 import { ImageModal } from "@/components/image-modal";
 import { NoProductsFound } from "@/components/no-products-found";
 import { getImageUrl } from "../product/services/upload-service";
-
-// Función helper para convertir nombre de categoría a slug
-const categoryToSlug = (category: string): string => {
-  return category
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .trim();
-};
+import { categoryToSlug } from "@/lib/helpers";
 
 type SortKey = "name" | "price";
 type SortDir = "asc" | "desc";

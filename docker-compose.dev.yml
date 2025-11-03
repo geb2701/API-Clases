@@ -12,6 +12,7 @@ services:
       MYSQL_DATABASE: ecommerce_db
       MYSQL_USER: ecommerce_user
       MYSQL_PASSWORD: ecommerce_pass
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
     volumes:

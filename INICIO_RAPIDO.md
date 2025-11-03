@@ -108,6 +108,18 @@ docker-compose down -v
 docker-compose up -d
 ```
 
+### ❌ Caracteres especiales rotos (ñ, á, é, etc.)
+```bash
+# Acceder a MySQL
+docker-compose exec mysql mysql -u ecommerce_user -pecommerce_pass ecommerce_db
+
+# Dentro de MySQL, ejecutar:
+source /docker-entrypoint-initdb.d/db/fix_categories_charset.sql
+
+# O ejecutar manualmente:
+mysql -h localhost -P 3306 -u ecommerce_user -pecommerce_pass ecommerce_db < db/fix_categories_charset.sql
+```
+
 ## 📚 Documentación completa
 
 - **[README.md](./README.md)** - Documentación general del proyecto
