@@ -14,8 +14,15 @@ import {
 import {
   Book,
   Cpu,
-  House, Lamp, PackageSearch, Search, Shirt, ShoppingCart,
+  House, 
+  Lamp, 
+  PackageSearch, 
+  Search, 
+  Shirt, 
+  ShoppingCart,
   SquareStar,
+  type LucideIcon,
+  Tag,
 } from "lucide-react";
 import { NavUser } from "./nav-user";
 import { SidebarItems } from "./sidebar-items";
@@ -23,9 +30,31 @@ import { SidebarSearchStore } from "./storage/sidebar-search-store";
 import { useCartContext } from "@/context/cart-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { useCategories } from "@/features/category/hooks/use-categories";
+import type { Category } from "@/types/product";
+import { categoryToSlug } from "@/lib/helpers";
 
+// Mapeo de nombres de categoría a iconos (sin acentos para facilitar matching)
+const categoryIconMap: Record<string, LucideIcon> = {
+  "accesorios": House,
+  "decoracion": SquareStar,
+  "hogar": Lamp,
+  "libros": Book,
+  "ropa": Shirt,
+  "tecnologia": Cpu,
+  "default": Tag,
+};
 
-const data = [
+const getCategoryIcon = (categoryName: string): LucideIcon => {
+  const normalizedName = categoryName
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+  return categoryIconMap[normalizedName] || categoryIconMap.default;
+};
+
+const getStaticData = (categories: Category[]) => [
   {
     title: "",
     items: [
@@ -48,44 +77,24 @@ const data = [
   },
   {
     title: "Categorias",
-    items: [
-      {
-        title: "Accesorios",
-        url: "/productos/categorias/accesorios",
-        icon: House,
-      },
-      {
-        title: "Decoración",
-        url: "/productos/categorias/decoracion",
-        icon: SquareStar,
-      },
-      {
-        title: "Hogar",
-        url: "/productos/categorias/hogar",
-        icon: Lamp,
-      },
-      {
-        title: "Libros",
-        url: "/productos/categorias/libros",
-        icon: Book,
-      },
-      {
-        title: "Ropa",
-        url: "/productos/categorias/ropa",
-        icon: Shirt,
-      },
-      {
-        title: "Tecnología",
-        url: "/productos/categorias/tecnologia",
-        icon: Cpu,
-      },
-    ],
+    items: categories.map((category) => ({
+      title: category.name,
+      url: `/productos/categorias/${categoryToSlug(category.name)}`,
+      icon: getCategoryIcon(category.name),
+    })),
   },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { filterValue, setFilter } = SidebarSearchStore();
   const { openCart, getTotalItems } = useCartContext();
+  
+  // Obtener categorías desde la API
+  const categoriesApi = useCategories();
+  const { data: categories = [] } = useQuery(categoriesApi.queryOptions.all());
+
+  // Generar datos del sidebar dinámicamente basados en las categorías
+  const data = getStaticData(categories);
 
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>

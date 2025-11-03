@@ -16,16 +16,7 @@ import { ImageModal } from "./image-modal";
 import type { Product } from "@/types/product";
 import { getImageUrl } from "@/features/product/services/upload-service";
 import { useCartContext } from "@/context/cart-context";
-
-// Función helper para convertir nombre de categoría a slug
-const categoryToSlug = (category: string): string => {
-  return category
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .trim();
-};
+import { categoryToSlug } from "@/lib/helpers";
 
 type ProductCardProps = {
   product: Product;
