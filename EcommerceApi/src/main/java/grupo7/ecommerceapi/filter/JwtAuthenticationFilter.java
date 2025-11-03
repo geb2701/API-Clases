@@ -15,11 +15,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = Logger.getLogger(JwtAuthenticationFilter.class.getName());
     private final JwtUtil jwtUtil;
 
     @Override
@@ -57,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             // Si hay error al procesar el token, continuar sin autenticación
-            logger.error("Error al procesar JWT: {}", e.getMessage());
+            logger.warning("Error al procesar JWT: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);

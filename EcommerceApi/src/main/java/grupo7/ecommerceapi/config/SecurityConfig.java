@@ -34,19 +34,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints públicos (sin autenticación)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/health/**").permitAll()
-                        .requestMatchers("/api/categories/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/health/**").permitAll()
+                        .requestMatchers("/categories/**").permitAll()
                         // Productos: GET público, POST/PUT/DELETE requieren autenticación
-                        .requestMatchers("GET", "/api/products/**").permitAll()
-                        .requestMatchers("POST", "/api/products/**").authenticated()
-                        .requestMatchers("PUT", "/api/products/**").authenticated()
-                        .requestMatchers("DELETE", "/api/products/**").authenticated()
+                        .requestMatchers("GET", "/products/**").permitAll()
+                        .requestMatchers("POST", "/products/**").authenticated()
+                        .requestMatchers("PUT", "/products/**").authenticated()
+                        .requestMatchers("DELETE", "/products/**").authenticated()
                         // Órdenes: todos requieren autenticación
-                        .requestMatchers("/api/orders/**").authenticated()
+                        .requestMatchers("/orders/**").authenticated()
                         // Archivos: subida requiere autenticación, lectura pública
-                        .requestMatchers("POST", "/api/files/**").authenticated()
-                        .requestMatchers("GET", "/api/files/**").permitAll()
+                        .requestMatchers("POST", "/files/**").authenticated()
+                        .requestMatchers("GET", "/files/**").permitAll()
                         // Todo lo demás requiere autenticación
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
