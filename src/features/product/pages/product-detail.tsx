@@ -19,7 +19,7 @@ const clamp = (v: number, min: number, max: number) =>
 export const ProductDetailPage = () => {
   const { id } = Route.useParams();
   const productId = parseInt(id);
-  const product = useSuspenseQuery(useProducts().queryOptions.all()).data.find(p => p.id === productId);
+  const product = useSuspenseQuery(useProducts().queryOptions.byId(productId)).data;
 
   const { addItem } = useCartContext();
 

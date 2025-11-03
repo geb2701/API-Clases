@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getProducts } from "../services/product-service";
+import { getProducts, getProductById } from "../services/product-service";
 
 const queryKey = ["productos"];
 const queryKeyPaginated = ["productos-paginated"];
@@ -17,9 +17,20 @@ export const useProducts = () =>
 		});
 	};
 
+	const byId = (productId: number) => {
+		return queryOptions({
+			queryKey: [...queryKey, "byId", productId],
+			queryFn: async () => getProductById(productId),
+			staleTime: 1000 * 60 * 5, // 5 minutos
+			refetchOnWindowFocus: true,
+			refetchOnReconnect: true,
+		});
+	};
+
 	return {
 		queryOptions: {
 			all,
+			byId,
 			queryKey,
 			queryKeyPaginated,
 		},
