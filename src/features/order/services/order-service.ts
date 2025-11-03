@@ -42,12 +42,20 @@ export interface OrderResponse {
  * Crear una nueva orden
  */
 export const createOrder = async (orderData: CreateOrderRequest): Promise<OrderResponse> => {
-  const response = await apiClient.post('orders', {
-    json: orderData
-  });
-  
-  const data = await response.json<OrderResponse>();
-  return data;
+  console.log("createOrder API call - Request:", orderData);
+  try {
+    const response = await apiClient.post('orders', {
+      json: orderData
+    });
+    
+    console.log("createOrder API call - Response status:", response.status);
+    const data = await response.json<OrderResponse>();
+    console.log("createOrder API call - Response data:", data);
+    return data;
+  } catch (error) {
+    console.error("createOrder API call - Error:", error);
+    throw error;
+  }
 };
 
 /**

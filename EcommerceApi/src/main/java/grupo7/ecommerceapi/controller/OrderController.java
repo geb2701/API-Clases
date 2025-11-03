@@ -50,6 +50,55 @@ public class OrderController {
         return ResponseEntity.ok(orderItems);
     }
 
+    // POST /api/orders - Crear nueva orden
+    @PostMapping
+    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest request) {
+        try {
+            // Crear direcciones
+            BillingAddress billingAddress = new BillingAddress();
+            billingAddress.setFirstName(request.getBilling().getFirstName());
+            billingAddress.setLastName(request.getBilling().getLastName());
+            billingAddress.setDni(request.getBilling().getDni());
+            billingAddress.setAddress(request.getBilling().getAddress());
+            billingAddress.setCity(request.getBilling().getCity());
+            billingAddress.setPostalCode(request.getBilling().getPostalCode());
+
+            ShippingAddress shippingAddress = null;
+            if (request.getShipping() != null) {
+                shippingAddress = new ShippingAddress();
+                shippingAddress.setFirstName(request.getShipping().getFirstName());
+                shippingAddress.setLastName(request.getShipping().getLastName());
+                shippingAddress.setAddress(request.getShipping().getAddress());
+                shippingAddress.setCity(request.getShipping().getCity());
+                shippingAddress.setPostalCode(request.getShipping().getPostalCode());
+            }
+
+            // Crear información de pago
+            PaymentInfo paymentInfo = new PaymentInfo();
+            paymentInfo.setCardNumberEncrypted(request.getPayment().getCardNumber()); // En producción debería estar encriptado
+            paymentInfo.setExpiryDate(request.getPayment().getExpiryDate());
+            paymentInfo.setCvvEncrypted(request.getPayment().getCvv()); // En producción debería estar encriptado
+            paymentInfo.setCardholderName(request.getPayment().getCardholderName());
+
+            // Convertir items del request
+            List<OrderService.OrderItemRequest> items = request.getItems().stream()
+                    .map(item -> new OrderService.OrderItemRequest(
+                            item.getProductId(),
+                            item.getQuantity()))
+                    .toList();
+
+            Order order = orderService.createOrder(
+                    billingAddress,
+                    shippingAddress,
+                    paymentInfo,
+                    items);
+
+            return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     // TODO: Re-enable when Cart feature is implemented
     /*
      * // POST /api/orders/create-from-cart - Crear pedido desde carrito
@@ -93,53 +142,68 @@ public class OrderController {
     }
 
     // Clases internas para requests
+    public static class AddressInfo {
+        private String firstName;
+        private String lastName;
+        private String dni;
+        private String address;
+        private String city;
+        private String postalCode;
+
+        public String getFirstName() { return firstName; }
+        public void setFirstName(String firstName) { this.firstName = firstName; }
+        public String getLastName() { return lastName; }
+        public void setLastName(String lastName) { this.lastName = lastName; }
+        public String getDni() { return dni; }
+        public void setDni(String dni) { this.dni = dni; }
+        public String getAddress() { return address; }
+        public void setAddress(String address) { this.address = address; }
+        public String getCity() { return city; }
+        public void setCity(String city) { this.city = city; }
+        public String getPostalCode() { return postalCode; }
+        public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+    }
+
+    public static class PaymentInfoDto {
+        private String cardNumber;
+        private String expiryDate;
+        private String cvv;
+        private String cardholderName;
+
+        public String getCardNumber() { return cardNumber; }
+        public void setCardNumber(String cardNumber) { this.cardNumber = cardNumber; }
+        public String getExpiryDate() { return expiryDate; }
+        public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
+        public String getCvv() { return cvv; }
+        public void setCvv(String cvv) { this.cvv = cvv; }
+        public String getCardholderName() { return cardholderName; }
+        public void setCardholderName(String cardholderName) { this.cardholderName = cardholderName; }
+    }
+
+    public static class OrderItemDto {
+        private Long productId;
+        private Integer quantity;
+
+        public Long getProductId() { return productId; }
+        public void setProductId(Long productId) { this.productId = productId; }
+        public Integer getQuantity() { return quantity; }
+        public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    }
+
     public static class CreateOrderRequest {
-        private String sessionId;
-        private Long userId;
-        private BillingAddress billingAddress;
-        private ShippingAddress shippingAddress;
-        private PaymentInfo paymentInfo;
+        private AddressInfo billing;
+        private AddressInfo shipping;
+        private PaymentInfoDto payment;
+        private List<OrderItemDto> items;
 
-        // Getters y setters
-        public String getSessionId() {
-            return sessionId;
-        }
-
-        public void setSessionId(String sessionId) {
-            this.sessionId = sessionId;
-        }
-
-        public Long getUserId() {
-            return userId;
-        }
-
-        public void setUserId(Long userId) {
-            this.userId = userId;
-        }
-
-        public BillingAddress getBillingAddress() {
-            return billingAddress;
-        }
-
-        public void setBillingAddress(BillingAddress billingAddress) {
-            this.billingAddress = billingAddress;
-        }
-
-        public ShippingAddress getShippingAddress() {
-            return shippingAddress;
-        }
-
-        public void setShippingAddress(ShippingAddress shippingAddress) {
-            this.shippingAddress = shippingAddress;
-        }
-
-        public PaymentInfo getPaymentInfo() {
-            return paymentInfo;
-        }
-
-        public void setPaymentInfo(PaymentInfo paymentInfo) {
-            this.paymentInfo = paymentInfo;
-        }
+        public AddressInfo getBilling() { return billing; }
+        public void setBilling(AddressInfo billing) { this.billing = billing; }
+        public AddressInfo getShipping() { return shipping; }
+        public void setShipping(AddressInfo shipping) { this.shipping = shipping; }
+        public PaymentInfoDto getPayment() { return payment; }
+        public void setPayment(PaymentInfoDto payment) { this.payment = payment; }
+        public List<OrderItemDto> getItems() { return items; }
+        public void setItems(List<OrderItemDto> items) { this.items = items; }
     }
 
     public static class UpdateStatusRequest {

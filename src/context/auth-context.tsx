@@ -37,6 +37,11 @@ const useAuthStore = create<AuthState>()(
           });
 
           if (response.success && response.user) {
+            // Guardar token JWT si está presente
+            if (response.token) {
+              localStorage.setItem("jwt_token", response.token);
+            }
+            
             // Crear usuario y guardar en estado
             const newUser = new User(
               response.user.id,
@@ -70,6 +75,11 @@ const useAuthStore = create<AuthState>()(
           });
 
           if (response.success && response.user) {
+            // Guardar token JWT si está presente
+            if (response.token) {
+              localStorage.setItem("jwt_token", response.token);
+            }
+            
             // Crear usuario y guardar en estado
             const loggedUser = new User(
               response.user.id,
@@ -95,6 +105,8 @@ const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error("Error en logout:", error);
         } finally {
+          // Limpiar token JWT
+          localStorage.removeItem("jwt_token");
           // Siempre limpiar estado local
           set({ isLogged: false, user: null });
         }

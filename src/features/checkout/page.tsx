@@ -20,12 +20,53 @@ import {
 	checkoutSchema,
 	type CheckoutData
 } from "@/lib/validations/checkout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getImageUrl } from "@/features/product/services/upload-service";
 import { createOrder } from "@/features/order/services/order-service";
+
+const CHECKOUT_STORAGE_KEY = "checkout_data";
+
+// Función para guardar datos en localStorage (sin datos sensibles de tarjeta)
+const saveCheckoutData = (data: CheckoutData) => {
+	try {
+		const dataToSave = {
+			billing: data.billing,
+			shipping: data.shipping,
+			payment: {
+				// NO guardar cardNumber ni cvv (datos sensibles)
+				expiryDate: data.payment.expiryDate,
+				cardholderName: data.payment.cardholderName
+			},
+			sameAddress: data.sameAddress
+		};
+		localStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(dataToSave));
+	} catch (error) {
+		console.error("Error al guardar datos de checkout:", error);
+	}
+};
+
+// Función para cargar datos guardados
+const loadCheckoutData = (): Partial<CheckoutData> | null => {
+	try {
+		const saved = localStorage.getItem(CHECKOUT_STORAGE_KEY);
+		if (!saved) return null;
+		const parsed = JSON.parse(saved);
+		return {
+			...parsed,
+			payment: {
+				...parsed.payment,
+				cardNumber: "", // Siempre vacío por seguridad
+				cvv: "" // Siempre vacío por seguridad
+			}
+		};
+	} catch (error) {
+		console.error("Error al cargar datos de checkout:", error);
+		return null;
+	}
+};
 
 const CheckoutPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -35,10 +76,13 @@ const CheckoutPage: React.FC = () => {
 
 	const [currentStep, setCurrentStep] = useState(1);
 
+	// Cargar datos guardados
+	const savedData = loadCheckoutData();
+
 	// Configurar react-hook-form con validación Zod
 	const form = useForm<CheckoutData>({
 		resolver: zodResolver(checkoutSchema),
-		defaultValues: {
+		defaultValues: savedData || {
 			billing: {
 				firstName: "",
 				lastName: "",
@@ -67,6 +111,21 @@ const CheckoutPage: React.FC = () => {
 
 	const { control, handleSubmit, watch, setValue, formState: { errors } } = form;
 	const formData = watch();
+
+	// Guardar datos automáticamente cuando cambian (con debounce)
+	useEffect(() => {
+		if (formData.billing?.firstName || formData.billing?.dni) {
+			const timeoutId = setTimeout(() => {
+				saveCheckoutData(formData);
+			}, 500); // Guardar después de 500ms de inactividad
+			
+			return () => clearTimeout(timeoutId);
+		}
+	}, [formData.billing?.firstName, formData.billing?.lastName, formData.billing?.dni, 
+	    formData.billing?.address, formData.billing?.city, formData.billing?.postalCode,
+	    formData.shipping?.firstName, formData.shipping?.lastName, formData.shipping?.address,
+	    formData.shipping?.city, formData.shipping?.postalCode, formData.sameAddress,
+	    formData.payment?.expiryDate, formData.payment?.cardholderName]);
 
 	// Función para validar el paso actual
 	const validateCurrentStep = (step: number): boolean => {
@@ -180,12 +239,22 @@ const CheckoutPage: React.FC = () => {
 	};
 
 	const onSubmit = async (data: CheckoutData) => {
+		console.log("onSubmit called with data:", data);
 		try {
 			// Preparar items de la orden
 			const orderItems = items.map(item => ({
 				productId: item.product.id,
 				quantity: item.quantity
 			}));
+
+			console.log("Calling createOrder API with:", {
+				billing: data.billing,
+				shipping: data.sameAddress ? undefined : data.shipping,
+				payment: {
+					cardNumber: data.payment.cardNumber.substring(0, 4) + "..." // Solo mostrar primeros 4 dígitos
+				},
+				items: orderItems
+			});
 
 			// Crear orden usando la API
 			const order = await createOrder({
@@ -223,25 +292,46 @@ const CheckoutPage: React.FC = () => {
 			// Limpiar carrito
 			clearCart();
 
+			// Limpiar datos guardados en localStorage
+			try {
+				localStorage.removeItem(CHECKOUT_STORAGE_KEY);
+			} catch (error) {
+				console.error("Error al limpiar datos de checkout:", error);
+			}
+
 			// Redireccionar a la página principal después de un breve delay
 			setTimeout(() => {
 				navigate({ to: "/" });
 			}, 2000);
 
 		} catch (error) {
+			console.error("Error en onSubmit:", error);
+			const errorMessage = error instanceof Error ? error.message : 
+				(error instanceof Response ? `HTTP ${error.status}: ${error.statusText}` : 
+				"No se pudo procesar tu pedido. Por favor, inténtalo de nuevo.");
+			
 			toast.error("Error al procesar la compra", {
-				description: error instanceof Error ? error.message : "No se pudo procesar tu pedido. Por favor, inténtalo de nuevo.",
+				description: errorMessage,
 				duration: 5000,
 			});
 		}
 	};
 
-	const handleFormSubmit = () => {
+	const handleFormSubmit = async (e?: React.MouseEvent) => {
+		e?.preventDefault();
+		console.log("handleFormSubmit called");
+		
 		// Forzar validación de todos los campos de pago
-		form.trigger(['payment.cardNumber', 'payment.cardholderName', 'payment.expiryDate', 'payment.cvv']);
+		const isValid = await form.trigger(['payment.cardNumber', 'payment.cardholderName', 'payment.expiryDate', 'payment.cvv']);
+		console.log("Form validation result:", isValid);
 
 		if (validateCurrentStep(2)) {
-			handleSubmit(onSubmit)();
+			console.log("Step 2 validated, calling onSubmit");
+			// Usar handleSubmit que devuelve una función que podemos llamar
+			const submitHandler = handleSubmit(onSubmit);
+			submitHandler();
+		} else {
+			console.log("Step 2 validation failed");
 		}
 	};
 
