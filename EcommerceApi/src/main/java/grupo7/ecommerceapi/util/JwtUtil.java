@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,14 +16,17 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:mySecretKey1234567890123456789012345678901234567890}")
-    private String secret;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    @Value("${jwt.expiration:86400000}") // 24 horas por defecto
+    @Value("${jwt.expiration}")
     private Long expiration;
 
+    /**
+     * Genera la clave secreta a partir de la cadena de configuración
+     */
     private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes();
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -54,6 +58,14 @@ public class JwtUtil {
      */
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    /**
+     * Extrae el username (email en nuestro caso) del token
+     * Alias para extractEmail para compatibilidad
+     */
+    public String extractUsername(String token) {
+        return extractEmail(token);
     }
 
     /**
@@ -120,5 +132,12 @@ public class JwtUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Obtiene el rol del token
+     */
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 }

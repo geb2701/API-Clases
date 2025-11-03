@@ -16,7 +16,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./db/database_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./db/poblar_base_datos_completa.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - ./db/add_role_column.sql:/docker-entrypoint-initdb.d/02-add-role.sql
+      - ./db/poblar_base_datos_completa.sql:/docker-entrypoint-initdb.d/03-data.sql
     networks:
       - ecommerce-network
     healthcheck:

@@ -30,7 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // Si no hay header Authorization o no empieza con "Bearer ", continuar sin autenticación
+        // Si no hay header Authorization o no empieza con "Bearer ", continuar sin
+        // autenticación
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -39,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // Extraer el token (remover "Bearer " del header)
             final String jwt = authHeader.substring(7);
-            
+
             // Validar y extraer información del token
             if (jwtUtil.validateToken(jwt)) {
                 String email = jwtUtil.extractEmail(jwt);
@@ -50,9 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                    );
-                    
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
@@ -65,5 +65,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-
-
