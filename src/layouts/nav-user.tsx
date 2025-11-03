@@ -55,7 +55,7 @@ export function NavUser() {
             sideOffset={4}
           >
             <DropdownMenuItem className="gap-3 px-1" asChild>
-              <Link to="/profile">
+              <Link to="/perfil">
                 <User size={20} className="text-muted-foreground/70" aria-hidden="true" />
                 <span>Perfil</span>
               </Link>
