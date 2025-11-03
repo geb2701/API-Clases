@@ -32,9 +32,24 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        // Verificar si el email ya existe
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("El email ya está registrado");
+        // Normalizar email a lowercase
+        String normalizedEmail = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : null;
+        if (normalizedEmail == null || normalizedEmail.isEmpty()) {
+            throw new RuntimeException("El email es requerido");
+        }
+        user.setEmail(normalizedEmail);
+
+        // Verificar si el email ya existe (case-insensitive)
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            // Intentar obtener el usuario existente para mejor mensaje
+            Optional<User> existingUser = userRepository.findActiveByEmail(normalizedEmail);
+            if (existingUser.isPresent()) {
+                throw new RuntimeException("El email " + existingUser.get().getEmail() + " ya está registrado. " +
+                        "Si es tu cuenta, intenta iniciar sesión. Si olvidaste tu contraseña, usa la opción 'Olvidé mi contraseña'.");
+            } else {
+                // Usuario inactivo o algún otro problema
+                throw new RuntimeException("El email ya está registrado pero no está disponible");
+            }
         }
 
         // Encriptar contraseña

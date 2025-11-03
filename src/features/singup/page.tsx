@@ -12,15 +12,19 @@ export const SignupPage = () => {
     <div className="container mx-auto px-4">
       <SignupComponent
         onSuccess={async (values) => {
-          const ok = await signup(values);
-          if (ok) {
-            toast.success("¡Cuenta creada!", {
-              description: "Tu cuenta ha sido creada exitosamente. Bienvenido!",
-            });
-            router.navigate({ to: "/" });
-          } else {
+          try {
+            const ok = await signup(values);
+            if (ok) {
+              toast.success("¡Cuenta creada!", {
+                description: "Tu cuenta ha sido creada exitosamente. Bienvenido!",
+              });
+              router.navigate({ to: "/" });
+            }
+          } catch (error) {
+            console.error("Error en signup:", error);
+            const errorMessage = error instanceof Error ? error.message : "Error desconocido";
             toast.error("Error al registrarse", {
-              description: "Ya existe un usuario con ese email. Intenta con otro.",
+              description: errorMessage || "No se pudo crear la cuenta. Verifica que el email no esté en uso y que todos los campos sean correctos.",
             });
           }
         }}

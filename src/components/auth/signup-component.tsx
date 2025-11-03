@@ -59,8 +59,11 @@ export const SignupComponent = ({ onSuccess }: Props) => {
     setError(null)
     setSubmitting(true)
     try {
-      await new Promise((r) => setTimeout(r, 600)) // simulación
-      onSuccess?.(values)
+      // Llamar al callback onSuccess que manejará la llamada a la API
+      await onSuccess?.(values)
+    } catch (error) {
+      // Si hay un error, lo mostramos en el componente
+      setError(error instanceof Error ? error.message : "Error al registrarse")
     } finally {
       setSubmitting(false)
     }

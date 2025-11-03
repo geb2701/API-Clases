@@ -2,6 +2,7 @@ package grupo7.ecommerceapi.controller;
 
 import grupo7.ecommerceapi.entity.User;
 import grupo7.ecommerceapi.service.UserService;
+import grupo7.ecommerceapi.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class AuthController {
 
   private final UserService userService;
+  private final JwtUtil jwtUtil;
 
   /**
    * POST /api/auth/register - Registrar nuevo usuario
@@ -24,14 +26,27 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
     try {
+      // Normalizar email a lowercase
+      String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
+
+      if (normalizedEmail == null || normalizedEmail.isEmpty()) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("success", false);
+        errorResponse.put("message", "El email es requerido");
+        return ResponseEntity.badRequest().body(errorResponse);
+      }
+
       // Crear usuario
       User user = new User();
       user.setName(request.getName());
       user.setSurname(request.getSurname());
-      user.setEmail(request.getEmail());
+      user.setEmail(normalizedEmail);
       user.setPassword(request.getPassword());
 
       User createdUser = userService.createUser(user);
+
+      // Generar token JWT
+      String token = jwtUtil.generateToken(createdUser.getId(), createdUser.getEmail());
 
       // Preparar respuesta
       Map<String, Object> response = new HashMap<>();
@@ -44,6 +59,7 @@ public class AuthController {
       userResponse.put("email", createdUser.getEmail());
 
       response.put("user", userResponse);
+      response.put("token", token);
       response.put("message", "Usuario registrado exitosamente");
 
       return ResponseEntity.ok(response);
@@ -62,10 +78,23 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
     try {
-      Optional<User> userOpt = userService.login(request.getEmail(), request.getPassword());
+      // Normalizar email a lowercase para comparación case-insensitive
+      String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
+
+      if (normalizedEmail == null || normalizedEmail.isEmpty()) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("success", false);
+        errorResponse.put("message", "El email es requerido");
+        return ResponseEntity.badRequest().body(errorResponse);
+      }
+
+      Optional<User> userOpt = userService.login(normalizedEmail, request.getPassword());
 
       if (userOpt.isPresent()) {
         User user = userOpt.get();
+
+        // Generar token JWT
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -77,6 +106,7 @@ public class AuthController {
         userResponse.put("email", user.getEmail());
 
         response.put("user", userResponse);
+        response.put("token", token);
         response.put("message", "Login exitoso");
 
         return ResponseEntity.ok(response);
@@ -111,10 +141,23 @@ public class AuthController {
    * GET /api/auth/check-email/{email} - Verificar si un email existe
    */
   @GetMapping("/check-email/{email}")
-  public ResponseEntity<Map<String, Boolean>> checkEmail(@PathVariable String email) {
-    boolean exists = userService.existsByEmail(email);
-    Map<String, Boolean> response = new HashMap<>();
+  public ResponseEntity<Map<String, Object>> checkEmail(@PathVariable String email) {
+    String normalizedEmail = email != null ? email.trim().toLowerCase() : null;
+    boolean exists = normalizedEmail != null ? userService.existsByEmail(normalizedEmail) : false;
+
+    Map<String, Object> response = new HashMap<>();
     response.put("exists", exists);
+    if (exists) {
+      // Intentar obtener el email real que existe
+      Optional<User> userOpt = userService.getUserByEmail(normalizedEmail);
+      if (userOpt.isPresent()) {
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("id", userOpt.get().getId());
+        userInfo.put("email", userOpt.get().getEmail());
+        userInfo.put("name", userOpt.get().getName());
+        response.put("user", userInfo);
+      }
+    }
     return ResponseEntity.ok(response);
   }
 
@@ -181,4 +224,3 @@ public class AuthController {
     }
   }
 }
-

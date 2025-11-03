@@ -1,8 +1,7 @@
 package grupo7.ecommerceapi.service;
 
 import grupo7.ecommerceapi.entity.*;
-import grupo7.ecommerceapi.repository.OrderRepository;
-import grupo7.ecommerceapi.repository.OrderItemRepository;
+import grupo7.ecommerceapi.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +19,9 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    // TODO: Re-enable when Cart feature is implemented
-    // private final CartService cartService;
+    private final BillingAddressRepository billingAddressRepository;
+    private final ShippingAddressRepository shippingAddressRepository;
+    private final PaymentInfoRepository paymentInfoRepository;
     private final ProductService productService;
 
     public List<Order> getOrdersByUserId(Long userId) {
@@ -115,6 +115,114 @@ public class OrderService {
 
     public List<Order> getOrdersByStatus(Order.OrderStatus status) {
         return orderRepository.findByStatus(status);
+    }
+
+    /**
+     * Crea una orden desde los datos del checkout
+     */
+    public Order createOrder(User user, BillingAddress billingAddress, ShippingAddress shippingAddress,
+            PaymentInfo paymentInfo, List<OrderItemRequest> items) {
+        // Validar stock de productos
+        for (OrderItemRequest itemRequest : items) {
+            Optional<Product> productOpt = productService.getProductById(itemRequest.getProductId());
+            if (productOpt.isEmpty()) {
+                throw new RuntimeException("Producto con ID " + itemRequest.getProductId() + " no encontrado");
+            }
+            Product product = productOpt.get();
+            if (product.getStock() < itemRequest.getQuantity()) {
+                throw new RuntimeException("Stock insuficiente para el producto: " + product.getName());
+            }
+        }
+
+        // Crear la orden
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderNumber(generateOrderNumber());
+        order.setStatus(Order.OrderStatus.PENDING);
+
+        // Calcular total
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (OrderItemRequest itemRequest : items) {
+            Product product = productService.getProductById(itemRequest.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+            BigDecimal actualPrice = product.getDiscount() != null
+                    && product.getDiscount().compareTo(BigDecimal.ZERO) > 0
+                            ? product.getPrice().subtract(product.getDiscount())
+                            : product.getPrice();
+
+            totalAmount = totalAmount.add(actualPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
+        }
+        order.setTotalAmount(totalAmount);
+
+        // Guardar orden
+        Order savedOrder = orderRepository.save(order);
+
+        // Crear items de la orden y actualizar stock
+        for (OrderItemRequest itemRequest : items) {
+            Product product = productService.getProductById(itemRequest.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+            BigDecimal actualPrice = product.getDiscount() != null
+                    && product.getDiscount().compareTo(BigDecimal.ZERO) > 0
+                            ? product.getPrice().subtract(product.getDiscount())
+                            : product.getPrice();
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(savedOrder);
+            orderItem.setProduct(product);
+            orderItem.setQuantity(itemRequest.getQuantity());
+            orderItem.setUnitPrice(actualPrice);
+            orderItem.setTotalPrice(actualPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
+
+            orderItemRepository.save(orderItem);
+
+            // Actualizar stock
+            product.setStock(product.getStock() - itemRequest.getQuantity());
+            productService.updateProduct(product.getId(), product);
+        }
+
+        // Crear direcciones y pago
+        if (billingAddress != null) {
+            billingAddress.setUser(user);
+            billingAddress.setOrder(savedOrder);
+            billingAddressRepository.save(billingAddress);
+        }
+
+        if (shippingAddress != null) {
+            shippingAddress.setUser(user);
+            shippingAddress.setOrder(savedOrder);
+            shippingAddressRepository.save(shippingAddress);
+        }
+
+        if (paymentInfo != null) {
+            paymentInfo.setOrder(savedOrder);
+            paymentInfoRepository.save(paymentInfo);
+        }
+
+        return savedOrder;
+    }
+
+    // Clase interna para request de items
+    public static class OrderItemRequest {
+        private Long productId;
+        private Integer quantity;
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Long productId) {
+            this.productId = productId;
+        }
+
+        public Integer getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(Integer quantity) {
+            this.quantity = quantity;
+        }
     }
 
     private String generateOrderNumber() {
