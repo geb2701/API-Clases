@@ -40,8 +40,7 @@ export default function EditProduct() {
   const { invalidateKeys } = api;
   const mockProducts = useSuspenseQuery(api.queryOptions.all()).data;
   const categoriesApi = useCategories();
-  const categoriesData = useSuspenseQuery(categoriesApi.queryOptions.all()).data;
-  const categories = categoriesData.map((cat) => cat.name).sort();
+  const categories = useSuspenseQuery(categoriesApi.queryOptions.all()).data;
   const { productId } = useParams({ from: "/gestionar/editar/$productId" });
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -81,7 +80,7 @@ export default function EditProduct() {
           name: foundProduct.name,
           description: foundProduct.description,
           price: foundProduct.price,
-          category: foundProduct.category,
+          category: String(foundProduct.category?.id ?? ""),
           image: foundProduct.image,
           stock: foundProduct.stock,
           discount: foundProduct.discount,
@@ -179,7 +178,7 @@ export default function EditProduct() {
         name: data.name,
         description: data.description,
         price: data.price,
-        category: data.category,
+        category: { id: Number(data.category) },
         image: data.image,
         stock: data.stock,
         discount: data.discount,
@@ -215,7 +214,7 @@ export default function EditProduct() {
         name: product.name,
         description: product.description,
         price: product.price,
-        category: product.category.name,
+        category: String(product.category.id),
         image: product.image,
         stock: product.stock,
         discount: product.discount,
@@ -345,14 +344,14 @@ export default function EditProduct() {
 
             <div className="space-y-2">
               <Label htmlFor="category">Categoría *</Label>
-              <Select onValueChange={(value) => setValue("category", value)} defaultValue={product.category.name}>
+              <Select onValueChange={(value) => setValue("category", value)} defaultValue={String(product.category.id)}>
                 <SelectTrigger className={errors.category ? "border-destructive" : ""}>
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={String(cat.id)}>
+                      {cat.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -472,7 +471,11 @@ export default function EditProduct() {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Categoría: {watch("category") || "Sin categoría"}
+                        {(() => {
+                          const selectedId = watch("category");
+                          const current = categories.find((c: any) => String(c.id) === String(selectedId));
+                          return `Categoría: ${current?.name ?? "Sin categoría"}`;
+                        })()}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Stock: {watch("stock") || 0} unidades

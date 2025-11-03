@@ -240,6 +240,34 @@ const CheckoutPage: React.FC = () => {
 	const onSubmit = async (data: CheckoutData) => {
 		console.log("onSubmit called with data:", data);
 
+		// Verificaciones explícitas solicitadas
+		try {
+			const itemsForOrder = items.map(item => ({
+				productId: Number(item.product.id),
+				quantity: Number(item.quantity)
+			}));
+			console.log('=== DATOS DE ORDEN ===');
+			console.log('Items:', JSON.stringify(itemsForOrder, null, 2));
+			const legacyToken = localStorage.getItem('token');
+			console.log('Token:', legacyToken ? 'Presente' : 'FALTA');
+			try {
+				const authStoreRaw = localStorage.getItem('auth-store');
+				const parsed = authStoreRaw ? JSON.parse(authStoreRaw) : null;
+				console.log('Token (auth-store):', parsed?.state?.token ? 'Presente' : 'FALTA');
+			} catch {}
+			console.log('Payload completo (previo):', JSON.stringify({
+				billing: data.billing,
+				shipping: data.sameAddress ? undefined : data.shipping,
+				payment: {
+					cardNumber: data.payment.cardNumber ? `${data.payment.cardNumber.slice(0,4)}...` : '' ,
+					expiryDate: data.payment.expiryDate,
+					cvv: data.payment.cvv ? '***' : '',
+					cardholderName: data.payment.cardholderName
+				},
+				items: itemsForOrder
+			}, null, 2));
+		} catch {}
+
 		// Verificar autenticación
 		if (!isLogged) {
 			toast.error("Debes iniciar sesión", {
@@ -253,8 +281,8 @@ const CheckoutPage: React.FC = () => {
 		try {
 			// Preparar items de la orden
 			const orderItems = items.map(item => ({
-				productId: item.product.id,
-				quantity: item.quantity
+				productId: Number(item.product.id),
+				quantity: Number(item.quantity)
 			}));
 
 			console.log("Calling createOrder API with:", {

@@ -74,7 +74,27 @@ export interface AddressResponse {
  * Crear una nueva orden
  */
 export const createOrder = async (orderData: CreateOrderRequest): Promise<OrderResponse> => {
-  console.log("createOrder API call - Request:", orderData);
+  console.log("=== DATOS DE ORDEN ===");
+  try {
+    console.log('Items:', JSON.stringify(orderData.items, null, 2));
+  } catch {}
+  try {
+    // Compat: muchos proyectos guardan token plano en 'token', este proyecto usa 'auth-store'
+    const legacyToken = localStorage.getItem('token');
+    const authStoreRaw = localStorage.getItem('auth-store');
+    let jwtFromStore: string | null = null;
+    if (authStoreRaw) {
+      try {
+        const parsed = JSON.parse(authStoreRaw);
+        jwtFromStore = parsed?.state?.token ?? null;
+      } catch {}
+    }
+    console.log('Token:', legacyToken ? 'Presente' : 'FALTA');
+    console.log('Token (auth-store):', jwtFromStore ? 'Presente' : 'FALTA');
+  } catch {}
+  try {
+    console.log('Payload completo:', JSON.stringify(orderData, null, 2));
+  } catch {}
   try {
     const response = await apiClient.post('orders', {
       json: orderData

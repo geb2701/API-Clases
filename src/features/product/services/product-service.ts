@@ -113,7 +113,7 @@ export interface UpdateProductRequest {
   name: string;
   description: string;
   price: number;
-  category: string;
+  category: { id: number };
   image: string;
   stock: number;
   discount?: number;
