@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import ImageLazy from "@/components/image-lazy";
+import { Link } from "@tanstack/react-router";
 import {
 	User as UserIcon,
 	Mail,
@@ -288,9 +289,19 @@ const ProfilePage: React.FC = () => {
 																		)}
 																	</div>
 																	<div className="flex-1 min-w-0">
-																		<h5 className="font-medium text-sm line-clamp-1">
-																			{item.product?.name || "Producto"}
-																		</h5>
+																		{item.product?.id ? (
+																			<Link
+																				to="/productos/$id"
+																				params={{ id: String(item.product.id) }}
+																				className="font-medium text-sm line-clamp-1 text-blue-600 hover:underline"
+																			>
+																				{item.product?.name || "Producto"}
+																			</Link>
+																		) : (
+																			<h5 className="font-medium text-sm line-clamp-1">
+																				{item.product?.name || "Producto"}
+																			</h5>
+																		)}
 																		<div className="flex items-center justify-between mt-1">
 																			<span className="text-xs text-muted-foreground">
 																				Cantidad: {item.quantity}

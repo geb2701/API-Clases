@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
 import React from "react";
 import { useCartContext } from "@/context/cart-context";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -124,9 +124,14 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ className }) => {
                       <div className="flex flex-1 flex-col gap-2">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h4 className="text-sm font-medium leading-tight">
+                            <Link
+                              to="/productos/$id"
+                              params={{ id: String(item.product.id) }}
+                              className="text-sm font-medium leading-tight text-blue-600 hover:underline"
+                              onClick={() => closeCart()}
+                            >
                               {item.product.name}
-                            </h4>
+                            </Link>
                             <p className="text-xs text-muted-foreground">
                               {item.product.category.name}
                             </p>

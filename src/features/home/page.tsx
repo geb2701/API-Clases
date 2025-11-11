@@ -62,7 +62,9 @@ const HomePage = () => {
 
   // Productos con descuento
   const discountedProducts = React.useMemo(() => {
-    return products.filter((product) => product.hasDiscount());
+    return products.filter(
+      (product) => product.hasDiscount() && product.discount !== undefined
+    );
   }, [products]);
 
   const filtered = React.useMemo(() => {
@@ -112,10 +114,18 @@ const HomePage = () => {
       return acc;
     }, {} as Record<string, typeof discountedProducts>);
 
-    return Object.entries(grouped).map(([category, categoryProducts]) => ({
-      category,
-      products: categoryProducts.slice(0, 3), // Top 3 por categoría
-    }));
+    return Object.entries(grouped)
+      .map(([category, categoryProducts]) => {
+        const sortedByDiscount = [...categoryProducts].sort((a, b) => {
+          return b.getDiscountPercentage() - a.getDiscountPercentage();
+        });
+        return {
+          category,
+          products: sortedByDiscount.slice(0, 3), // Top 3 por categoría con mayor descuento
+          topDiscount: sortedByDiscount[0]?.getDiscountPercentage() ?? 0,
+        };
+      })
+      .filter((entry) => entry.products.length > 0);
   }, [discountedProducts]);
 
   React.useEffect(() => {
@@ -282,9 +292,19 @@ const HomePage = () => {
           <Zap className="h-6 w-6 text-orange-500" />
           <h2 className="text-2xl font-bold">Ofertas</h2>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {productsByCategory.map(
-            ({ category, products: categoryProducts }) => (
+        {productsByCategory.length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="py-6 flex flex-col items-center gap-2 text-center text-muted-foreground">
+              <Zap className="h-8 w-8" />
+              <p className="text-sm font-medium">
+                Aún no hay productos en oferta. Vuelve pronto para descubrir los mejores descuentos.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {productsByCategory.map(
+              ({ category, products: categoryProducts, topDiscount }) => (
               <Card key={category} className="overflow-hidden">
                 <div className="bg-gradient-to-r from-orange-500 to-red-500 p-4 text-white">
                   <div className="flex items-center justify-between">
@@ -293,7 +313,7 @@ const HomePage = () => {
                       variant="secondary"
                       className="bg-white text-orange-600"
                     >
-                      -{categoryProducts[0]?.getDiscountPercentage() || 0}%
+                        -{topDiscount}%
                     </Badge>
                   </div>
                   <p className="text-sm opacity-90 mt-1">Oferta limitada</p>
@@ -316,9 +336,13 @@ const HomePage = () => {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
+                          <Link
+                            to="/productos/$id"
+                            params={{ id: String(product.id) }}
+                            className="text-sm font-medium truncate text-blue-600 hover:underline"
+                          >
                             {product.name}
-                          </p>
+                          </Link>
                           <div className="flex items-center gap-2">
                             <span className="text-sm text-muted-foreground line-through">
                               {product.getFormattedPrice()}
@@ -328,21 +352,38 @@ const HomePage = () => {
                             </span>
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          onClick={() => addToCart(product)}
-                          className="shrink-0"
-                        >
-                          <ShoppingCart className="w-3 h-3" />
-                        </Button>
+                        <div className="flex flex-col gap-2 shrink-0">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            asChild
+                            className="whitespace-nowrap"
+                          >
+                            <Link
+                              to="/productos/$id"
+                              params={{ id: String(product.id) }}
+                            >
+                              Ver producto
+                            </Link>
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => addToCart(product)}
+                            className="shrink-0"
+                            disabled={product.stock === 0}
+                          >
+                            <ShoppingCart className="w-3 h-3" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
-            )
-          )}
-        </div>
+              )
+            )}
+          </div>
+        )}
       </section>
 
       {/* Anuncio de Oferta del Día */}

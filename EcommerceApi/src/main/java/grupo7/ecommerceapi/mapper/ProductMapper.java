@@ -1,8 +1,10 @@
 package grupo7.ecommerceapi.mapper;
 
+import grupo7.ecommerceapi.dto.CategorySummaryDTO;
 import grupo7.ecommerceapi.dto.ProductResponseDTO;
 import grupo7.ecommerceapi.dto.ProductStockResponseDTO;
 import grupo7.ecommerceapi.dto.ProductSummaryDTO;
+import grupo7.ecommerceapi.entity.Category;
 import grupo7.ecommerceapi.entity.Product;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +15,6 @@ public class ProductMapper {
         if (product == null) {
             return null;
         }
-
         return ProductResponseDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -23,10 +24,12 @@ public class ProductMapper {
                 .actualPrice(product.getActualPrice())
                 .image(product.getImage())
                 .stock(product.getStock())
-                .hasDiscount(product.hasDiscount())
-                .active(product.getIsActive())
-                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
-                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
+                .hasActiveDiscount(product.hasDiscount())
+                .isActive(product.getIsActive())
+                .category(mapCategory(product.getCategory()))
+                .discountPercentage(product.getDiscountPercentage())
+                .formattedPrice(product.getFormattedPrice())
+                .formattedActualPrice(product.getFormattedActualPrice())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .build();
@@ -36,13 +39,24 @@ public class ProductMapper {
         if (product == null) {
             return null;
         }
-        return new ProductSummaryDTO(
-                product.getId(),
-                product.getName(),
-                product.getImage(),
-                product.getPrice(),
-                product.getDiscount()
-        );
+        return ProductSummaryDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .discount(product.getDiscount())
+                .actualPrice(product.getActualPrice())
+                .image(product.getImage())
+                .stock(product.getStock())
+                .hasActiveDiscount(product.hasDiscount())
+                .isActive(product.getIsActive())
+                .category(mapCategory(product.getCategory()))
+                .discountPercentage(product.getDiscountPercentage())
+                .formattedPrice(product.getFormattedPrice())
+                .formattedActualPrice(product.getFormattedActualPrice())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
+                .build();
     }
 
     public ProductStockResponseDTO toStock(Product product) {
@@ -51,6 +65,18 @@ public class ProductMapper {
         }
         return new ProductStockResponseDTO(product.getId(), product.getStock());
     }
+
+    private CategorySummaryDTO mapCategory(Category category) {
+        if (category == null) {
+            return null;
+        }
+        return CategorySummaryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .isActive(category.getIsActive())
+                .createdAt(category.getCreatedAt())
+                .updatedAt(category.getUpdatedAt())
+                .build();
+    }
 }
-
-

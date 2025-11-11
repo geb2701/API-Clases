@@ -21,12 +21,12 @@ public class ProductResponseDTO {
     private BigDecimal actualPrice;
     private String image;
     private Integer stock;
-    private Boolean hasDiscount;
-    private Boolean active;
-    private Long categoryId;
-    private String categoryName;
+    private Boolean hasActiveDiscount;
+    private Boolean isActive;
+    private CategorySummaryDTO category;
+    private BigDecimal discountPercentage;
+    private String formattedPrice;
+    private String formattedActualPrice;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-
-

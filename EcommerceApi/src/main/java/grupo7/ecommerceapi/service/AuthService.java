@@ -82,6 +82,7 @@ public class AuthService {
 
     private AuthResponseDTO buildAuthResponse(User user, String token, String message) {
         return AuthResponseDTO.builder()
+                .success(true)
                 .user(authMapper.toAuthUser(user))
                 .token(token)
                 .message(message)

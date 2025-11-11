@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
 import { useCartContext } from "@/context/cart-context";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuthContext } from "@/context/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -998,7 +998,13 @@ const CheckoutPage: React.FC = () => {
 												</div>
 												<div className="flex-1 min-w-0">
 													<h4 className="text-xs font-medium line-clamp-1 mb-1">
-														{item.product.name}
+														<Link
+															to="/productos/$id"
+															params={{ id: String(item.product.id) }}
+															className="text-blue-600 hover:underline"
+														>
+															{item.product.name}
+														</Link>
 													</h4>
 													<div className="space-y-0.5">
 														<div className="flex items-center justify-between text-xs text-muted-foreground">
