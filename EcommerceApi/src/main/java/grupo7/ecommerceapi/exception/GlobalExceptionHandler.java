@@ -53,6 +53,60 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Maneja excepciones de email duplicado
+   */
+  @ExceptionHandler(EmailAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(
+      EmailAlreadyExistsException ex,
+      WebRequest request) {
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        LocalDateTime.now(),
+        HttpStatus.CONFLICT.value(),
+        "Conflict",
+        ex.getMessage(),
+        request.getDescription(false).replace("uri=", ""));
+
+    return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+  }
+
+  /**
+   * Maneja credenciales inválidas
+   */
+  @ExceptionHandler(InvalidCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(
+      InvalidCredentialsException ex,
+      WebRequest request) {
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        LocalDateTime.now(),
+        HttpStatus.UNAUTHORIZED.value(),
+        "Unauthorized",
+        ex.getMessage(),
+        request.getDescription(false).replace("uri=", ""));
+
+    return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+  }
+
+  /**
+   * Maneja excepciones de stock insuficiente
+   */
+  @ExceptionHandler(InsufficientStockException.class)
+  public ResponseEntity<ErrorResponse> handleInsufficientStockException(
+      InsufficientStockException ex,
+      WebRequest request) {
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        LocalDateTime.now(),
+        HttpStatus.BAD_REQUEST.value(),
+        "Bad Request",
+        ex.getMessage(),
+        request.getDescription(false).replace("uri=", ""));
+
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
    * Maneja excepciones de validación
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -4,6 +4,7 @@ import grupo7.ecommerceapi.dto.CreateProductRequest;
 import grupo7.ecommerceapi.entity.Category;
 import grupo7.ecommerceapi.entity.Product;
 import grupo7.ecommerceapi.entity.User;
+import grupo7.ecommerceapi.exception.ResourceNotFoundException;
 import grupo7.ecommerceapi.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,72 +28,80 @@ public class ProductService {
     public Page<Product> getAllProducts(Pageable pageable) {
         Page<Product> products = productRepository.findAllActive(pageable);
         // Forzar carga de categorías para evitar problemas de serialización
-        // Acceder a todos los campos necesarios dentro de la transacción
-        products.getContent().forEach(product -> {
-            if (product.getCategory() != null) {
-                Category cat = product.getCategory();
-                cat.getId();
-                cat.getName();
-                cat.getDescription();
-                cat.getIsActive();
-            }
-        });
+        products.getContent().forEach(this::ensureCategoryLoaded);
         return products;
     }
 
+    @Transactional(readOnly = true)
     public Optional<Product> getProductById(Long id) {
         return productRepository.findActiveById(id);
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> getProductsByCategory(String categoryName, Pageable pageable) {
-        return productRepository.findByCategoryNameAndActiveTrue(categoryName, pageable);
+        Page<Product> products = productRepository.findByCategoryNameAndActiveTrue(categoryName, pageable);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> searchProducts(String searchTerm, Pageable pageable) {
-        return productRepository.findBySearchTermAndActiveTrue(searchTerm, pageable);
+        Page<Product> products = productRepository.findBySearchTermAndActiveTrue(searchTerm, pageable);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> getProductsByCategoryAndSearch(String categoryName, String searchTerm, Pageable pageable) {
-        return productRepository.findByCategoryAndSearchTerm(categoryName, searchTerm, pageable);
+        Page<Product> products = productRepository.findByCategoryAndSearchTerm(categoryName, searchTerm, pageable);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> getDiscountedProducts(Pageable pageable) {
-        return productRepository.findDiscountedProducts(pageable);
+        Page<Product> products = productRepository.findDiscountedProducts(pageable);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-        return productRepository.findByPriceRangeAndActiveTrue(minPrice, maxPrice, pageable);
+        Page<Product> products = productRepository.findByPriceRangeAndActiveTrue(minPrice, maxPrice, pageable);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> getProductsByUserId(Long userId, Pageable pageable) {
-        return productRepository.findByCreatedByIdAndActiveTrue(userId, pageable);
+        Page<Product> products = productRepository.findByCreatedByIdAndActiveTrue(userId, pageable);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> getProductsSortedByName(String direction, Pageable pageable) {
-        return "desc".equalsIgnoreCase(direction)
+        Page<Product> products = "desc".equalsIgnoreCase(direction)
                 ? productRepository.findAllActiveOrderByNameDesc(pageable)
                 : productRepository.findAllActiveOrderByNameAsc(pageable);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> getProductsSortedByPrice(String direction, Pageable pageable) {
-        return "desc".equalsIgnoreCase(direction)
+        Page<Product> products = "desc".equalsIgnoreCase(direction)
                 ? productRepository.findAllActiveOrderByPriceDesc(pageable)
                 : productRepository.findAllActiveOrderByPriceAsc(pageable);
-    }
-
-    @Transactional
-    public Product createProduct(Product product, User user) {
-        product.setCreatedBy(user);
-        return productRepository.save(product);
+        products.getContent().forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
     @Transactional
     public Product createProduct(CreateProductRequest request, User user) {
-        // Buscar la categoría por nombre
         Category category = categoryService.getCategoryByName(request.getCategory())
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada: " + request.getCategory()));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + request.getCategory()));
 
-        // Crear el producto
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -108,51 +117,66 @@ public class ProductService {
     }
 
     @Transactional
-    public Optional<Product> updateProduct(Long id, Product productDetails) {
-        return productRepository.findActiveById(id)
-                .map(existingProduct -> {
-                    existingProduct.setName(productDetails.getName());
-                    existingProduct.setDescription(productDetails.getDescription());
-                    existingProduct.setPrice(productDetails.getPrice());
-                    existingProduct.setCategory(productDetails.getCategory());
-                    existingProduct.setImage(productDetails.getImage());
-                    existingProduct.setStock(productDetails.getStock());
-                    existingProduct.setDiscount(productDetails.getDiscount());
-                    return productRepository.save(existingProduct);
-                });
+    public Product updateProduct(Long id, CreateProductRequest request) {
+        Product product = productRepository.findActiveById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
+
+        Category category = categoryService.getCategoryByName(request.getCategory())
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + request.getCategory()));
+
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setCategory(category);
+        product.setImage(request.getImage());
+        product.setStock(request.getStock());
+        product.setDiscount(request.getDiscount());
+
+        return productRepository.save(product);
     }
 
     @Transactional
-    public boolean deleteProduct(Long id) {
-        return productRepository.findActiveById(id)
-                .map(product -> {
-                    product.setIsActive(false);
-                    productRepository.save(product);
-                    return true;
-                })
-                .orElse(false);
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findActiveById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
+
+        product.setIsActive(false);
+        productRepository.save(product);
     }
 
-    public Optional<Integer> getProductStock(Long productId) {
-        return productRepository.findStockById(productId);
+    @Transactional(readOnly = true)
+    public int getProductStock(Long productId) {
+        return productRepository.findStockById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productId));
     }
 
+    @Transactional(readOnly = true)
     public List<Product> getLowStockProducts(Integer threshold) {
-        return productRepository.findLowStockProducts(threshold);
+        List<Product> products = productRepository.findLowStockProducts(threshold);
+        products.forEach(this::ensureCategoryLoaded);
+        return products;
     }
 
     @Transactional
-    public boolean updateStock(Long productId, Integer quantity) {
-        return productRepository.findActiveById(productId)
-                .map(product -> {
-                    int newStock = product.getStock() + quantity; // Permite valores negativos para descontar
-                    if (newStock < 0) {
-                        return false; // No permitir stock negativo
-                    }
-                    product.setStock(newStock);
-                    productRepository.save(product);
-                    return true;
-                })
-                .orElse(false);
+    public void adjustStock(Long productId, int delta) {
+        Product product = productRepository.findActiveById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productId));
+
+        int newStock = product.getStock() + delta;
+        if (newStock < 0) {
+            throw new IllegalArgumentException("La operación de stock dejaría el producto con stock negativo");
+        }
+        product.setStock(newStock);
+        productRepository.save(product);
+    }
+
+    private void ensureCategoryLoaded(Product product) {
+        if (product != null && product.getCategory() != null) {
+            Category category = product.getCategory();
+            category.getId();
+            category.getName();
+            category.getDescription();
+            category.getIsActive();
+        }
     }
 }
