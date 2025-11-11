@@ -152,6 +152,3 @@ class AuthServiceTest {
     }
 }
 
-package grupo7.ecommerceapi.service;
-
-

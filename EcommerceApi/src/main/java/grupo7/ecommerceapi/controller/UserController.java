@@ -46,7 +46,7 @@ public class UserController {
             System.out.println(
                     "DEBUG: Usuario autenticado encontrado: " + user.getEmail() + " (ID: " + user.getId() + ")");
 
-            List<OrderResponseDTO> orders = orderService.getOrdersByUserIdAsDTO(user.getId());
+            List<OrderResponseDTO> orders = orderService.getOrdersByUserId(user.getId());
             System.out.println("DEBUG: Se encontraron " + orders.size() + " órdenes para el usuario");
 
             return ResponseEntity.ok(orders);
