@@ -1,6 +1,7 @@
 package grupo7.ecommerceapi.service;
 
 import grupo7.ecommerceapi.entity.User;
+import grupo7.ecommerceapi.exception.EmailAlreadyExistsException;
 import grupo7.ecommerceapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +36,7 @@ public class UserService {
         // Normalizar email a lowercase
         String normalizedEmail = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : null;
         if (normalizedEmail == null || normalizedEmail.isEmpty()) {
-            throw new RuntimeException("El email es requerido");
+            throw new IllegalArgumentException("El email es requerido");
         }
         user.setEmail(normalizedEmail);
 
@@ -44,11 +45,11 @@ public class UserService {
             // Intentar obtener el usuario existente para mejor mensaje
             Optional<User> existingUser = userRepository.findActiveByEmail(normalizedEmail);
             if (existingUser.isPresent()) {
-                throw new RuntimeException("El email " + existingUser.get().getEmail() + " ya está registrado. " +
+                throw new EmailAlreadyExistsException("El email " + existingUser.get().getEmail() + " ya está registrado. " +
                         "Si es tu cuenta, intenta iniciar sesión. Si olvidaste tu contraseña, usa la opción 'Olvidé mi contraseña'.");
             } else {
                 // Usuario inactivo o algún otro problema
-                throw new RuntimeException("El email ya está registrado pero no está disponible");
+                throw new EmailAlreadyExistsException("El email ya está registrado pero no está disponible");
             }
         }
 
